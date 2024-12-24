@@ -11,8 +11,10 @@ import {
 import axios from "axios";
 import { useState, useEffect } from "react";
 import GeneratePost from "../global/generate-post";
+import Image from "next/image";
 
-const BACKEND_URI = process.env.NEXT_PUBLIC_BACKEND_URI || "https://api.bot.thesquirrel.site";
+const BACKEND_URI =
+  process.env.NEXT_PUBLIC_BACKEND_URI || "https://api.bot.thesquirrel.site";
 
 type Post = {
   _id: string;
@@ -32,7 +34,7 @@ const LinkedinTable = () => {
   const fetchPosts = async () => {
     try {
       const token = localStorage.getItem("adminToken");
-      
+
       if (!token) {
         throw new Error("No authentication token found");
       }
@@ -45,19 +47,19 @@ const LinkedinTable = () => {
           },
         }
       );
-      
+
       if (response.data?.success && Array.isArray(response.data?.posts)) {
         setPosts(response.data.posts);
       } else {
         throw new Error("Invalid response format");
       }
-      
+
       setLoading(false);
     } catch (err) {
       console.error("Error fetching posts:", err);
       setError(
-        err instanceof Error 
-          ? err.message 
+        err instanceof Error
+          ? err.message
           : "Failed to fetch posts. Please try again later."
       );
       setLoading(false);
@@ -86,7 +88,7 @@ const LinkedinTable = () => {
 
   return (
     <div className="w-full">
-      <GeneratePost type="linkedin" fetchPosts={fetchPosts}/>
+      <GeneratePost type="linkedin" fetchPosts={fetchPosts} />
       <Table className="border mt-10 border-muted rounded-md">
         <TableHeader>
           <TableRow>
@@ -102,9 +104,11 @@ const LinkedinTable = () => {
             <TableRow key={post._id}>
               <TableCell>
                 {post.img || post.imageData ? (
-                  <img
+                  <Image
                     src={post.imageData || post.img}
                     alt="Post"
+                    width={1000}
+                    height={1000}
                     className="w-12 h-12 object-cover rounded-md"
                   />
                 ) : (
@@ -118,11 +122,11 @@ const LinkedinTable = () => {
               </TableCell>
               <TableCell>
                 {new Date(post.createdAt).toLocaleDateString("en-US", {
-                  year: 'numeric',
-                  month: 'short',
-                  day: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit'
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
                 })}
               </TableCell>
               <TableCell>
@@ -139,11 +143,11 @@ const LinkedinTable = () => {
               <TableCell>
                 {post.tobePublishedAt
                   ? new Date(post.tobePublishedAt).toLocaleDateString("en-US", {
-                      year: 'numeric',
-                      month: 'short',
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit'
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
                     })
                   : "Not scheduled"}
               </TableCell>

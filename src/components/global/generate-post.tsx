@@ -42,9 +42,9 @@ const GeneratePost: React.FC<GeneratePostProps> = ({ type, fetchPosts }) => {
     } catch (error) {
       console.error("Error generating post:", error);
 
-      const errorMessage = axios.isAxiosError(error)
-        ? error.response?.data?.message || error.message
-        : "Failed to generate post";
+      // const errorMessage = axios.isAxiosError(error)
+      //   ? error.response?.data?.message || error.message
+      //   : "Failed to generate post";
     } finally {
       setLoading(false);
     }
