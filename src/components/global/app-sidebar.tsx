@@ -9,7 +9,9 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarHeader,
+  SidebarFooter,
 } from "@/components/ui/sidebar";
+import Logout from "./log-out";
 
 // Menu items.
 const items = [
@@ -54,6 +56,9 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter>
+        <Logout />
+      </SidebarFooter>
     </Sidebar>
   );
 }

@@ -34,6 +34,7 @@ const PostTable = () => {
       const token = localStorage.getItem("adminToken");
       
       if (!token) {
+        window.location.href = "/";
         throw new Error("No authentication token found");
       }
 
