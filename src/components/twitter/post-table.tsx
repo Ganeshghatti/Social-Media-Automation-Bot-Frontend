@@ -98,12 +98,12 @@ const PostTable = () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {posts.map((post) => (
-            <TableRow key={post._id}>
+          {posts?.map((post) => (
+            <TableRow key={post?._id}>
               <TableCell>
-                {post.img || post.imageData ? (
+                {post?.img || post?.imageData ? (
                   <Image
-                    src={post.imageData || post.img}
+                    src={post?.imageData || post?.img}
                     alt="Post"
                     width={1000}
                     height={1000}

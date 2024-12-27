@@ -1,21 +1,19 @@
-import React from "react";
-import LinkedinTable from "@/components/linkedin/linkedin-table";
+import PostTable from "@/components/twitter/post-table";
 
-const page = () => {
+export default function Page() {
   return (
     <main className="p-8">
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold">
-            Upload Linkedin Post by Automation
+            Upload Twitter Post by Automation
           </h1>
+          {/* <ThemeChange /> */}
         </div>
       </div>
       <div className="mt-6">
-        <LinkedinTable />
+        <PostTable />
       </div>
     </main>
   );
-};
-
-export default page;
+}

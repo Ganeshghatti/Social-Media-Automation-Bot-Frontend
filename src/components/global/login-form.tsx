@@ -14,9 +14,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import LogoText from "./logo-txt";
 
 // Access environment variable
-const BACKEND_URI = process.env.NEXT_PUBLIC_BACKEND_URI || "https://api.bot.thesquirrel.site";
+const BACKEND_URI =
+  process.env.NEXT_PUBLIC_BACKEND_URI || "https://api.bot.thesquirrel.site";
 
 const LoginForm = () => {
   const router = useRouter();
@@ -29,9 +31,9 @@ const LoginForm = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -62,7 +64,9 @@ const LoginForm = () => {
       }
     } catch (err) {
       if (axios.isAxiosError(err)) {
-        setError(err.response?.data?.message || err.message || "Login failed. Please try again.");
+        setError(
+          err.response?.data?.error || "Login failed. Please try again."
+        );
       } else {
         setError("An unexpected error occurred. Please try again.");
       }
@@ -71,65 +75,65 @@ const LoginForm = () => {
     }
   };
 
-  const validateEmail = (email: string) => {
-    return email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
-  };
-
-  const isSubmitDisabled = !formData.email || !formData.password || !validateEmail(formData.email) || isLoading;
-
   return (
-    <Card className="w-full max-w-md mx-auto">
-      <CardHeader>
-        <CardTitle>Login</CardTitle>
-        <CardDescription>
-          Enter your email and password to access your account.
-        </CardDescription>
-      </CardHeader>
-      <form onSubmit={handleSubmit}>
-        <CardContent className="space-y-4">
-          {error && (
-            <Alert variant="destructive">
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              placeholder="name@example.com"
-              value={formData.email}
-              onChange={handleChange}
-              required
-              disabled={isLoading}
-              className={!validateEmail(formData.email) && formData.email ? "border-red-500" : ""}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              name="password"
-              type="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              disabled={isLoading}
-            />
-          </div>
-        </CardContent>
-        <CardFooter>
-          <Button 
-            type="submit" 
-            className="w-full" 
-            disabled={isSubmitDisabled}
-          >
-            {isLoading ? "Logging in..." : "Log in"}
-          </Button>
-        </CardFooter>
-      </form>
-    </Card>
+    <section className="max-w-sm w-full">
+      <Card className="w-full rounded-xl py-6">
+        <CardHeader>
+          <CardTitle className="text-center">
+            <LogoText />
+          </CardTitle>
+          <CardDescription className="text-center">
+            Please enter your credentials to Login
+          </CardDescription>
+        </CardHeader>
+        <form onSubmit={handleSubmit}>
+          <CardContent className="space-y-4 mt-2">
+            {error && (
+              <Alert variant="destructive">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="name@example.com"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                disabled={isLoading}
+                className="w-full bg-customAccent"
+              />
+            </div>
+            <div className="space-y-2 mt-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                name="password"
+                className=" bg-customAccent"
+                type="password"
+                placeholder="enter your password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                disabled={isLoading}
+              />
+            </div>
+          </CardContent>
+          <CardFooter>
+            <Button type="submit" className="w-full mt-3" disabled={isLoading}>
+              {isLoading ? "Logging in..." : "Log in"}
+            </Button>
+          </CardFooter>
+        </form>
+      </Card>
+      <div className="text-center mt-4 text-xs text-gray-500 mx-auto max-w-[200px]">
+        By clicking on Log In you agree to our{" "}
+        <span className="underline cursor-pointer"> Terms and Conditions</span>
+      </div>
+    </section>
   );
 };
 

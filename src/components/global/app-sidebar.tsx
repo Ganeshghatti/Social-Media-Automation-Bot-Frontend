@@ -1,13 +1,11 @@
+'use client'
 import { Calendar, Home, Inbox } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from 'next/navigation';
+import LogoText from "./logo-txt";
 import {
   Sidebar,
   SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
   SidebarHeader,
   SidebarFooter,
 } from "@/components/ui/sidebar";
@@ -19,6 +17,11 @@ const items = [
     title: "Dashboard",
     url: "/dashboard",
     icon: Home,
+  },
+  {
+    title: "Twitter",
+    url: "/dashboard/twitter",
+    icon: Inbox,
   },
   {
     title: "LinkedIn",
@@ -33,28 +36,20 @@ const items = [
 ];
 
 export function AppSidebar() {
+  const pathname = usePathname();
   return (
-    <Sidebar variant="sidebar">
+    <Sidebar variant="sidebar" className=" bg-customPrimary !px-6 !py-2">
       <SidebarHeader>
-        <p className="p-2 font-medium">The Squirrel</p>
+        <LogoText />
+        <p className=" text-sm text-gray-500">Next Gen Automation Tool</p>
       </SidebarHeader>
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton size={"lg"} style={{ padding: 4 }} asChild>
-                    <Link href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+      <SidebarContent className="flex flex-col gap-4 mt-4">
+        {items.map((item) => (
+            <Link key={item.title} className={`text-black transition-all text-sm rounded-md py-2 px-4 ${pathname === item.url && "bg-customSecondary/10 !text-customSecondary font-semibold "}`} href={item.url}>
+              {/* <item.icon /> */}
+              <span>{item.title}</span>
+            </Link>
+        ))}
       </SidebarContent>
       <SidebarFooter>
         <Logout />

@@ -1,20 +1,17 @@
-import ThemeChange from "@/components/global/theme-change";
-import PostTable from "@/components/twitter/post-table";
+import React from "react";
 
-export default function Home() {
+const page = () => {
   return (
     <main className="p-8">
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold">
-            Upload Twitter Post by Automation
-          </h1>
-          <ThemeChange />
-        </div>
+      <div className="space-y-2">
+        <h1 className="text-2xl font-bold">Dashboard</h1>
+        <p className="text-sm text-muted-foreground">
+          Hi, Adarsh. Welcome back to us!
+        </p>
       </div>
-      <div className="mt-10">
-        <PostTable />
-      </div>
+      <div className="mt-6">Comming Soon...</div>
     </main>
   );
-}
+};
+
+export default page;
