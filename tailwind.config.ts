@@ -10,9 +10,14 @@ export default {
   theme: {
     extend: {
       colors: {
-        customPrimary: "#F3F2F7",
-        customSecondary: "#0077FF",
-        customAccent: "#F9F6F6",
+        lightPrimary: "#F3F2F7",
+        lightSecondary: "#FFFFFF",
+        lightAccent: "#0077FF",
+
+        darkPrimary: "#1E1E1F",
+        darkSecondary: "#2A2A2A",
+    
+
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         card: {

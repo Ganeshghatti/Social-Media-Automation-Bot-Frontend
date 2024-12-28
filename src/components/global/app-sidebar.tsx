@@ -38,14 +38,14 @@ const items = [
 export function AppSidebar() {
   const pathname = usePathname();
   return (
-    <Sidebar variant="sidebar" className=" bg-customPrimary !px-6 !py-2">
+    <Sidebar variant="sidebar" className="bg-lightSecondary dark:bg-[#181818] !px-6 !py-2 !border-0">
       <SidebarHeader>
         <LogoText />
         <p className=" text-sm text-gray-500">Next Gen Automation Tool</p>
       </SidebarHeader>
       <SidebarContent className="flex flex-col gap-4 mt-4">
         {items.map((item) => (
-            <Link key={item.title} className={`text-black transition-all text-sm rounded-md py-2 px-4 ${pathname === item.url && "bg-customSecondary/10 !text-customSecondary font-semibold "}`} href={item.url}>
+            <Link key={item.title} className={`transition-all text-sm rounded-md py-2 px-4 ${pathname === item.url && "bg-lightAccent/10 !text-lightAccent font-semibold "}`} href={item.url}>
               {/* <item.icon /> */}
               <span>{item.title}</span>
             </Link>

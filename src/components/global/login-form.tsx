@@ -77,7 +77,7 @@ const LoginForm = () => {
 
   return (
     <section className="max-w-sm w-full">
-      <Card className="w-full rounded-xl py-6">
+      <Card className="w-full rounded-xl py-6 bg-secondary border-0 dark:bg-darkSecondary">
         <CardHeader>
           <CardTitle className="text-center">
             <LogoText />
@@ -104,7 +104,7 @@ const LoginForm = () => {
                 onChange={handleChange}
                 required
                 disabled={isLoading}
-                className="w-full bg-customAccent"
+                className="w-full border-0 bg-lightPrimary/50 dark:bg-darkPrimary/50"
               />
             </div>
             <div className="space-y-2 mt-2">
@@ -112,7 +112,7 @@ const LoginForm = () => {
               <Input
                 id="password"
                 name="password"
-                className=" bg-customAccent"
+                className="border-0 bg-lightPrimary/50 dark:bg-darkPrimary/50"
                 type="password"
                 placeholder="enter your password"
                 value={formData.password}
@@ -123,7 +123,7 @@ const LoginForm = () => {
             </div>
           </CardContent>
           <CardFooter>
-            <Button type="submit" className="w-full mt-3" disabled={isLoading}>
+            <Button type="submit" className="w-full mt-3 text-white" disabled={isLoading}>
               {isLoading ? "Logging in..." : "Log in"}
             </Button>
           </CardFooter>
@@ -131,7 +131,7 @@ const LoginForm = () => {
       </Card>
       <div className="text-center mt-4 text-xs text-gray-500 mx-auto max-w-[200px]">
         By clicking on Log In you agree to our{" "}
-        <span className="underline cursor-pointer"> Terms and Conditions</span>
+        <span className="underline cursor-pointer text-lightAccent"> Terms and Conditions</span>
       </div>
     </section>
   );
