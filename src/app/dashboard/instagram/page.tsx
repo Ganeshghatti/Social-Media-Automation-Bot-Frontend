@@ -11,7 +11,7 @@ const page = () => {
         </h1>
       </div>
     </div>
-    <div className="mt-10">
+    <div className="mt-6">
       <InstagramTable />
     </div>
   </main>

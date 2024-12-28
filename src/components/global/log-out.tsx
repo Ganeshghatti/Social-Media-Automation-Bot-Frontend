@@ -11,7 +11,7 @@ const Logout = () => {
   return (
     <Button
       variant={"outline"}
-      className="rounded-full text-red-600 border-red-900 hover:bg-red-700 transition-all"
+      className="rounded-full bg-transparent !text-red-600 border-red-900 hover:bg-red-700/10 hover:text-red-600 transition-all"
       onClick={handleLogout}
     >
       Logout

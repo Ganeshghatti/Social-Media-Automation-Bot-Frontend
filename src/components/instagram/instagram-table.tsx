@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/table";
 import axios from "axios";
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import GeneratePost from "../global/generate-post";
 
 const BACKEND_URI = process.env.NEXT_PUBLIC_BACKEND_URI || "https://api.bot.thesquirrel.site";
@@ -102,9 +103,11 @@ const InstagramTable = () => {
             <TableRow key={post._id}>
               <TableCell>
                 {post.img || post.imageData ? (
-                  <img
+                  <Image
                     src={post.imageData || post.img}
                     alt="Post"
+                    width={1000}
+                    height={1000}
                     className="w-12 h-12 object-cover rounded-md"
                   />
                 ) : (
