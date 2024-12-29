@@ -1,4 +1,5 @@
 import PostTable from "@/components/twitter/post-table";
+import { GenerateModal } from "@/components/linkedin/generate-modal";
 
 export default function Page() {
   return (
@@ -12,6 +13,7 @@ export default function Page() {
         </div>
       </div>
       <div className="mt-6">
+        <GenerateModal/>
         <PostTable />
       </div>
     </main>

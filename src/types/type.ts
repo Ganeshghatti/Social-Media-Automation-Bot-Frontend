@@ -6,5 +6,6 @@ export type Post = {
   isPublished: boolean;
   tobePublishedAt: string | null;
   imageData?: string;
+  status?: string;
   date: string;
 };
