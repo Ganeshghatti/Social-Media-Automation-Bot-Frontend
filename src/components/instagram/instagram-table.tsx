@@ -1,64 +1,53 @@
 "use client";
 import React from "react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Post } from "@/types/type";
 import axios from "axios";
 import { useState, useEffect } from "react";
-import Image from "next/image";
 import GeneratePost from "../global/generate-post";
+import InstagramCard from "./instagram-card";
 
-const BACKEND_URI = process.env.NEXT_PUBLIC_BACKEND_URI || "https://api.bot.thesquirrel.site";
 
-type Post = {
-  _id: string;
-  text: string;
-  img: string;
-  createdAt: string;
-  isPublished: boolean;
-  tobePublishedAt: string | null;
-  imageData?: string;
+const BACKEND_URI =
+  process.env.NEXT_PUBLIC_BACKEND_URI || "https://api.bot.thesquirrel.site";
+
+type post = {
+  date: string;
+  posts: Post[];
 };
 
-const InstagramTable = () => {
-  const [posts, setPosts] = useState<Post[]>([]);
+const PostTable = () => {
+  const [posts, setPosts] = useState<post[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchPosts = async () => {
     try {
       const token = localStorage.getItem("adminToken");
-      
+
       if (!token) {
+        window.location.href = "/";
         throw new Error("No authentication token found");
       }
 
-      const response = await axios.get(
-        `${BACKEND_URI}/instagram/get-all-posts`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      
-      if (response.data?.success && Array.isArray(response.data?.posts)) {
-        setPosts(response.data.posts);
+      const response = await axios.get(`${BACKEND_URI}/instagram/get-all-posts`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.data?.success && Array.isArray(response.data?.data)) {
+        console.log(response.data.data);
+        setPosts(response.data.data);
       } else {
         throw new Error("Invalid response format");
       }
-      
+
       setLoading(false);
     } catch (err) {
       console.error("Error fetching posts:", err);
       setError(
-        err instanceof Error 
-          ? err.message 
+        err instanceof Error
+          ? err.message
           : "Failed to fetch posts. Please try again later."
       );
       setLoading(false);
@@ -87,75 +76,23 @@ const InstagramTable = () => {
 
   return (
     <div className="w-full">
-      <GeneratePost type="instagram" fetchPosts={fetchPosts}/>
-      <Table className="border mt-10 border-muted rounded-md">
-        <TableHeader>
-          <TableRow>
-            <TableHead>Image</TableHead>
-            <TableHead>Text</TableHead>
-            <TableHead>Created At</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Scheduled For</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {posts.map((post) => (
-            <TableRow key={post._id}>
-              <TableCell>
-                {post.img || post.imageData ? (
-                  <Image
-                    src={post.imageData || post.img}
-                    alt="Post"
-                    width={1000}
-                    height={1000}
-                    className="w-12 h-12 object-cover rounded-md"
-                  />
-                ) : (
-                  <div className="w-12 h-12 bg-gray-200 rounded-md flex items-center justify-center text-sm text-gray-500">
-                    No image
-                  </div>
-                )}
-              </TableCell>
-              <TableCell className="max-w-md">
-                <div className="line-clamp-3">{post.text}</div>
-              </TableCell>
-              <TableCell>
-                {new Date(post.createdAt).toLocaleDateString("en-US", {
-                  year: 'numeric',
-                  month: 'short',
-                  day: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit'
-                })}
-              </TableCell>
-              <TableCell>
-                <span
-                  className={`px-2 py-1 rounded-full text-sm ${
-                    post.isPublished
-                      ? "bg-green-100 text-green-800"
-                      : "bg-yellow-100 text-yellow-800"
-                  }`}
-                >
-                  {post.isPublished ? "Published" : "Draft"}
-                </span>
-              </TableCell>
-              <TableCell>
-                {post.tobePublishedAt
-                  ? new Date(post.tobePublishedAt).toLocaleDateString("en-US", {
-                      year: 'numeric',
-                      month: 'short',
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    })
-                  : "Not scheduled"}
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      <GeneratePost type="twitter" fetchPosts={fetchPosts} />
+      <div className="mt-6">
+        {posts?.map((dateGroup: post) =>
+          <div className="mt-10"> 
+            <p className="text-xl font-semibold">{dateGroup.date}</p>
+            <div className="grid mt-6 grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {
+              dateGroup.posts.map((post: Post) => (
+                <InstagramCard key={post._id} post={post} />
+              ))
+            }
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
 
-export default InstagramTable;
+export default PostTable;

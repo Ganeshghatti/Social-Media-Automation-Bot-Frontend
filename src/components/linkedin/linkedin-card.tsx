@@ -1,14 +1,15 @@
 import React from "react";
-import { FaInstagram } from "react-icons/fa";
 import { Post } from "@/types/type";
+import { FaLinkedin } from "react-icons/fa6";
 import Image from "next/image";
 
-const InstagramCard = ({ post }: { post: Post }) => {
+const LinkedinCard = ({ post }: { post: Post }) => {
+  console.log("post data from the card",post)
   return (
     <div className="rounded-xl shadow-sm bg-lightSecondary dark:bg-darkSecondary p-6">
       <div className="flex items-center justify-between gap-4">
         <p className="font-semibold">@Ganeshtx</p>
-        <FaInstagram className="text-pink-500 text-2xl" />
+        <FaLinkedin className="text-blue-600 text-2xl" />
       </div>
       <div className="mt-2 flex flex-row gap-3 items-center ">
         {/* <span className="text-black/70 dark:text-[#A3A3A3]"> 
@@ -40,4 +41,4 @@ const InstagramCard = ({ post }: { post: Post }) => {
   );
 };
 
-export default InstagramCard;
+export default LinkedinCard;
