@@ -4,7 +4,6 @@ import { Post } from "@/types/type";
 import Image from "next/image";
 
 const TwitterCard = ({ post }: { post: Post }) => {
-  console.log("post data from the card",post)
   return (
     <div className="rounded-xl shadow-sm bg-lightSecondary dark:bg-darkSecondary p-6">
       <div className="flex items-center justify-between gap-4">
@@ -20,7 +19,7 @@ const TwitterCard = ({ post }: { post: Post }) => {
           <span className="w-2 h-2 aspect-square rounded-full inline-block mr-1 bg-black/30 dark:bg-[#A3A3A3]"></span>
           <span className="text-green-700">
             {
-              post.tobePublishedAt ? "Scheduled" : "Published"
+              post.status && post.status
             }
           </span>
         </div>
@@ -37,6 +36,18 @@ const TwitterCard = ({ post }: { post: Post }) => {
       <p className="mt-3 text-black/70 dark:text-[#A3A3A3] line-clamp-3">
         {post.text}{" "}
       </p>
+      <div className="mt-2 w-full justify-end">
+      {
+        post.status == "scheduled" && (
+          <div className="flex gap-4">
+            delete
+            update
+            {/* <DeleteModal post={post} />
+            <UpdateModal post={post} /> */}
+          </div>
+        )
+      }
+      </div>
     </div>
   );
 };
