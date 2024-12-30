@@ -3,9 +3,8 @@ import React from "react";
 import { Post } from "@/types/type";
 import axios from "axios";
 import { useState, useEffect } from "react";
-import GeneratePost from "../global/generate-post";
 import TwitterCard from "./twitter-card";
-
+import { GenerateModal } from "./generate-modal";
 
 const BACKEND_URI =
   process.env.NEXT_PUBLIC_BACKEND_URI || "https://api.bot.thesquirrel.site";
@@ -76,20 +75,18 @@ const PostTable = () => {
 
   return (
     <div className="w-full">
-      <GeneratePost type="twitter" fetchPosts={fetchPosts} />
+      <GenerateModal fetchPosts={fetchPosts} />
       <div className="mt-6">
-        {posts?.map((dateGroup: post, i: number) =>
-          <div key={i} className="mt-10"> 
+        {posts?.map((dateGroup: post, i: number) => (
+          <div key={i} className="mt-10">
             <p className="text-xl font-semibold">{dateGroup.date}</p>
             <div className="grid mt-6 grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {
-              dateGroup.posts.map((post: Post) => (
-                <TwitterCard key={post._id} post={post} />
-              ))
-            }
+              {dateGroup.posts.map((post: Post) => (
+                <TwitterCard fetchPosts={fetchPosts} key={post._id} post={post} />
+              ))}
             </div>
           </div>
-        )}
+        ))}
       </div>
     </div>
   );
