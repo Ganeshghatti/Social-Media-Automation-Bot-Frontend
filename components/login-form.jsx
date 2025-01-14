@@ -15,7 +15,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import useStore from "@/store";
+import useAuthStore from "@/store";
+
+import { useRouter } from "next/navigation";
 
 import axios from "axios";
 
@@ -30,7 +32,9 @@ import {
 } from "@/components/ui/form";
 
 export function LoginForm({ className, ...props }) {
-  const { setToken } = useStore();
+  const updateToken = useAuthStore((state) => state.updateToken);
+
+  const router = useRouter();
 
   const formSchema = z.object({
     email: z.string().email({
@@ -57,11 +61,11 @@ export function LoginForm({ className, ...props }) {
       );
 
       const token = response.data.data.token;
+      updateToken(token);
+      localStorage.setItem("token", token);
       console.log(token);
-      setToken(token);
-      if (response.data) {
-        window.location.href = "/dashboard";
-      }
+
+      router.push("/onboarding");
     } catch (error) {
       console.error("Signup failed:", error);
     }

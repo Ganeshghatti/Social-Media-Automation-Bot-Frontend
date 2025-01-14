@@ -3,6 +3,8 @@
 import React from "react";
 import { useState, useEffect } from "react";
 
+import axios from "axios";
+
 const Page = ({ params }) => {
   const resolvedParams = React.use(params);
   const { token } = resolvedParams;
@@ -14,16 +16,18 @@ const Page = ({ params }) => {
   useEffect(() => {
     const verifyToken = async () => {
       try {
-        await axios.post(
+        const response = await axios.post(
           `https://api.bot.thesquirrel.site/user/verification/${token}`
         );
         setMessage("Email verified successfully!");
         setDescription(
           "You can now close this window and login to your account"
         );
+        console.log(response.data);
       } catch (error) {
         setMessage("Verification failed. Please try again.");
         setDescription("Please try again later or contact support");
+        console.log(error);
       } finally {
         setIsLoading(false);
       }
