@@ -34,7 +34,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
-const WorkspaceCreate = ({ isOpen, setIsOpen }) => {
+const WorkspaceEdit = ({ isOpen, setIsOpen, workSpaceData }) => {
   const [file, setFile] = useState(null);
 
   const [blobFile, setblobFile] = useState(null);
@@ -58,7 +58,7 @@ const WorkspaceCreate = ({ isOpen, setIsOpen }) => {
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
+      name: workSpaceData?.name,
       about: "",
       icon: undefined,
       settings: { description: "", keywords: [] },
@@ -121,10 +121,10 @@ const WorkspaceCreate = ({ isOpen, setIsOpen }) => {
         <DialogContent>
           <DialogHeader>
             <DialogTitle className="capitalize text-lg">
-              Create a New Workspace
+              Edit your Workspace
             </DialogTitle>
             <DialogDescription>
-              Enter your Information Below to Create a WorkSpace
+              Enter the information you want to change
             </DialogDescription>
           </DialogHeader>
 
@@ -232,7 +232,7 @@ const WorkspaceCreate = ({ isOpen, setIsOpen }) => {
                   </FormItem>
                 )}
               />
-              <Button type="submit">Create Workspace</Button>
+              <Button type="submit">Edit Workspace</Button>
             </form>
           </Form>
         </DialogContent>
@@ -241,4 +241,4 @@ const WorkspaceCreate = ({ isOpen, setIsOpen }) => {
   );
 };
 
-export default WorkspaceCreate;
+export default WorkspaceEdit;

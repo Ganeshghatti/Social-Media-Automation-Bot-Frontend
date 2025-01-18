@@ -1,23 +1,31 @@
 "use client";
-import React, { use } from "react";
+import React from "react";
 import { Button } from "@/components/ui/button";
 
-import { Plus, Settings, Trash } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useState, useEffect } from "react";
+
+import { useRouter } from "next/navigation";
 
 import axios from "axios";
 
-import useAuthStore from "@/store";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu";
+
 import WorkspaceSettings from "@/feature/workspace/components/workspace-setting";
 import WorkspaceCreate from "@/feature/workspace/components/workspace-create";
+import WorkspaceEdit from "@/feature/workspace/components/workspace-edit";
 
 const Page = () => {
   const [workspaces, setWorkspaces] = useState([]);
@@ -26,9 +34,13 @@ const Page = () => {
 
   const [createWorkSpaceState, setCreateWorkSpaceState] = useState(false);
 
+  const [editWorkSpaceState, setEditWorkSpaceState] = useState(false);
+
   const [workSpaceData, setWorkSpaceData] = useState();
 
-  const token = localStorage.getItem("token"); // Import useStore from your store file
+  const token = localStorage.getItem("token");
+
+  const router = useRouter();
 
   useEffect(() => {
     const fetchWorkspaces = async () => {
@@ -50,6 +62,42 @@ const Page = () => {
     };
     fetchWorkspaces();
   }, []);
+
+  const connectTwitter = async (workspaceId) => {
+    try {
+      const response = await axios.post(
+        `https://api.bot.thesquirrel.site/workspace/twitter/connect/${workspaceId}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log(response.data.data);
+      router.push(response.data.data);
+    } catch (error) {
+      console.error("Error connecting Twitter:", error);
+    }
+  };
+
+  const disconnectTwitter = async (workspaceId, userId) => {
+    try {
+      const response = await axios.post(
+        `https://api.bot.thesquirrel.site/workspace/twitter/disconnect/${workspaceId}/${userId}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log(response.data.data);
+      // Update the workspace state if needed
+    } catch (error) {
+      console.error("Error disconnecting Twitter:", error);
+    }
+  };
 
   const deleteWorkspace = async (workspaceId) => {
     try {
@@ -81,35 +129,91 @@ const Page = () => {
           </Button>
         </div>
         {/* Workspace List */}
-        <div className="space-y-2">
-          {workspaces.map((workspace) => (
-            <div
-              key={workspace._id}
-              className="flex items-center justify-between p-2 hover:bg-gray-100 rounded-lg"
-            >
-              <span className="capitalize text-sm">{workspace.name}</span>
-              <div className="space-x-0">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => {
-                    setWorkSpaceData(workspace);
-                    setDialogState(true);
-                    console.log(workspace);
-                  }}
+        <Accordion type="single" key={24} collapsible>
+          {workspaces.map((workspace, index) => (
+            <ContextMenu key={`context-menu-${workspace._id}`}>
+              <ContextMenuTrigger key={`context-menu-trigger-${workspace._id}`}>
+                <ContextMenuContent>
+                  <ContextMenuItem
+                    onClick={() => {
+                      setWorkSpaceData(workspace);
+                      setEditWorkSpaceState(true);
+                      console.log(workspace);
+                    }}
+                  >
+                    Edit
+                  </ContextMenuItem>
+                  <ContextMenuItem
+                    onClick={() => {
+                      setWorkSpaceData(workspace);
+                      setDialogState(true);
+                      console.log(workspace);
+                    }}
+                  >
+                    Settings
+                  </ContextMenuItem>
+                  <ContextMenuItem
+                    onClick={() => deleteWorkspace(workspace._id)}
+                  >
+                    Delete
+                  </ContextMenuItem>
+                </ContextMenuContent>
+                <AccordionItem
+                  value={`item-${index}`}
+                  key={workspace._id}
+                  className="items-center border-2 border-gray-200 justify-between p-1 px-5 hover:bg-gray-100 rounded-lg"
                 >
-                  <Settings className="h-4 w-4" />
-                </Button>
+                  <AccordionTrigger className="flex">
+                    <span className="capitalize text-sm">{workspace.name}</span>
+                  </AccordionTrigger>
 
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => deleteWorkspace(workspace._id)}
-                >
-                  <Trash className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
+                  <AccordionContent className="p-2">
+                    <div className="space-y-2">
+                      {workspace.connectedAccounts.length > 0 ? (
+                        workspace.connectedAccounts.map((account, index) => (
+                          <div
+                            key={index}
+                            className="flex flex-col gap-2 border p-4 rounded-md"
+                          >
+                            <h3 className="text-md font-bold capitalize">
+                              {account.type}
+                            </h3>
+                            <p className="text-sm text-muted-foreground">
+                              Username : {account.username}
+                            </p>
+                            <p className="capitalize text-sm text-muted-foreground">
+                              Status : {account.isConnected ? "true" : "false"}
+                            </p>
+                            <Button
+                              variant="outline"
+                              className="w-full flex items-center gap-2"
+                              onClick={() => {
+                                disconnectTwitter(
+                                  workspace._id,
+                                  account.userId
+                                );
+                              }}
+                            >
+                              Disconnect
+                            </Button>
+                          </div>
+                        ))
+                      ) : (
+                        <Button
+                          variant="outline"
+                          className="w-full flex items-center gap-2"
+                          onClick={() => {
+                            connectTwitter(workspace._id);
+                          }}
+                        >
+                          Connect Twitter
+                        </Button>
+                      )}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </ContextMenuTrigger>
+            </ContextMenu>
           ))}
           <WorkspaceSettings
             isOpen={dialogState}
@@ -120,7 +224,13 @@ const Page = () => {
             isOpen={createWorkSpaceState}
             setIsOpen={setCreateWorkSpaceState}
           />
-        </div>
+
+          <WorkspaceEdit
+            isOpen={editWorkSpaceState}
+            setIsOpen={setEditWorkSpaceState}
+            workSpaceData={workSpaceData}
+          />
+        </Accordion>
       </div>
     </div>
   );
