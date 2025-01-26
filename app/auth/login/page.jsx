@@ -1,8 +1,8 @@
-import { LoginForm } from "@/components/login-form";
-import { RegisterForm } from "@/components/register-form";
-import React from "react";
+"use client";
 
-import withAuth from "@/components/auth/route";
+import { LoginForm } from "@/components/login-form";
+import React from "react";
+import dynamic from "next/dynamic";
 
 const Page = () => {
   return (
@@ -12,4 +12,7 @@ const Page = () => {
   );
 };
 
-export default withAuth(Page);
+// Use dynamic import with ssr disabled for the auth wrapper
+export default dynamic(() => Promise.resolve(withAuth(Page)), {
+  ssr: false
+});

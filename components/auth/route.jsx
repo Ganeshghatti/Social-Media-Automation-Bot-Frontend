@@ -1,26 +1,18 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 const withAuth = (WrappedComponent) => {
-  return (props) => {
+  return function AuthenticatedComponent(props) {
     const router = useRouter();
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
 
     useEffect(() => {
-      // Check for token in localStorage
       const token = localStorage.getItem("token");
       if (token) {
         router.push("/dashboard");
-      } else {
-        setIsAuthenticated(false);
       }
     }, [router]);
-
-    if (!isAuthenticated) {
-      return null; // Show nothing while checking authentication
-    }
 
     return <WrappedComponent {...props} />;
   };
