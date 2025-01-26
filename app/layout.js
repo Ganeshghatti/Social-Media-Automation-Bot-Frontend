@@ -1,5 +1,6 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import Script from 'next/script';
 
 export const metadata = {
   title: "Create Next App",
@@ -9,7 +10,25 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`family-jakarta antialiased`}>{children}</body>
+      <body className={`family-jakarta antialiased`}>
+        <Script
+          id="google-analytics"
+          strategy="afterInteractive"
+          src={`https://www.googletagmanager.com/gtag/js?id=G-TNSWCQXZTN`}
+        />
+        <Script
+          id="google-analytics-init"
+          strategy="afterInteractive"
+        >
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-TNSWCQXZTN');
+          `}
+        </Script>
+        {children}
+      </body>
     </html>
   );
 }

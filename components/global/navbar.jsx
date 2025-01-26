@@ -26,7 +26,7 @@ export default function Navbar() {
       </div>
       <div className="md:block hidden">
         <Button className="border-2 border-[#0C1E5B] px-10 bg-white text-[#0C1E5B]  py-2 rounded-md hover:bg-[#0C1E5B] hover:text-white">
-          Get Started
+          <Link href="/auth/register">Get Started</Link>
         </Button>
       </div>
     </nav>
