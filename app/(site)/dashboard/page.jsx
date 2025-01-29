@@ -1,45 +1,38 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-
 import { Plus } from "lucide-react";
-import { useState, useEffect } from "react";
-
 import { useRouter } from "next/navigation";
-
 import axios from "axios";
-
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-
 import {
   ContextMenu,
   ContextMenuContent,
   ContextMenuItem,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
-
 import WorkspaceSettings from "@/feature/workspace/components/workspace-setting";
 import WorkspaceCreate from "@/feature/workspace/components/workspace-create";
 import WorkspaceEdit from "@/feature/workspace/components/workspace-edit";
+import WorkSpacePost from "@/feature/workspace/components/workspace-post";
+import WorkSpaceThread from "@/feature/workspace-thread";
 
 const Page = () => {
   const [workspaces, setWorkspaces] = useState([]);
-
   const [dialogState, setDialogState] = useState(false);
-
   const [createWorkSpaceState, setCreateWorkSpaceState] = useState(false);
-
   const [editWorkSpaceState, setEditWorkSpaceState] = useState(false);
-
   const [workSpaceData, setWorkSpaceData] = useState();
+  const [accountId, setAccountId] = useState();
+  const [workSpaceApiId, setWorkSpaceApiId] = useState();
+  const [postType, setPostType] = useState("thread");
 
   const token = localStorage.getItem("token");
-
   const router = useRouter();
 
   useEffect(() => {
@@ -54,8 +47,8 @@ const Page = () => {
           }
         );
         setWorkspaces(response.data.data);
-        console.log(response.data.data);
-        console.log(token);
+        setWorkSpaceApiId(response.data.data[0]._id);
+        setAccountId(response.data.data[0].connectedAccounts[0].userId);
       } catch (error) {
         console.error("Error fetching workspaces:", error);
       }
@@ -74,8 +67,8 @@ const Page = () => {
           },
         }
       );
-      console.log(response.data.data);
       router.push(response.data.data);
+      setWorkSpaceApiId(workspaceId);
     } catch (error) {
       console.error("Error connecting Twitter:", error);
     }
@@ -92,8 +85,6 @@ const Page = () => {
           },
         }
       );
-      console.log(response.data.data);
-      // Update the workspace state if needed
     } catch (error) {
       console.error("Error disconnecting Twitter:", error);
     }
@@ -115,6 +106,10 @@ const Page = () => {
     }
   };
 
+  const handlePostTypeChange = (event) => {
+    setPostType(event.target.value);
+  };
+
   return (
     <div className="flex min-h-screen bg-gray-100">
       <div className="w-64 bg-white p-4 shadow-sm">
@@ -128,7 +123,6 @@ const Page = () => {
             <Plus className="h-4 w-4" />
           </Button>
         </div>
-        {/* Workspace List */}
         <Accordion type="single" key={24} collapsible>
           {workspaces.map((workspace, index) => (
             <ContextMenu key={`context-menu-${workspace._id}`}>
@@ -138,7 +132,6 @@ const Page = () => {
                     onClick={() => {
                       setWorkSpaceData(workspace);
                       setEditWorkSpaceState(true);
-                      console.log(workspace);
                     }}
                   >
                     Edit
@@ -147,7 +140,6 @@ const Page = () => {
                     onClick={() => {
                       setWorkSpaceData(workspace);
                       setDialogState(true);
-                      console.log(workspace);
                     }}
                   >
                     Settings
@@ -166,7 +158,6 @@ const Page = () => {
                   <AccordionTrigger className="flex">
                     <span className="capitalize text-sm">{workspace.name}</span>
                   </AccordionTrigger>
-
                   <AccordionContent className="p-2">
                     <div className="space-y-2">
                       {workspace.connectedAccounts.length > 0 ? (
@@ -215,22 +206,42 @@ const Page = () => {
               </ContextMenuTrigger>
             </ContextMenu>
           ))}
-          <WorkspaceSettings
-            isOpen={dialogState}
-            setIsOpen={setDialogState}
-            workSpaceData={workSpaceData}
-          />
-          <WorkspaceCreate
-            isOpen={createWorkSpaceState}
-            setIsOpen={setCreateWorkSpaceState}
-          />
-
-          <WorkspaceEdit
-            isOpen={editWorkSpaceState}
-            setIsOpen={setEditWorkSpaceState}
-            workSpaceData={workSpaceData}
-          />
         </Accordion>
+        <WorkspaceSettings
+          isOpen={dialogState}
+          setIsOpen={setDialogState}
+          workSpaceData={workSpaceData}
+        />
+        <WorkspaceCreate
+          isOpen={createWorkSpaceState}
+          setIsOpen={setCreateWorkSpaceState}
+        />
+        <WorkspaceEdit
+          isOpen={editWorkSpaceState}
+          setIsOpen={setEditWorkSpaceState}
+          workSpaceData={workSpaceData}
+        />
+      </div>
+      <div className="flex-1 p-4">
+        <div className="mb-4">
+          <label htmlFor="postType" className="mr-2">
+            Select Post Type:
+          </label>
+          <select
+            id="postType"
+            value={postType}
+            onChange={handlePostTypeChange}
+            className="border p-2 rounded"
+          >
+            <option value="thread">Thread</option>
+            <option value="post">Post</option>
+          </select>
+        </div>
+        {postType === "thread" ? (
+          <WorkSpaceThread accountId={accountId} workSpaceId={workSpaceApiId} />
+        ) : (
+          <WorkSpacePost accountId={accountId} workSpaceId={workSpaceApiId} />
+        )}
       </div>
     </div>
   );
