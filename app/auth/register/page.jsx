@@ -1,6 +1,5 @@
 "use client";
 
-import { LoginForm } from "@/components/login-form";
 import { RegisterForm } from "@/components/register-form";
 import React from "react";
 import withAuth from "@/components/auth/route";

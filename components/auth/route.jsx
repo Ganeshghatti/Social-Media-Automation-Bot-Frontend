@@ -6,20 +6,19 @@ import { useEffect, useState } from "react";
 const withAuth = (WrappedComponent) => {
   return (props) => {
     const router = useRouter();
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [checkingAuth, setCheckingAuth] = useState(true);
 
     useEffect(() => {
-      // Check for token in localStorage
       const token = localStorage.getItem("token");
       if (token) {
         router.push("/dashboard");
       } else {
-        setIsAuthenticated(false);
+        setCheckingAuth(false);
       }
     }, [router]);
 
-    if (!isAuthenticated) {
-      return null; // Show nothing while checking authentication
+    if (checkingAuth) {
+      return <div className="h-screen flex items-center justify-center text-lg">Checking authentication...</div>;
     }
 
     return <WrappedComponent {...props} />;
