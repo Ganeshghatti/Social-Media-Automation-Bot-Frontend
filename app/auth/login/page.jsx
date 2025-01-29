@@ -3,8 +3,6 @@
 import { LoginForm } from "@/components/login-form";
 import React from "react";
 
-import withAuth from "@/components/auth/route";
-
 const Page = () => {
   return (
     <div className="h-screen w-screen flex items-center justify-center">
@@ -13,4 +11,4 @@ const Page = () => {
   );
 };
 
-export default withAuth(Page);
+export default Page;

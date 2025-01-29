@@ -18,7 +18,11 @@ const withAuth = (WrappedComponent) => {
     }, [router]);
 
     if (checkingAuth) {
-      return <div className="h-screen flex items-center justify-center text-lg">Checking authentication...</div>;
+      return (
+        <div className="h-screen flex items-center justify-center text-lg">
+          Checking authentication...
+        </div>
+      );
     }
 
     return <WrappedComponent {...props} />;

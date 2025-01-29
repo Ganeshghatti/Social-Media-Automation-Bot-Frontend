@@ -2,7 +2,6 @@
 
 import { RegisterForm } from "@/components/register-form";
 import React from "react";
-import withAuth from "@/components/auth/route";
 
 const Page = () => {
   return (
@@ -12,4 +11,4 @@ const Page = () => {
   );
 };
 
-export default withAuth(Page);
+export default Page;
