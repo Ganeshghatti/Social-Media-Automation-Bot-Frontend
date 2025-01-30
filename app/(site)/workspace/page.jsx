@@ -1,19 +1,29 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 const WorkspacePage = () => {
   const router = useRouter();
-  const { success } = router.query;
+  const [success, setSuccess] = useState(null);
 
   useEffect(() => {
-    if (success === "true") {
-      setTimeout(() => {
-        router.push("/dashboard");
-      }, 5000);
+    const { success } = router.query;
+
+    // Delay access to query parameters to ensure it runs in the browser
+    if (success) {
+      setSuccess(success);
+      if (success === "true") {
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 5000);
+      }
     }
-  }, [success, router]);
+  }, [router.query]);
+
+  if (success === null) {
+    return <div>Loading...</div>; // Handle loading state if needed
+  }
 
   return (
     <div>
