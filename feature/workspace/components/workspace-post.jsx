@@ -44,7 +44,14 @@ const WorkSpacePost = ({ accountId, workSpaceId }) => {
 
   const onSubmit = async (data) => {
     try {
-      const token = localStorage.getItem("token");
+      let token = null;
+      if (typeof window !== "undefined") {
+        token = localStorage.getItem("token");
+      }
+
+      if (!token) {
+        throw new Error("No token found!");
+      }
 
       const formData = {
         posts: [
@@ -156,48 +163,46 @@ const WorkSpacePost = ({ accountId, workSpaceId }) => {
   const handleFileChange = (e, onChange) => {
     const files = Array.from(e.target.files);
     const currentFiles = form.getValues("media") || [];
-    
+
     const totalSize = files.reduce((sum, file) => sum + file.size, 0);
     const maxTotalSize = 30 * 1024 * 1024; // 30MB
-    
+
     if (totalSize > maxTotalSize) {
       alert("Total size of all files cannot exceed 30MB");
       return;
     }
-  
+
     if (currentFiles.length + files.length > 4) {
       alert("You can only upload a maximum of 4 files.");
       return;
     }
-  
+
     // Stricter file type validation
-    const allowedTypes = [
-      'image/jpeg',
-      'image/png',
-      'image/gif',
-    ];
-  
-    const invalidFiles = files.filter(file => !allowedTypes.includes(file.type));
+    const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
+
+    const invalidFiles = files.filter(
+      (file) => !allowedTypes.includes(file.type)
+    );
     if (invalidFiles.length > 0) {
       alert("Please only upload supported image types (JPG, PNG, GIF)");
       return;
     }
-  
+
     // Individual file size check
     const maxSize = 8 * 1024 * 1024; // 8MB per file
-    const oversizedFiles = files.filter(file => file.size > maxSize);
+    const oversizedFiles = files.filter((file) => file.size > maxSize);
     if (oversizedFiles.length > 0) {
       alert("Each file must be under 8MB");
       return;
     }
-  
+
     const fileData = files.map((file) => ({
       originalname: file.name,
       size: file.size,
       mimetype: file.type,
       blobUrl: URL.createObjectURL(file),
     }));
-  
+
     onChange([...currentFiles, ...fileData]);
   };
 
