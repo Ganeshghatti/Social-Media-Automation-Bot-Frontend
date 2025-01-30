@@ -14,8 +14,8 @@ const useAuthToken = () => {
     }
   }, []);
 
-  if (!loading && !token) {
-    throw new Error("No token found!");
+  if (loading) {
+    return null; // Token is not ready yet.
   }
 
   return token;
