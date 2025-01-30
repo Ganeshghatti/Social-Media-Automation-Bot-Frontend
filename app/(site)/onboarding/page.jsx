@@ -11,11 +11,7 @@ import useAuthToken from "@/hooks/useAuthToken";
 const Page = () => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  // Fetch token safely inside useEffect
-  useEffect(() => {
-    const token = useAuthToken();
-  }, []);
+  const token = useAuthToken();
 
   // Fetch user data only if token is available
   useEffect(() => {
