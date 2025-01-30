@@ -34,6 +34,8 @@ const Page = () => {
   const [workSpaceApiId, setWorkSpaceApiId] = useState();
   const [postType, setPostType] = useState("thread");
 
+  console.log("Account Id ",accountId)
+
   const token = localStorage.getItem("token");
   const router = useRouter();
 
@@ -48,9 +50,10 @@ const Page = () => {
             },
           }
         );
+        console.log("Response data ",response.data)
         setWorkspaces(response.data.data);
         setWorkSpaceApiId(response.data.data[0]._id);
-        setAccountId(response.data.data[0].connectedAccounts[0].userId);
+        setAccountId(response.data.data[0].connectedAccounts[0]?.userId);
       } catch (error) {
         console.error("Error fetching workspaces:", error);
       }

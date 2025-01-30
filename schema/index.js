@@ -18,6 +18,8 @@ export const workSpacePostSchema = z.object({
     .optional(),
 });
 
+
+
 export const workSpaceThreadSchema = z.object({
   type: z.string(),
   posttype: z.enum(["post", "thread"]),
