@@ -7,9 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 
 import axios from "axios";
+import useAuthToken from "@/hooks/useAuthToken";
 
 const Page = () => {
-  const token = localStorage.getItem("token");
+  const token = useAuthToken();
+
 
   const [userData, setUserData] = React.useState(null);
 

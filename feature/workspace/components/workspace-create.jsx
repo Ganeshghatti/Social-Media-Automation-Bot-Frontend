@@ -33,13 +33,14 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import useAuthToken from "@/hooks/useAuthToken";
 
 const WorkspaceCreate = ({ isOpen, setIsOpen }) => {
   const [file, setFile] = useState(null);
 
   const [blobFile, setblobFile] = useState(null);
 
-  const token = localStorage.getItem("token");
+  const token = useAuthToken();
 
   const formSchema = z.object({
     name: z.string().min(1, "Name is required"),

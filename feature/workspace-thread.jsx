@@ -18,6 +18,7 @@ import axios from "axios";
 
 import { Switch } from "@/components/ui/switch"; // Assuming you have a Switch component
 import { workSpaceThreadSchema } from "@/schema";
+import useAuthToken from "@/hooks/useAuthToken";
 
 const WorkSpaceThread = ({ accountId, workSpaceId }) => {
   const form = useForm({
@@ -57,7 +58,7 @@ const WorkSpaceThread = ({ accountId, workSpaceId }) => {
     };
 
     try {
-      const token = localStorage.getItem("token");
+      const token = useAuthToken();
       const response = await axios.post(
         `https://api.bot.thesquirrel.site/workspace/posts/create/presigned-url/${workSpaceId}`,
         formData,

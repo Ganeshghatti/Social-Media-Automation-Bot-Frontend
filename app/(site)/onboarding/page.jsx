@@ -1,148 +1,123 @@
 "use client";
 
-import React from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
-import { Button } from "@/components/ui/button";
+import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { useState } from "react";
-import { X } from "lucide-react";
-
-import { useRouter } from "next/navigation";
-
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import axios from "axios";
-
-const formSchema = z.object({
-  description: z.string().min(10, "Description must be at least 10 characters"),
-  keywords: z.string(),
-});
+import useAuthToken from "@/hooks/useAuthToken";
 
 const Page = () => {
-  const token = localStorage.getItem("token");
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const [keywords, setKeywords] = useState([]);
+  // Fetch token safely inside useEffect
+  useEffect(() => {
+    const token = useAuthToken();
+  }, []);
 
-  const form = useForm({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      description: "",
-      keywords: "",
-    },
-  });
+  // Fetch user data only if token is available
+  useEffect(() => {
+    if (!token) return;
 
-  const addKeyword = (value) => {
-    if (value && !keywords.includes(value)) {
-      setKeywords([...keywords, value]);
-      form.setValue("keyword", "");
-    }
-  };
+    const fetchProfile = async () => {
+      try {
+        const response = await axios.get(
+          "https://api.bot.thesquirrel.site/user/profile",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setUserData(response.data.data);
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const removeKeyword = (keywordToRemove) => {
-    setKeywords(keywords.filter((keyword) => keyword !== keywordToRemove));
-  };
+    fetchProfile();
+  }, [token]);
 
-  const router = useRouter();
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        Loading...
+      </div>
+    );
+  }
 
-  const onSubmit = async (data) => {
-    try {
-      const response = await axios.post(
-        "https://api.bot.thesquirrel.site/user/welcome",
-        { ...data, keywords },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      router.push("/dashboard");
-    } catch (error) {
-      console.error("Error:", error.response?.data || error.message);
-    }
-  };
+  if (!token) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Card className="max-w-md p-6 text-center">
+          <CardHeader>
+            <CardTitle>Authentication Required</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p>Please log in to view your profile.</p>
+            <Button className="mt-4">Go to Login</Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
-    <div className="flex items-center justify-center min-h-screen p-4">
-      <Card className="w-full max-w-lg">
-        <CardHeader>
-          <CardTitle>Onboarding</CardTitle>
+    <div className="min-h-screen flex items-center p-8 bg-gray-50">
+      <Card className="max-w-2xl mx-auto">
+        <CardHeader className="text-center">
+          <CardTitle>Profile</CardTitle>
         </CardHeader>
         <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Description</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter description" {...field} />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="keywords"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Keywords</FormLabel>
-                    <FormControl>
-                      <div className="flex gap-2">
-                        <Input
-                          placeholder="Add keyword"
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter") {
-                              e.preventDefault();
-                              addKeyword(field.value);
-                            }
-                          }}
-                          {...field}
-                        />
-                        <Button
-                          type="button"
-                          onClick={() => addKeyword(field.value)}
-                        >
-                          Add
-                        </Button>
-                      </div>
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-              <div className="flex flex-wrap gap-2">
-                {keywords.map((keyword, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center gap-1 bg-secondary px-3 py-1 rounded-full"
-                  >
-                    {keyword}
-                    <button
-                      type="button"
-                      onClick={() => removeKeyword(keyword)}
-                      className="text-muted-foreground hover:text-foreground"
-                    >
-                      <X size={14} />
-                    </button>
-                  </div>
-                ))}
+          <div className="flex flex-col items-center space-y-6">
+            <Avatar className="h-24 w-24">
+              <AvatarFallback className="text-2xl font-bold">
+                {userData?.username?.[0] || "U"}
+              </AvatarFallback>
+            </Avatar>
+
+            <div className="space-y-2 text-center">
+              <h2 className="text-2xl font-bold">
+                {userData?.username || "Unknown User"}
+              </h2>
+              <p className="text-gray-500">
+                {userData?.email || "No email provided"}
+              </p>
+            </div>
+
+            <div className="w-full space-y-4">
+              <div>
+                <Label>Bio</Label>
+                <p className="text-gray-600">
+                  A passionate developer who loves to code.
+                </p>
               </div>
-              <Button type="submit" className="w-full">
-                Submit
-              </Button>
-            </form>
-          </Form>
+              <div>
+                <Label>Phone</Label>
+                <p className="text-gray-600 capitalize">
+                  {userData?.phone || "Not available"}
+                </p>
+              </div>
+              <div>
+                <Label>Role</Label>
+                <p className="text-gray-600 capitalize">
+                  {userData?.role || "User"}
+                </p>
+              </div>
+              <div>
+                <Label>Subscription</Label>
+                <p className="text-gray-600 capitalize">
+                  {userData?.subscription || "None"}
+                </p>
+              </div>
+
+              <Button className="w-full capitalize">Edit Profile</Button>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>

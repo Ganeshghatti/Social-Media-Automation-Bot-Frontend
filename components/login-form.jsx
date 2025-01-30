@@ -62,7 +62,9 @@ export function LoginForm({ className, ...props }) {
 
       const token = response.data.data.token;
       updateToken(token);
-      localStorage.setItem("token", token);
+      if (typeof window !== "undefined") {
+        localStorage.setItem("token", token);
+      }
       console.log(token);
 
       router.push("/onboarding");

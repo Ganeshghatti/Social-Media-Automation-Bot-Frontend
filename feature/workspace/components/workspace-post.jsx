@@ -27,6 +27,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 
 import axios from "axios";
+import useAuthToken from "@/hooks/useAuthToken";
 
 const WorkSpacePost = ({ accountId, workSpaceId }) => {
   const [postId, setPostId] = useState();
@@ -44,14 +45,8 @@ const WorkSpacePost = ({ accountId, workSpaceId }) => {
 
   const onSubmit = async (data) => {
     try {
-      let token = null;
-      if (typeof window !== "undefined") {
-        token = localStorage.getItem("token");
-      }
+      const token = useAuthToken();
 
-      if (!token) {
-        throw new Error("No token found!");
-      }
 
       const formData = {
         posts: [

@@ -23,6 +23,7 @@ import WorkspaceCreate from "@/feature/workspace/components/workspace-create";
 import WorkspaceEdit from "@/feature/workspace/components/workspace-edit";
 import WorkSpacePost from "@/feature/workspace/components/workspace-post";
 import WorkSpaceThread from "@/feature/workspace-thread";
+import useAuthToken from "@/hooks/useAuthToken";
 
 const Page = () => {
   const [workspaces, setWorkspaces] = useState([]);
@@ -33,10 +34,11 @@ const Page = () => {
   const [accountId, setAccountId] = useState();
   const [workSpaceApiId, setWorkSpaceApiId] = useState();
   const [postType, setPostType] = useState("thread");
+  const token = useAuthToken();
+
 
   console.log("Account Id ",accountId)
 
-  const token = localStorage.getItem("token");
   const router = useRouter();
 
   useEffect(() => {
