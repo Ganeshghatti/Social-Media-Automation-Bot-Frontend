@@ -1,28 +1,28 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const WorkspacePage = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [success, setSuccess] = useState(null);
 
   useEffect(() => {
-    const { success } = router.query;
+    const successParam = searchParams.get("success");
 
-    // Delay access to query parameters to ensure it runs in the browser
-    if (success) {
-      setSuccess(success);
-      if (success === "true") {
+    if (successParam) {
+      setSuccess(successParam);
+      if (successParam === "true") {
         setTimeout(() => {
           router.push("/dashboard");
         }, 5000);
       }
     }
-  }, [router.query]);
+  }, [searchParams, router]);
 
   if (success === null) {
-    return <div>Loading...</div>; // Handle loading state if needed
+    return <div>Loading...</div>;
   }
 
   return (

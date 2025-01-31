@@ -26,6 +26,7 @@ import WorkSpaceThread from "@/feature/workspace-thread";
 import useAuthToken from "@/hooks/useAuthToken";
 
 const Page = () => {
+  const token = useAuthToken();
   const [workspaces, setWorkspaces] = useState([]);
   const [dialogState, setDialogState] = useState(false);
   const [createWorkSpaceState, setCreateWorkSpaceState] = useState(false);
@@ -34,14 +35,13 @@ const Page = () => {
   const [accountId, setAccountId] = useState();
   const [workSpaceApiId, setWorkSpaceApiId] = useState();
   const [postType, setPostType] = useState("thread");
-  const token = useAuthToken();
 
-
-  console.log("Account Id ",accountId)
 
   const router = useRouter();
 
   useEffect(() => {
+    if (!token) return; // Ensure token is available before making requests
+
     const fetchWorkspaces = async () => {
       try {
         const response = await axios.get(
@@ -52,7 +52,6 @@ const Page = () => {
             },
           }
         );
-        console.log("Response data ",response.data)
         setWorkspaces(response.data.data);
         setWorkSpaceApiId(response.data.data[0]._id);
         setAccountId(response.data.data[0].connectedAccounts[0]?.userId);
@@ -60,8 +59,9 @@ const Page = () => {
         console.error("Error fetching workspaces:", error);
       }
     };
+
     fetchWorkspaces();
-  }, []);
+  }, [token]);
 
   const connectTwitter = async (workspaceId) => {
     try {
