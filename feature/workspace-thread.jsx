@@ -77,7 +77,6 @@ const WorkSpaceThread = ({ accountId, workSpaceId }) => {
 
       console.log("Presigned Response ",presignedResponse)
 
-      // Check if any posts have media that needs to be uploaded
       const postsWithMedia = data.posts.filter(
         (post) => post.media && post.media.length > 0
       );
@@ -137,7 +136,6 @@ const WorkSpaceThread = ({ accountId, workSpaceId }) => {
 
       console.log("Step 3: Creating final post");
 
-      // Step 3: Create final post
       const finalResponse = await axios.post(
         `https://api.bot.thesquirrel.site/workspace/posts/create/${workSpaceId}`,
         {

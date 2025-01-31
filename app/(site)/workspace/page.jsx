@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-const WorkspacePage = () => {
+const WorkspacePageContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [success, setSuccess] = useState(null);
+  const [success, setSuccess] = (useState < string) | (null > null);
 
   useEffect(() => {
     const successParam = searchParams.get("success");
@@ -33,6 +33,20 @@ const WorkspacePage = () => {
         <h1>Connection failed</h1>
       )}
     </div>
+  );
+};
+
+const WorkspacePage = () => {
+  return (
+    <Suspense
+      fallback={
+        <div>
+          <h1>Loading...</h1>
+        </div>
+      }
+    >
+      <WorkspacePageContent />
+    </Suspense>
   );
 };
 
