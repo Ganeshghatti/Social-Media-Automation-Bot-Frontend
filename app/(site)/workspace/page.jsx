@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 const WorkspacePageContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [success, setSuccess] = (useState < string) | (null > null);
+  const [success, setSuccess] = useState(null);
 
   useEffect(() => {
     const successParam = searchParams.get("success");

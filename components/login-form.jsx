@@ -15,7 +15,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import useAuthStore from "@/store";
 
 import { useRouter } from "next/navigation";
 
@@ -32,7 +31,6 @@ import {
 } from "@/components/ui/form";
 
 export function LoginForm({ className, ...props }) {
-  const updateToken = useAuthStore((state) => state.updateToken);
 
   const router = useRouter();
 
@@ -61,7 +59,6 @@ export function LoginForm({ className, ...props }) {
       );
 
       const token = response.data.data.token;
-      updateToken(token);
       if (typeof window !== "undefined") {
         localStorage.setItem("token", token);
       }
