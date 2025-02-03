@@ -47,7 +47,6 @@ const WorkSpacePost = ({ accountId, workSpaceId }) => {
     try {
       const token = useAuthToken();
 
-
       const formData = {
         posts: [
           {
