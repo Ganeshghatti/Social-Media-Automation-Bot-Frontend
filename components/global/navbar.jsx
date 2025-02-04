@@ -1,8 +1,8 @@
-import { navItems } from "@/constants";
+import { navItems } from "@constants/index.js";
 import Link from "next/link";
 import Image from "next/image";
 
-import { Button } from "../ui/button";
+import { Button } from "@components/ui/button";
 
 export default function Navbar() {
   return (

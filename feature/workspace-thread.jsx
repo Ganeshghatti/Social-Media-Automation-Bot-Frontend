@@ -2,9 +2,9 @@ import React from "react";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@components/ui/button";
+import { Input } from "@components/ui/input";
+import { Textarea } from "@components/ui/textarea";
 import {
   Form,
   FormControl,
@@ -12,13 +12,13 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
+} from "@components/ui/form";
 
 import axios from "axios";
 
-import { Switch } from "@/components/ui/switch"; // Assuming you have a Switch component
-import { workSpaceThreadSchema } from "@/schema";
-import useAuthToken from "@/hooks/useAuthToken";
+import { Switch } from "@components/ui/switch"; // Assuming you have a Switch component
+import { workSpaceThreadSchema } from "@/schema/index";
+import useAuthToken from "@hooks/useAuthToken";
 
 const WorkSpaceThread = ({ accountId, workSpaceId }) => {
   const token = useAuthToken();

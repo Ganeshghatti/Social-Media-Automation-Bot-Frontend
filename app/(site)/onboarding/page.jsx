@@ -4,22 +4,22 @@ import React, { useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@components/ui/card";
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+} from "@components/ui/form";
+import { Input } from "@components/ui/input";
 import { useState } from "react";
 import { X } from "lucide-react";
 
 import axios from "axios";
-import useAuthToken from "@/hooks/useAuthToken";
-import { useUserStore } from "@/store/userStore";
+import useAuthToken from "@hooks/useAuthToken";
+import { useUserStore } from "@store/userStore";
 import { useRouter } from "next/navigation";
 
 const formSchema = z.object({

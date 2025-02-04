@@ -4,9 +4,9 @@ import React from "react";
 
 import { z } from "zod";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@components/ui/button";
 
-import { Textarea } from "@/components/ui/textarea";
+import { Textarea } from "@components/ui/textarea";
 
 import {
   Form,
@@ -16,8 +16,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+} from "@components/ui/form";
+import { Input } from "@components/ui/input";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 

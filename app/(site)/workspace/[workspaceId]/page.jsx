@@ -2,7 +2,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation"; // to use `params` in the app directory
-import useAuthToken from "@/hooks/useAuthToken";
+import useAuthToken from "@hooks/useAuthToken";
 
 const WorkspacePage = () => {
   const [loading, setLoading] = useState(false);

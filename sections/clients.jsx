@@ -1,4 +1,4 @@
-import { clients } from "@/constants";
+import { clients } from "@constants/index.js";
 import Image from "next/image";
 import React from "react";
 

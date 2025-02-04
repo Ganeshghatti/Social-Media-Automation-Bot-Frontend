@@ -32,8 +32,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import useAuthToken from "@/hooks/useAuthToken";
+} from "@components/ui/form";
+import useAuthToken from "@hooks/useAuthToken";
 
 const WorkspaceEdit = ({ isOpen, setIsOpen, workSpaceData }) => {
   const [file, setFile] = useState(null);

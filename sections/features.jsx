@@ -1,5 +1,5 @@
-import FeatureCard from "@/components/global/feature-card";
-import { featureData } from "@/constants";
+import FeatureCard from "@components/global/feature-card";
+import { featureData } from "@constants/index.js";
 import React from "react";
 
 const Features = () => {

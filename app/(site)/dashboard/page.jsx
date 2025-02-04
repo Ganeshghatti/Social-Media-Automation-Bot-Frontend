@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@components/ui/button";
 import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
@@ -9,21 +9,21 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion";
+} from "@components/ui/accordion";
 
 import {
   ContextMenu,
   ContextMenuContent,
   ContextMenuItem,
   ContextMenuTrigger,
-} from "@/components/ui/context-menu";
+} from "@components/ui/context-menu";
 
-import WorkspaceSettings from "@/feature/workspace/components/workspace-setting";
-import WorkspaceCreate from "@/feature/workspace/components/workspace-create";
-import WorkspaceEdit from "@/feature/workspace/components/workspace-edit";
-import WorkSpacePost from "@/feature/workspace/components/workspace-post";
-import WorkSpaceThread from "@/feature/workspace-thread";
-import useAuthToken from "@/hooks/useAuthToken";
+import WorkspaceSettings from "@feature/workspace/components/workspace-setting";
+import WorkspaceCreate from "@feature/workspace/components/workspace-create";
+import WorkspaceEdit from "@feature/workspace/components/workspace-edit";
+import WorkSpacePost from "@feature/workspace/components/workspace-post";
+import useAuthToken from "@hooks/useAuthToken";
+import WorkSpaceThread from "@feature/workspace-thread";
 
 const Page = () => {
   const token = useAuthToken();
