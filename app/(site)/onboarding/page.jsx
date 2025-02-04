@@ -19,7 +19,7 @@ import { X } from "lucide-react";
 
 import axios from "axios";
 import useAuthToken from "@hooks/useAuthToken";
-import { useUserStore } from "@store/userStore";
+import { useUserStore } from "@/store/userStore";
 import { useRouter } from "next/navigation";
 
 const formSchema = z.object({

@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect } from "react";
-import { useUserStore } from "@store/userStore";
+import { useUserStore } from "@/store/userStore";
 import useAuthToken from "@hooks/useAuthToken";
 
 const LayoutOnboadingPage = ({ children }) => {
