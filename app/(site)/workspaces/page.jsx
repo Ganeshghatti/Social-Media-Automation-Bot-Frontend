@@ -60,7 +60,7 @@ const WorkspacesPage = () => {
           )}
 
           <Link
-            href={`/dashboard`}
+            href={`/workspace/create`}
             className="border-gray-900 border-2 rounded-sm px-6 py-4 "
           >
             Add Workspace

@@ -30,6 +30,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", ".next/types/**/*.ts", "**/*.ts", "**/*.tsx"],
+  "include": ["next-env.d.ts", ".next/types/**/*.ts", "**/*.ts", "**/*.tsx", "app/(site)/workspace/[workspaceId]/edit/page.jsx"],
   "exclude": ["node_modules"]
 }

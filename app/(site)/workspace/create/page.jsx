@@ -1,7 +1,7 @@
 "use client";
 
-import { useParams, useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -20,15 +20,12 @@ import { z } from "zod";
 import axios from "axios";
 import useAuthToken from "@hooks/useAuthToken";
 
-const EditWorkspace = () => {
+const Page = () => {
   const [loading, setLoading] = useState(false);
-  const [singleWorkspace, setSingleWorkspace] = useState(null);
   const [keywordInput, setKeywordInput] = useState("");
   const [iconPreview, setIconPreview] = useState(null);
   const router = useRouter();
   const token = useAuthToken() || "";
-  const params = useParams();
-  const { workspaceId } = params;
 
   const formSchema = z.object({
     name: z.string().min(1, "Name is required"),
@@ -60,7 +57,7 @@ const EditWorkspace = () => {
       return;
     }
 
-    const maxSize = 5 * 1024 * 1024;
+    const maxSize = 5 * 1024 * 1024; // 5MB
     if (file.size > maxSize) {
       alert("File size must be less than 5MB");
       return;
@@ -76,37 +73,6 @@ const EditWorkspace = () => {
     onChange(fileData);
     setIconPreview(URL.createObjectURL(file));
   };
-
-  const SingleWorkspaceData = async (workspaceId, token) => {
-    try {
-      setLoading(true);
-      const response = await axios.get(
-        `https://api.bot.thesquirrel.site/workspace/get/${workspaceId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      setSingleWorkspace(response.data.data);
-      if (response.data.data) {
-        setIconPreview(response.data.data.icon);
-        form.reset({
-          name: response.data.data.name || "",
-          about: response.data.data.about || "",
-          description: response.data.data.settings.description || "",
-          keywords: response.data.data.settings.keywords || [],
-        });
-      }
-    } catch (error) {
-      console.error("Error:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (!token) return;
-    SingleWorkspaceData(workspaceId, token);
-  }, [token, workspaceId]);
 
   const onSubmit = async (data) => {
     try {
@@ -130,21 +96,22 @@ const EditWorkspace = () => {
         };
       }
 
-      const response = await axios.put(
-        `https://api.bot.thesquirrel.site/workspace/edit/${workspaceId}`,
+      const response = await axios.post(
+        `https://api.bot.thesquirrel.site/workspace/create`,
         payload,
         {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
         }
       );
 
-      if (
-        response.data.success &&
-        data.icon &&
-        response.data.data.presignedUrl
-      ) {
+      if (response.data.success && data.icon) {
         await axios.put(response.data.data.presignedUrl, data.icon.file, {
-          headers: { "Content-Type": data.icon.mimetype },
+          headers: {
+            "Content-Type": data.icon.mimetype,
+          },
         });
       }
 
@@ -174,7 +141,9 @@ const EditWorkspace = () => {
     );
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="flex items-center justify-center w-full">
@@ -182,7 +151,7 @@ const EditWorkspace = () => {
         <Card>
           <CardHeader>
             <CardTitle className="text-2xl text-center">
-              Update Workspace
+              Create Workspace
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -194,7 +163,7 @@ const EditWorkspace = () => {
                 <FormField
                   control={form.control}
                   name="icon"
-                  render={({ field: { onChange } }) => (
+                  render={({ field: { onChange, value, ...field } }) => (
                     <FormItem>
                       <FormLabel>Workspace Icon</FormLabel>
                       <FormControl>
@@ -214,7 +183,7 @@ const EditWorkspace = () => {
                               <button
                                 type="button"
                                 onClick={() => {
-                                  setIconPreview(singleWorkspace?.icon || null);
+                                  setIconPreview(null);
                                   onChange(null);
                                 }}
                                 className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1"
@@ -229,7 +198,6 @@ const EditWorkspace = () => {
                     </FormItem>
                   )}
                 />
-                {/* Rest of the form fields remain the same */}
                 <FormField
                   control={form.control}
                   name="name"
@@ -269,6 +237,7 @@ const EditWorkspace = () => {
                     </FormItem>
                   )}
                 />
+
                 <FormField
                   control={form.control}
                   name="keywords"
@@ -299,6 +268,7 @@ const EditWorkspace = () => {
                     </FormItem>
                   )}
                 />
+
                 <div className="flex flex-wrap gap-2">
                   {keywords.map((keyword, index) => (
                     <div
@@ -321,7 +291,7 @@ const EditWorkspace = () => {
                   className="w-full mt-6"
                   disabled={loading}
                 >
-                  {loading ? "Updating..." : "Update Workspace"}
+                  {loading ? "Creating..." : "Create Workspace"}
                 </Button>
               </form>
             </Form>
@@ -332,4 +302,4 @@ const EditWorkspace = () => {
   );
 };
 
-export default EditWorkspace;
+export default Page;
