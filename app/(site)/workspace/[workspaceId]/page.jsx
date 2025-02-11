@@ -1,47 +1,87 @@
 "use client";
-
-import { useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import useAuthToken from "@hooks/useAuthToken";
+import { Button } from "@components/ui/button";
+import { useRouter } from "next/navigation";
 
 const WorkspacePage = () => {
+  const [loading, setLoading] = useState(false);
+  const [singleWorkspace, setSingleWorkspace] = useState(null);
+  const { workspaceId } = useParams();
+  const token = useAuthToken();
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const success = searchParams.get("success");
+
+  const SingleWorkspaceData = async (workspaceId, token) => {
+    try {
+      setLoading(true);
+      const response = await axios.get(
+        `https://api.bot.thesquirrel.site/workspace/get/${workspaceId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log("Response ", response);
+      setSingleWorkspace(response.data.data);
+    } catch (error) {
+      console.log("Error ", error);
+      setSingleWorkspace(null);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    if (success === "true") {
-      setTimeout(() => {
-        router.push("/dashboard");
-      }, 5000);
+    if (workspaceId && token) {
+      SingleWorkspaceData(workspaceId, token);
     }
-  }, [success, router]);
+  }, [workspaceId, token]);
+
+  const deleteWorkspace = async () => {
+    if (!token) return;
+
+    try {
+      const response = await axios.delete(
+        `https://api.bot.thesquirrel.site/workspace/delete/${workspaceId}`, // FIXED DELETE ENDPOINT
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log("message", response.data.message);
+
+      if (response.data.success) {
+        router.push("/workspaces");
+      }
+    } catch (error) {
+      console.error("Error deleting workspace:", error);
+    }
+  };
 
   return (
-    <div className="h-screen flex items-center justify-center ">
-      {success === "true" ? (
-        <div className="flex items-center justify-center flex-col gap-5">
-          <h1 className="text-7xl font-bold">Connection Completed!</h1>
-          <p className="text-2xl text-muted-foreground">
-            Twitter account connected successfully. Enjoy your twitter posting
-            with breeze
-          </p>
-          <p className="text-lg text-blue-600 font-medium">
-            Redirecting to your page in a while !
-          </p>
-        </div>
+    <main>
+      {loading ? (
+        <h1 className="text-2xl font-semibold">Loading...</h1>
       ) : (
-        <div className="flex items-center justify-center flex-col gap-5">
-          <h1 className="text-7xl font-bold">Connection failed</h1>
-          <p className="text-2xl text-muted-foreground">
-            Twitter account was not able to connect properly please try once
-            again.
-          </p>
-          <p className="text-lg text-blue-600 font-medium">
-            Redirecting to your page in a while !
-          </p>
-        </div>
+        singleWorkspace && (
+          <div>
+            <h2 className="text-2xl font-semibold">{singleWorkspace.name}</h2>
+            <div className="flex gap-6 items-center">
+              <Button
+                onClick={() => router.push(`/workspace/${workspaceId}/edit`)}
+              >
+                Edit Workspace
+              </Button>
+              <Button onClick={deleteWorkspace}>Delete Workspace</Button>
+            </div>
+          </div>
+        )
       )}
-    </div>
+    </main>
   );
 };
 

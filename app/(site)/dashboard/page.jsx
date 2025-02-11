@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@components/ui/button";
 import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
@@ -9,22 +9,24 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion";
+} from "@components/ui/accordion";
 
 import {
   ContextMenu,
   ContextMenuContent,
   ContextMenuItem,
   ContextMenuTrigger,
-} from "@/components/ui/context-menu";
+} from "@components/ui/context-menu";
 
-import WorkspaceSettings from "@/feature/workspace/components/workspace-setting";
-import WorkspaceCreate from "@/feature/workspace/components/workspace-create";
-import WorkspaceEdit from "@/feature/workspace/components/workspace-edit";
-import WorkSpacePost from "@/feature/workspace/components/workspace-post";
-import WorkSpaceThread from "@/feature/workspace-thread";
+import WorkspaceSettings from "@feature/workspace/components/workspace-setting";
+import WorkspaceCreate from "@feature/workspace/components/workspace-create";
+import WorkspaceEdit from "@feature/workspace/components/workspace-edit";
+import WorkSpacePost from "@feature/workspace/components/workspace-post";
+import useAuthToken from "@hooks/useAuthToken";
+import WorkSpaceThread from "@feature/workspace-thread";
 
 const Page = () => {
+  const token = useAuthToken();
   const [workspaces, setWorkspaces] = useState([]);
   const [dialogState, setDialogState] = useState(false);
   const [createWorkSpaceState, setCreateWorkSpaceState] = useState(false);
@@ -34,10 +36,12 @@ const Page = () => {
   const [workSpaceApiId, setWorkSpaceApiId] = useState();
   const [postType, setPostType] = useState("thread");
 
-  const token = localStorage.getItem("token");
+
   const router = useRouter();
 
   useEffect(() => {
+    if (!token) return; // Ensure token is available before making requests
+
     const fetchWorkspaces = async () => {
       try {
         const response = await axios.get(
@@ -50,13 +54,14 @@ const Page = () => {
         );
         setWorkspaces(response.data.data);
         setWorkSpaceApiId(response.data.data[0]._id);
-        setAccountId(response.data.data[0].connectedAccounts[0].userId);
+        setAccountId(response.data.data[0].connectedAccounts[0]?.userId);
       } catch (error) {
         console.error("Error fetching workspaces:", error);
       }
     };
+
     fetchWorkspaces();
-  }, []);
+  }, [token]);
 
   const connectTwitter = async (workspaceId) => {
     try {

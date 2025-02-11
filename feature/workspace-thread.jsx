@@ -2,9 +2,9 @@ import React from "react";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@components/ui/button";
+import { Input } from "@components/ui/input";
+import { Textarea } from "@components/ui/textarea";
 import {
   Form,
   FormControl,
@@ -12,14 +12,17 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
+} from "@components/ui/form";
 
 import axios from "axios";
 
-import { Switch } from "@/components/ui/switch"; // Assuming you have a Switch component
-import { workSpaceThreadSchema } from "@/schema";
+import { Switch } from "@components/ui/switch"; // Assuming you have a Switch component
+import { workSpaceThreadSchema } from "@/schema/index";
+import useAuthToken from "@hooks/useAuthToken";
 
 const WorkSpaceThread = ({ accountId, workSpaceId }) => {
+  const token = useAuthToken();
+
   const form = useForm({
     resolver: zodResolver(workSpaceThreadSchema),
     defaultValues: {
@@ -47,7 +50,10 @@ const WorkSpaceThread = ({ accountId, workSpaceId }) => {
       posts: [
         {
           accountId: accountId,
-          ...data,
+          type: "twitter",
+          posttype: "thread",
+          publishnow: data.publishnow,
+          tobePublishedAt: data.tobePublishedAt,
           posts: data.posts.map((post) => ({
             ...post,
             media: post.media.map(({ blobUrl, ...rest }) => rest),
@@ -57,8 +63,9 @@ const WorkSpaceThread = ({ accountId, workSpaceId }) => {
     };
 
     try {
-      const token = localStorage.getItem("token");
-      const response = await axios.post(
+      console.log("Step 1: Sending initial data:", formData);
+
+      const presignedResponse = await axios.post(
         `https://api.bot.thesquirrel.site/workspace/posts/create/presigned-url/${workSpaceId}`,
         formData,
         {
@@ -67,27 +74,86 @@ const WorkSpaceThread = ({ accountId, workSpaceId }) => {
           },
         }
       );
-      console.log("Response", response.data);
 
-      const finalData = {
-        posts: [...response.data.data],
-      };
+      console.log("Presigned Response ",presignedResponse)
+
+      const postsWithMedia = data.posts.filter(
+        (post) => post.media && post.media.length > 0
+      );
+
+      if (postsWithMedia.length > 0) {
+        console.log("Step 2: Uploading media files for posts ",postsWithMedia);
+
+        for (
+          let postIndex = 0;
+          postIndex < postsWithMedia.length;
+          postIndex++
+        ) {
+          const post = postsWithMedia[postIndex];
+          const responsePost = presignedResponse.data.data[0].posts[postIndex];
+
+          console.log("Response post ",responsePost)
+
+          if (post.media && responsePost.media) {
+            for (
+              let mediaIndex = 0;
+              mediaIndex < post.media.length;
+              mediaIndex++
+            ) {
+              const mediaItem = post.media[mediaIndex];
+              const presignedMediaItem = responsePost.media[mediaIndex];
+              console.log("Media ",presignedMediaItem)
+
+              if (mediaItem && presignedMediaItem) {
+                console.log(
+                  `Uploading file ${mediaIndex + 1} for post ${postIndex + 1}`
+                );
+
+                try {
+                  const imageBlob = await fetch(mediaItem.blobUrl).then((r) =>
+                    r.blob()
+                  );
+                  const uploadResult = await axios.put(
+                    presignedMediaItem.presignedUrl,
+                    imageBlob,
+                    {
+                      headers: {
+                        "Content-Type": mediaItem.mimetype,
+                      },
+                    }
+                  );
+
+                  console.log(`File upload status:`, uploadResult.status);
+                } catch (uploadError) {
+                  console.error(`Error uploading file:`, uploadError);
+                  throw uploadError;
+                }
+              }
+            }
+          }
+        }
+      }
+
+      console.log("Step 3: Creating final post");
 
       const finalResponse = await axios.post(
         `https://api.bot.thesquirrel.site/workspace/posts/create/${workSpaceId}`,
-        finalData,
+        {
+          posts: presignedResponse.data.data,
+        },
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
-      console.log("Final Response", finalResponse.data);
+
+      console.log("Final Response ",finalResponse)
+
+      console.log("Post created successfully:", finalResponse.data);
     } catch (error) {
       console.error("Error posting data", error);
     }
-
-    console.log("DATA", formData);
   };
 
   const handleFileChange = (e, onChange, index) => {
@@ -171,7 +237,9 @@ const WorkSpaceThread = ({ accountId, workSpaceId }) => {
                                   field.onChange
                                 )
                               }
-                              className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 focus:outline-none"
+                              className="absolute top-0
+                               right-0 bg-red-500 text-white rounded-full p-1 
+                               focus:outline-none"
                             >
                               X
                             </button>

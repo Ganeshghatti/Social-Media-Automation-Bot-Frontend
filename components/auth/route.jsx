@@ -1,5 +1,6 @@
 "use client";
 
+import useAuthToken from "@hooks/useAuthToken";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -9,7 +10,7 @@ const withAuth = (WrappedComponent) => {
     const [checkingAuth, setCheckingAuth] = useState(true);
 
     useEffect(() => {
-      const token = localStorage.getItem("token");
+      const token = useAuthToken();
       if (token) {
         router.push("/dashboard");
       } else {

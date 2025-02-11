@@ -1,6 +1,6 @@
 import React from "react";
 import Image from "next/image";
-import { socialData } from "@/constants";
+import { socialData } from "@constants/index.js";
 
 const Footer = () => {
   return (

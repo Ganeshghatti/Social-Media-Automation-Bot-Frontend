@@ -1,21 +1,20 @@
 "use client";
 
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { cn } from "@lib/utils";
+import { Button } from "@components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+} from "@components/ui/card";
+import { Input } from "@components/ui/input";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import useAuthStore from "@/store";
 
 import { useRouter } from "next/navigation";
 
@@ -32,7 +31,6 @@ import {
 } from "@/components/ui/form";
 
 export function LoginForm({ className, ...props }) {
-  const updateToken = useAuthStore((state) => state.updateToken);
 
   const router = useRouter();
 
@@ -61,8 +59,9 @@ export function LoginForm({ className, ...props }) {
       );
 
       const token = response.data.data.token;
-      updateToken(token);
-      localStorage.setItem("token", token);
+      if (typeof window !== "undefined") {
+        localStorage.setItem("token", token);
+      }
       console.log(token);
 
       router.push("/onboarding");
