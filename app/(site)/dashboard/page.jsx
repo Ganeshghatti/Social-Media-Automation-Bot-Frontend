@@ -25,6 +25,7 @@ import useAuthToken from "@hooks/useAuthToken";
 import WorkSpaceThread from "@feature/workspace-thread";
 import { useUserStore } from "@/store/userStore";
 import { useRouter } from "next/navigation";
+import ImageFetch from "@feature/post/components/image-fetch" 
 
 const Page = () => {
   const token = useAuthToken();
@@ -270,7 +271,9 @@ const Page = () => {
         ) : (
           <WorkSpacePost accountId={accountId} workSpaceId={workSpaceApiId} />
         )}
+         <ImageFetch token={token}/>
       </div>
+     
     </div>
   );
 };
