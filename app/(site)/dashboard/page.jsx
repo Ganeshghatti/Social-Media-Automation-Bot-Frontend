@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@components/ui/button";
 import { Plus } from "lucide-react";
-import { useRouter } from "next/navigation";
 import axios from "axios";
 import {
   Accordion,
@@ -24,6 +23,8 @@ import WorkspaceEdit from "@feature/workspace/components/workspace-edit";
 import WorkSpacePost from "@feature/workspace/components/workspace-post";
 import useAuthToken from "@hooks/useAuthToken";
 import WorkSpaceThread from "@feature/workspace-thread";
+import { useUserStore } from "@/store/userStore";
+import { useRouter } from "next/navigation";
 
 const Page = () => {
   const token = useAuthToken();
@@ -35,9 +36,22 @@ const Page = () => {
   const [accountId, setAccountId] = useState();
   const [workSpaceApiId, setWorkSpaceApiId] = useState();
   const [postType, setPostType] = useState("thread");
-
-
+  const { user, fetchUser } = useUserStore();
   const router = useRouter();
+
+  useEffect(() => {
+    if (token) {
+      fetchUser(token); // Pass token as parameter
+    }
+  }, [token]);
+
+  useEffect(() => {
+    if (user) {
+      if (!user.onboarding) {
+        router.replace("/onboarding");
+      }
+    }
+  }, [user, router]);
 
   useEffect(() => {
     if (!token) return; // Ensure token is available before making requests
@@ -116,6 +130,13 @@ const Page = () => {
   const handlePostTypeChange = (event) => {
     setPostType(event.target.value);
   };
+
+  if (user === null)
+    return (
+      <div className="flex flex-col">
+        <h1 className="text-2xl">Loading...</h1>
+      </div>
+    );
 
   return (
     <div className="flex min-h-screen bg-gray-100">

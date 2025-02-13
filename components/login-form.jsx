@@ -10,12 +10,9 @@ import {
   CardTitle,
 } from "@components/ui/card";
 import { Input } from "@components/ui/input";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-
-
 import { useRouter } from "next/navigation";
 
 import axios from "axios";
@@ -29,9 +26,9 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import Link from "next/link";
 
 export function LoginForm({ className, ...props }) {
-
   const router = useRouter();
 
   const formSchema = z.object({
@@ -62,9 +59,8 @@ export function LoginForm({ className, ...props }) {
       if (typeof window !== "undefined") {
         localStorage.setItem("token", token);
       }
-      console.log(token);
 
-      router.push("/onboarding");
+      router.push("/dashboard");
     } catch (error) {
       console.error("Signup failed:", error);
     }
@@ -81,7 +77,10 @@ export function LoginForm({ className, ...props }) {
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-8 mb-4"
+            >
               <FormField
                 control={form.control}
                 name="email"
@@ -89,7 +88,11 @@ export function LoginForm({ className, ...props }) {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input placeholder="enter your email" {...field} />
+                      <Input
+                        placeholder="enter your email"
+                        type="text"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -102,7 +105,11 @@ export function LoginForm({ className, ...props }) {
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input placeholder="setup a good password" {...field} />
+                      <Input
+                        type="password"
+                        placeholder="setup a good password"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -113,6 +120,13 @@ export function LoginForm({ className, ...props }) {
               </Button>
             </form>
           </Form>
+
+          <Link
+            href={"/forget-password"}
+            className="text-lg font-semibold underline mt-12"
+          >
+            Forget Password?
+          </Link>
         </CardContent>
       </Card>
     </div>
