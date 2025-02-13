@@ -30,7 +30,7 @@ const formSchema = z.object({
 const Page = () => {
   const token = useAuthToken();
   const [keywords, setKeywords] = useState([]);
-  const { user, fetchUser } = useUserStore();
+  const { user } = useUserStore();
   const router = useRouter();
 
   const form = useForm({
@@ -48,21 +48,15 @@ const Page = () => {
     }
   };
 
-  const removeKeyword = (keywordToRemove) => {
-    setKeywords(keywords.filter((keyword) => keyword !== keywordToRemove));
-  };
-
-  useEffect(() => {
-    if (token) {
-      fetchUser(token); // Pass token as parameter
-    }
-  }, [token]);
-
   useEffect(() => {
     if (user?.onboarding) {
       router.replace("/dashboard");
     }
   }, [user, router]);
+
+  const removeKeyword = (keywordToRemove) => {
+    setKeywords(keywords.filter((keyword) => keyword !== keywordToRemove));
+  };
 
   if (user === null)
     return (
@@ -70,7 +64,6 @@ const Page = () => {
         <h1 className="text-2xl">Loading...</h1>
       </div>
     );
-  if (user?.onboarding) return null;
 
   const onSubmit = async (data) => {
     try {
