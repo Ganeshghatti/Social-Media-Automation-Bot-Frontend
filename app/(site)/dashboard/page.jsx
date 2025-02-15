@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { Button } from "@components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import axios from "axios";
 import {
   Accordion,
@@ -39,6 +39,7 @@ const Page = () => {
   const [postType, setPostType] = useState("thread");
   const { user, fetchUser } = useUserStore();
   const router = useRouter();
+  const [selectedImages, setSelectedImages] = useState([]);
 
   useEffect(() => {
     if (token) {
@@ -96,6 +97,10 @@ const Page = () => {
     }
   };
 
+  const handleRemoveImage = (imageToRemove) => {
+    setSelectedImages(selectedImages.filter(img => img.imageUrl !== imageToRemove.imageUrl));
+  };
+
   const disconnectTwitter = async (workspaceId, userId) => {
     try {
       const response = await axios.post(
@@ -139,6 +144,9 @@ const Page = () => {
       </div>
     );
 
+    useEffect(() => {
+      console.log(selectedImages)
+    },[selectedImages])
   return (
     <div className="flex min-h-screen bg-gray-100">
       <div className="w-64 bg-white p-4 shadow-sm">
@@ -271,7 +279,34 @@ const Page = () => {
         ) : (
           <WorkSpacePost accountId={accountId} workSpaceId={workSpaceApiId} />
         )}
-         <ImageFetch token={token}/>
+        {selectedImages.length > 0 && (
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold mb-3">Selected Images</h3>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {selectedImages.map((image, index) => (
+                <div key={index} className="relative group">
+                  <img
+                    src={image.imageUrl}
+                    alt={image.title}
+                    className="w-full h-48 object-cover rounded-lg shadow-md"
+                  />
+                  <button
+                    onClick={() => handleRemoveImage(image)}
+                    className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition-colors"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+         <ImageFetch 
+  token={token} 
+  selectedImages={selectedImages} 
+  setSelectedImages={setSelectedImages} 
+/>
       </div>
      
     </div>
