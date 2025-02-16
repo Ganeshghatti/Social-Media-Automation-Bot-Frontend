@@ -25,6 +25,13 @@ import useAuthToken from "@hooks/useAuthToken";
 import WorkSpaceThread from "@feature/workspace-thread";
 import { useUserStore } from "@/store/userStore";
 import { useRouter } from "next/navigation";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@components/ui/dialog";
 
 const Page = () => {
   const token = useAuthToken();
@@ -67,6 +74,7 @@ const Page = () => {
           }
         );
         setWorkspaces(response.data.data);
+
         setWorkSpaceApiId(response.data.data[0]._id);
         setAccountId(response.data.data[0].connectedAccounts[0]?.userId);
       } catch (error) {
@@ -129,6 +137,40 @@ const Page = () => {
 
   const handlePostTypeChange = (event) => {
     setPostType(event.target.value);
+  };
+
+  const connectLinkedin = async (workspaceId) => {
+    try {
+      const response = await axios.post(
+        `https://api.bot.thesquirrel.site/workspace/linkedin/connect/${workspaceId}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      router.push(response.data.data);
+      setWorkSpaceApiId(workspaceId);
+    } catch (error) {
+      console.error("Error connecting linked in: ", error);
+    }
+  };
+
+  const disconnectLinkedIn = async (workspaceId, userId) => {
+    try {
+      const response = await axios.post(
+        `https://api.bot.thesquirrel.site/workspace/linkedin/disconnect/${workspaceId}/${userId}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+    } catch (error) {
+      console.error("Error disconnecting Linkedin:", error);
+    }
   };
 
   if (user === null)
@@ -203,30 +245,75 @@ const Page = () => {
                             <p className="capitalize text-sm text-muted-foreground">
                               Status : {account.isConnected ? "true" : "false"}
                             </p>
-                            <Button
-                              variant="outline"
-                              className="w-full flex items-center gap-2"
-                              onClick={() => {
-                                disconnectTwitter(
-                                  workspace._id,
-                                  account.userId
-                                );
-                              }}
-                            >
-                              Disconnect
-                            </Button>
+                            {account?.type === "linkedin" ? (
+                              <Button
+                                variant="outline"
+                                className="w-full flex items-center gap-2"
+                                onClick={() => {
+                                  disconnectLinkedIn(
+                                    workspace._id,
+                                    account.userId
+                                  );
+                                }}
+                              >
+                                Disconnect
+                              </Button>
+                            ) : (
+                              <Button
+                                variant="outline"
+                                className="w-full flex items-center gap-2"
+                                onClick={() => {
+                                  disconnectTwitter(
+                                    workspace._id,
+                                    account.userId
+                                  );
+                                }}
+                              >
+                                Disconnect
+                              </Button>
+                            )}
                           </div>
                         ))
                       ) : (
-                        <Button
-                          variant="outline"
-                          className="w-full flex items-center gap-2"
-                          onClick={() => {
-                            connectTwitter(workspace._id);
-                          }}
-                        >
-                          Connect Twitter
-                        </Button>
+                        <>
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button
+                                variant="outline"
+                                className="w-full flex items-center gap-2"
+                              >
+                                Social Links to Connect
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                              <DialogHeader>
+                                <DialogTitle>
+                                  Connect With Social Accounts
+                                </DialogTitle>
+                              </DialogHeader>
+                              <div className="w-full grid grid-cols-3 gap-5 mt-5">
+                                <Button
+                                  variant="outline"
+                                  className="w-full flex items-center gap-2"
+                                  onClick={() => {
+                                    connectTwitter(workspace._id);
+                                  }}
+                                >
+                                  Connect Twitter
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  className="w-full flex items-center gap-2"
+                                  onClick={() => {
+                                    connectLinkedin(workspace._id);
+                                  }}
+                                >
+                                  Connect Linkedin
+                                </Button>
+                              </div>
+                            </DialogContent>
+                          </Dialog>
+                        </>
                       )}
                     </div>
                   </AccordionContent>
