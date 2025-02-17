@@ -17,6 +17,13 @@ import {
   ContextMenuTrigger,
 } from "@components/ui/context-menu";
 
+import {
+  connectTwitter,
+  disconnectTwitter,
+  connectLinkedin,
+  disconnectLinkedIn,
+} from "@functions/social/index";
+
 import WorkspaceSettings from "@feature/workspace/components/workspace-setting";
 import WorkspaceCreate from "@feature/workspace/components/workspace-create";
 import WorkspaceEdit from "@feature/workspace/components/workspace-edit";
@@ -33,6 +40,8 @@ import {
   DialogTrigger,
 } from "@components/ui/dialog";
 import Link from "next/link";
+import { Label } from "@components/ui/label";
+import { Select } from "@components/ui/select";
 
 const WorkspacePage = () => {
   const { workspaceId } = useParams();
@@ -89,76 +98,8 @@ const WorkspacePage = () => {
     fetchWorkspaces();
   }, [token]);
 
-  const connectTwitter = async (workspaceId) => {
-    try {
-      const response = await axios.post(
-        `https://api.bot.thesquirrel.site/workspace/twitter/connect/${workspaceId}`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      router.push(response.data.data);
-      setWorkSpaceApiId(workspaceId);
-    } catch (error) {
-      console.error("Error connecting Twitter:", error);
-    }
-  };
-
-  const disconnectTwitter = async (workspaceId, userId) => {
-    try {
-      const response = await axios.post(
-        `https://api.bot.thesquirrel.site/workspace/twitter/disconnect/${workspaceId}/${userId}`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-    } catch (error) {
-      console.error("Error disconnecting Twitter:", error);
-    }
-  };
-
   const handlePostTypeChange = (event) => {
     setPostType(event.target.value);
-  };
-
-  const connectLinkedin = async (workspaceId) => {
-    try {
-      const response = await axios.post(
-        `https://api.bot.thesquirrel.site/workspace/linkedin/connect/${workspaceId}`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      router.push(response.data.data);
-      setWorkSpaceApiId(workspaceId);
-    } catch (error) {
-      console.error("Error connecting linked in: ", error);
-    }
-  };
-
-  const disconnectLinkedIn = async (workspaceId, userId) => {
-    try {
-      const response = await axios.post(
-        `https://api.bot.thesquirrel.site/workspace/linkedin/disconnect/${workspaceId}/${userId}`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-    } catch (error) {
-      console.error("Error disconnecting Linkedin:", error);
-    }
   };
 
   const SingleWorkspaceData = useCallback(async (workspaceId, token) => {
@@ -286,7 +227,8 @@ const WorkspacePage = () => {
                                 onClick={() => {
                                   disconnectLinkedIn(
                                     workspace._id,
-                                    account.userId
+                                    account.userId,
+                                    token
                                   );
                                 }}
                               >
@@ -299,7 +241,8 @@ const WorkspacePage = () => {
                                 onClick={() => {
                                   disconnectTwitter(
                                     workspace._id,
-                                    account.userId
+                                    account.userId,
+                                    token
                                   );
                                 }}
                               >
@@ -326,7 +269,12 @@ const WorkspacePage = () => {
                                     variant="outline"
                                     className="w-full flex items-center gap-2"
                                     onClick={() => {
-                                      connectTwitter(workspace._id);
+                                      connectTwitter(
+                                        workspace._id,
+                                        router,
+                                        setWorkSpaceApiId,
+                                        token
+                                      );
                                     }}
                                   >
                                     Connect Twitter
@@ -335,7 +283,12 @@ const WorkspacePage = () => {
                                     variant="outline"
                                     className="w-full flex items-center gap-2"
                                     onClick={() => {
-                                      connectLinkedin(workspace._id);
+                                      connectLinkedin(
+                                        workspace._id,
+                                        router,
+                                        setWorkSpaceApiId,
+                                        token
+                                      );
                                     }}
                                   >
                                     Connect Linkedin
@@ -367,7 +320,12 @@ const WorkspacePage = () => {
                                   variant="outline"
                                   className="w-full flex items-center gap-2"
                                   onClick={() => {
-                                    connectTwitter(workspace._id);
+                                    connectTwitter(
+                                      workspace._id,
+                                      router,
+                                      setWorkSpaceApiId,
+                                      token
+                                    );
                                   }}
                                 >
                                   Connect Twitter
@@ -376,7 +334,7 @@ const WorkspacePage = () => {
                                   variant="outline"
                                   className="w-full flex items-center gap-2"
                                   onClick={() => {
-                                    connectLinkedin(workspace._id);
+                                    connectLinkedin(workspace._id,router,setWorkSpaceApiId,token);
                                   }}
                                 >
                                   Connect Linkedin
@@ -416,10 +374,10 @@ const WorkspacePage = () => {
       </div>
       <div className="flex-1 p-4">
         <div className="mb-4">
-          <label htmlFor="postType" className="mr-2">
+          <Label htmlFor="postType" className="mr-2">
             Select Post Type:
-          </label>
-          <select
+          </Label>
+          <Select
             id="postType"
             value={postType}
             onChange={handlePostTypeChange}
@@ -427,7 +385,7 @@ const WorkspacePage = () => {
           >
             <option value="thread">Thread</option>
             <option value="post">Post</option>
-          </select>
+          </Select>
         </div>
         {postType === "thread" ? (
           <WorkSpaceThread accountId={accountId} workSpaceId={workSpaceApiId} />
