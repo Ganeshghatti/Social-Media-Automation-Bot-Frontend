@@ -30,6 +30,7 @@ import useAuthToken from "@/hooks/useAuthToken";
 
 const WorkSpacePost = ({ accountId, workSpaceId }) => {
   const [postId, setPostId] = useState();
+  const token = useAuthToken();
 
   const form = useForm({
     resolver: zodResolver(workSpacePostSchema),
@@ -44,7 +45,6 @@ const WorkSpacePost = ({ accountId, workSpaceId }) => {
 
   const onSubmit = async (data) => {
     try {
-      const token = useAuthToken();
 
       const formData = {
         posts: [
