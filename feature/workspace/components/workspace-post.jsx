@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Plus, X } from "lucide-react";
 
 import { workSpacePostSchema } from "@/schema/index";
 
@@ -24,11 +25,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import ImageFetch from "@feature/post/components/image-fetch";
 
 import axios from "axios";
 import useAuthToken from "@/hooks/useAuthToken";
 
 const WorkSpacePost = ({ accountId, workSpaceId }) => {
+  const token = useAuthToken();
+  const [selectedImages, setSelectedImages] = useState([]);
   const [postId, setPostId] = useState();
 
   const form = useForm({
@@ -44,7 +48,16 @@ const WorkSpacePost = ({ accountId, workSpaceId }) => {
 
   const onSubmit = async (data) => {
     try {
-      const token = useAuthToken();
+
+      // adding slected image on the form in media field
+     
+      // form.setValue("media", selectedImages.map((image) => ({ blobUrl: image.imageUrl })));
+
+      const formateSelectedImages = selectedImages.map((image) => ({ blobUrl: image.imageUrl }));
+
+      const formateFormImage = data.media.map((image) => ({ blobUrl: image.blobUrl }));
+
+      const mergedImages = [...formateSelectedImages, ...formateFormImage];
 
       const formData = {
         posts: [
@@ -52,7 +65,8 @@ const WorkSpacePost = ({ accountId, workSpaceId }) => {
             accountId: accountId,
             type: "twitter",
             ...data,
-            media: data.media.map(({ blobUrl, ...rest }) => rest),
+            media: mergedImages
+            // media: data.media.map(({ blobUrl, ...rest }) => rest),
           },
         ],
       };
@@ -82,7 +96,10 @@ const WorkSpacePost = ({ accountId, workSpaceId }) => {
 
         for (let i = 0; i < mediaFromResponse.length; i++) {
           const media = mediaFromResponse[i];
-          const imageFile = data.media[i];
+
+          // const imageFile = data.media[i];
+
+          const imageFile = mergedImages[i];
 
           console.log(`Uploading file ${i + 1}/${mediaFromResponse.length}`);
 
@@ -197,6 +214,12 @@ const WorkSpacePost = ({ accountId, workSpaceId }) => {
     }));
 
     onChange([...currentFiles, ...fileData]);
+  };
+
+  const handleRemoveImages = (imageToRemove) => {
+    setSelectedImages(
+      selectedImages.filter((img) => img.imageUrl !== imageToRemove.imageUrl)
+    );
   };
 
   const handleRemoveImage = (index, onChange) => {
@@ -327,11 +350,40 @@ const WorkSpacePost = ({ accountId, workSpaceId }) => {
               </FormItem>
             )}
           />
+
+          {selectedImages.length > 0 && (
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold mb-3">Selected Images</h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {selectedImages.map((image, index) => (
+                  <div key={index} className="relative group">
+                    <img
+                      src={image.imageUrl}
+                      alt={image.title}
+                      className="w-full h-48 object-cover rounded-lg shadow-md"
+                    />
+                    <button
+                      onClick={() => handleRemoveImages(image)}
+                      className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition-colors"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           <Button type="submit" className="focus:outline-none">
             Submit
           </Button>
         </form>
       </Form>
+      <ImageFetch
+            token={token}
+            selectedImages={selectedImages}
+            setSelectedImages={setSelectedImages}
+          />
     </div>
   );
 };

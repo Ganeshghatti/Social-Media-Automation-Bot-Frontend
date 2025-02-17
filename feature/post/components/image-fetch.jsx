@@ -98,6 +98,8 @@ const ImageFetch = ({ token, selectedImages, setSelectedImages }) => {
       if (exists) {
         return prev.filter(img => img.imageUrl !== imageUrl);
       }
+
+      
       return [...prev, {
         id: `${componentId}-${Date.now()}`,
         imageUrl,
