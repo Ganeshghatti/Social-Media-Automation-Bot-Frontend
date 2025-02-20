@@ -1,7 +1,14 @@
 "use client";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Button } from "@components/ui/button";
-import { Plus } from "lucide-react";
+import {
+  ChevronsUpDown,
+  EllipsisVertical,
+  MoonIcon,
+  Plus,
+  Settings,
+  SettingsIcon,
+} from "lucide-react";
 import axios from "axios";
 import {
   Accordion,
@@ -24,6 +31,11 @@ import {
   disconnectLinkedIn,
 } from "@functions/social/index";
 
+import { CreatePostCard } from "@components/CreatePost/CreatePostCard";
+import { Sidebar } from "@components/CreatePost/Sidebar";
+import { CreatePostHeader } from "@components/CreatePost/CreatePostHeader";
+import { ButtonsHeader } from "@components/CreatePost/ButtonsHeader";
+
 import WorkspaceSettings from "@feature/workspace/components/workspace-setting";
 import WorkspaceCreate from "@feature/workspace/components/workspace-create";
 import WorkspaceEdit from "@feature/workspace/components/workspace-edit";
@@ -41,23 +53,35 @@ import {
 } from "@components/ui/dialog";
 import Link from "next/link";
 import { Label } from "@components/ui/label";
-import { Select } from "@components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@components/ui/select";
+import Image from "next/image";
+import { Switch } from "@components/ui/switch";
+import { Card, CardContent, CardFooter, CardTitle } from "@components/ui/card";
+import { Textarea } from "@components/ui/textarea";
+import { Form } from "@components/ui/form";
 
 const WorkspacePage = () => {
   const { workspaceId } = useParams();
   const router = useRouter();
   const token = useAuthToken();
-  const [workspaces, setWorkspaces] = useState([]);
   const [dialogState, setDialogState] = useState(false);
   const [createWorkSpaceState, setCreateWorkSpaceState] = useState(false);
   const [editWorkSpaceState, setEditWorkSpaceState] = useState(false);
   const [workSpaceData, setWorkSpaceData] = useState();
   const [accountId, setAccountId] = useState();
   const [workSpaceApiId, setWorkSpaceApiId] = useState();
-  const [postType, setPostType] = useState("thread");
+  const [postType, setPostType] = useState("post");
   const { user, fetchUser } = useUserStore();
   const [loading, setLoading] = useState(false);
   const [singleWorkspace, setSingleWorkspace] = useState(null);
+  const [cards, setCards] = useState([{ id: 0, text: "" }]);
+  const textAreaRefs = useRef([]); // Refs for all textareas
 
   useEffect(() => {
     if (token) {
@@ -73,34 +97,35 @@ const WorkspacePage = () => {
     }
   }, [user, router]);
 
+  const focusLastTextarea = () => {
+    setTimeout(() => {
+      const lastTextarea =
+        textAreaRefs.current[textAreaRefs.current.length - 1];
+      if (lastTextarea) lastTextarea.focus();
+    }, 0); // Ensure DOM is updated
+  };
+
   useEffect(() => {
-    if (!token) return;
+    const handleKeyPress = (e) => {
+      if (e.ctrlKey && e.shiftKey) {
+        setCards((prev) => [...prev, { id: prev.length, text: "" }]);
+      }
+      if (cards.length > 1) setPostType("thread");
 
-    const fetchWorkspaces = async () => {
-      try {
-        const response = await axios.get(
-          "https://api.bot.thesquirrel.site/workspace/get",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        setWorkspaces(response.data.data);
-
-        setWorkSpaceApiId(response.data.data[0]._id);
-        setAccountId(response.data.data[0].connectedAccounts[0]?.userId);
-      } catch (error) {
-        console.error("Error fetching workspaces:", error);
+      if (e.ctrlKey && e.key === "Backspace") {
+        setCards((prev) => (prev.length > 1 ? prev.slice(0, -1) : prev));
+        if (cards.length <= 1) setPostType("post");
       }
     };
 
-    fetchWorkspaces();
-  }, [token]);
+    window.addEventListener("keydown", handleKeyPress);
+    return () => window.removeEventListener("keydown", handleKeyPress);
+  }, [cards]);
 
-  const handlePostTypeChange = (event) => {
-    setPostType(event.target.value);
-  };
+  useEffect(() => {
+    focusLastTextarea(); // Focus new card textarea after card addition
+  }, [cards]);
+
 
   const SingleWorkspaceData = useCallback(async (workspaceId, token) => {
     try {
@@ -114,6 +139,7 @@ const WorkspacePage = () => {
         }
       );
       setSingleWorkspace(response.data.data);
+      setAccountId(response.data?.data?.connectedAccounts[0]?.userId);
     } catch (error) {
       console.log("Error ", error);
       setSingleWorkspace(null);
@@ -126,27 +152,84 @@ const WorkspacePage = () => {
     if (workspaceId && token) {
       SingleWorkspaceData(workspaceId, token);
     }
+    console.log("Workspace data ", singleWorkspace);
   }, [workspaceId, token, SingleWorkspaceData]);
 
-  const deleteWorkspace = async () => {
-    if (!token) return;
+  const handleTextareaChange = (id, val) => {
+    setCards((prev) =>
+      prev.map((card) => (card.id === id ? { ...card, text: val } : card))
+    );
+  };
+
+  const onPublish = async () => {
+    const isThread = cards.length > 1 && postType === "thread";
+
+    const formData = {
+      mode: "create",
+      posts: [
+        isThread
+          ? {
+              mode: "create",
+              type: "twitter",
+              posttype: "thread",
+              publishnow: true,
+              tobePublishedAt: "",
+              accountId: accountId,
+              posts: cards.map((card) => ({
+                mode: "create",
+                content: card.text,
+                type: "twitter",
+                posttype: "post",
+                publishnow: true,
+                tobePublishedAt: "",
+              })),
+            }
+          : {
+              mode: "create",
+              type: "twitter",
+              posttype: "post",
+              content: cards[0]?.text || "",
+              publishnow: true,
+              tobePublishedAt: "",
+              accountId: accountId,
+            },
+      ],
+    };
 
     try {
-      const response = await axios.delete(
-        `https://api.bot.thesquirrel.site/workspace/delete/${workspaceId}`, // FIXED DELETE ENDPOINT
+      const token = localStorage.getItem("token");
+
+      // Step 1: Get presigned URL
+      const presignedResponse = await axios.post(
+        `https://api.bot.thesquirrel.site/workspace/posts/create/presigned-url/${workspaceId}`,
+        formData,
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
-      console.log("message", response.data.message);
+      console.log("Presigned URL Response:", presignedResponse.data);
 
-      if (response.data.success) {
-        router.push("/workspaces");
-      }
+      // Step 2: Final create post request
+      const finalData = {
+        mode: "create",
+        posts: [...presignedResponse.data.data],
+      };
+
+      const finalResponse = await axios.post(
+        `https://api.bot.thesquirrel.site/workspace/posts/create/${workspaceId}`,
+        finalData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      console.log("Final Response:", finalResponse.data);
     } catch (error) {
-      console.error("Error deleting workspace:", error);
+      console.error("Error posting data:", error);
     }
   };
 
@@ -158,241 +241,24 @@ const WorkspacePage = () => {
     );
 
   return (
-    <div className="flex min-h-screen bg-gray-100 w-full">
-      <div className="w-64 bg-white p-4 shadow-sm">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold">Workspaces</h2>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setCreateWorkSpaceState(true)}
-          >
-            <Plus className="h-4 w-4" />
-          </Button>
-        </div>
-        <Accordion type="single" collapsible>
-          {workspaces.map((workspace, index) => (
-            <ContextMenu key={`context-menu-${workspace._id}`}>
-              <ContextMenuTrigger key={`context-menu-trigger-${workspace._id}`}>
-                <ContextMenuContent>
-                  <ContextMenuItem
-                    onClick={() => {
-                      setWorkSpaceData(workspace);
-                      setEditWorkSpaceState(true);
-                    }}
-                  >
-                    Edit
-                  </ContextMenuItem>
-                  <ContextMenuItem
-                    onClick={() => {
-                      setWorkSpaceData(workspace);
-                      setDialogState(true);
-                    }}
-                  >
-                    Settings
-                  </ContextMenuItem>
-                  <ContextMenuItem onClick={() => deleteWorkspace()}>
-                    Delete
-                  </ContextMenuItem>
-                </ContextMenuContent>
-                <AccordionItem
-                  value={`item-${index}`}
-                  key={workspace._id}
-                  className="items-center border-2 border-gray-200 justify-between p-1 px-5 hover:bg-gray-100 rounded-lg"
-                >
-                  <AccordionTrigger className="flex">
-                    <span className="capitalize text-sm">{workspace.name}</span>
-                  </AccordionTrigger>
-                  <AccordionContent className="p-2">
-                    <div className="space-y-2">
-                      {workspace.connectedAccounts.length > 0 ? (
-                        workspace.connectedAccounts.map((account, index) => (
-                          <div
-                            key={index}
-                            className="flex flex-col gap-2 border p-4 rounded-md"
-                          >
-                            <h3 className="text-md font-bold capitalize">
-                              {account.type}
-                            </h3>
-                            <p className="text-sm text-muted-foreground">
-                              Username : {account.username}
-                            </p>
-                            <p className="capitalize text-sm text-muted-foreground">
-                              Status : {account.isConnected ? "true" : "false"}
-                            </p>
-                            {account?.type === "linkedin" ? (
-                              <Button
-                                variant="outline"
-                                className="w-full flex items-center gap-2"
-                                onClick={() => {
-                                  disconnectLinkedIn(
-                                    workspace._id,
-                                    account.userId,
-                                    token
-                                  );
-                                }}
-                              >
-                                Disconnect
-                              </Button>
-                            ) : (
-                              <Button
-                                variant="outline"
-                                className="w-full flex items-center gap-2"
-                                onClick={() => {
-                                  disconnectTwitter(
-                                    workspace._id,
-                                    account.userId,
-                                    token
-                                  );
-                                }}
-                              >
-                                Disconnect
-                              </Button>
-                            )}
-                            <Dialog>
-                              <DialogTrigger asChild>
-                                <Button
-                                  variant="outline"
-                                  className="w-full flex items-center gap-2"
-                                >
-                                  Links to Connect
-                                </Button>
-                              </DialogTrigger>
-                              <DialogContent>
-                                <DialogHeader>
-                                  <DialogTitle>
-                                    Connect With Social Accounts
-                                  </DialogTitle>
-                                </DialogHeader>
-                                <div className="w-full grid grid-cols-3 gap-5 mt-5">
-                                  <Button
-                                    variant="outline"
-                                    className="w-full flex items-center gap-2"
-                                    onClick={() => {
-                                      connectTwitter(
-                                        workspace._id,
-                                        router,
-                                        setWorkSpaceApiId,
-                                        token
-                                      );
-                                    }}
-                                  >
-                                    Connect Twitter
-                                  </Button>
-                                  <Button
-                                    variant="outline"
-                                    className="w-full flex items-center gap-2"
-                                    onClick={() => {
-                                      connectLinkedin(
-                                        workspace._id,
-                                        router,
-                                        setWorkSpaceApiId,
-                                        token
-                                      );
-                                    }}
-                                  >
-                                    Connect Linkedin
-                                  </Button>
-                                </div>
-                              </DialogContent>
-                            </Dialog>
-                          </div>
-                        ))
-                      ) : (
-                        <>
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <Button
-                                variant="outline"
-                                className="w-full flex items-center gap-2"
-                              >
-                                Social Links to Connect
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                              <DialogHeader>
-                                <DialogTitle>
-                                  Connect With Social Accounts
-                                </DialogTitle>
-                              </DialogHeader>
-                              <div className="w-full grid grid-cols-3 gap-5 mt-5">
-                                <Button
-                                  variant="outline"
-                                  className="w-full flex items-center gap-2"
-                                  onClick={() => {
-                                    connectTwitter(
-                                      workspace._id,
-                                      router,
-                                      setWorkSpaceApiId,
-                                      token
-                                    );
-                                  }}
-                                >
-                                  Connect Twitter
-                                </Button>
-                                <Button
-                                  variant="outline"
-                                  className="w-full flex items-center gap-2"
-                                  onClick={() => {
-                                    connectLinkedin(workspace._id,router,setWorkSpaceApiId,token);
-                                  }}
-                                >
-                                  Connect Linkedin
-                                </Button>
-                              </div>
-                            </DialogContent>
-                          </Dialog>
-                        </>
-                      )}
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-                <Link href={`/workspace/${workspaceId}/twitter/${accountId}`}>
-                  <Button className="w-full flex items-center gap-2 mt-6">
-                    go to twitter page
-                  </Button>
-                </Link>
-              </ContextMenuTrigger>
-            </ContextMenu>
-          ))}
-        </Accordion>
-
-        <WorkspaceSettings
-          isOpen={dialogState}
-          setIsOpen={setDialogState}
-          workSpaceData={workSpaceData}
-        />
-        <WorkspaceCreate
-          isOpen={createWorkSpaceState}
-          setIsOpen={setCreateWorkSpaceState}
-        />
-        <WorkspaceEdit
-          isOpen={editWorkSpaceState}
-          setIsOpen={setEditWorkSpaceState}
-          workSpaceData={workSpaceData}
-        />
-      </div>
-      <div className="flex-1 p-4">
-        <div className="mb-4">
-          <Label htmlFor="postType" className="mr-2">
-            Select Post Type:
-          </Label>
-          <Select
-            id="postType"
-            value={postType}
-            onChange={handlePostTypeChange}
-            className="border p-2 rounded"
-          >
-            <option value="thread">Thread</option>
-            <option value="post">Post</option>
-          </Select>
-        </div>
-        {postType === "thread" ? (
-          <WorkSpaceThread accountId={accountId} workSpaceId={workSpaceApiId} />
-        ) : (
-          <WorkSpacePost accountId={accountId} workSpaceId={workSpaceApiId} />
-        )}
-      </div>
+    <div className="flex-1 flex flex-col h-screen">
+      <CreatePostHeader />
+      <ButtonsHeader onPublish={onPublish} />
+      <Form>
+        <form className="w-full flex-1 p-4 py-10 overflow-y-auto justify-center items-center">
+        {cards.map((card, index) => (
+          <CreatePostCard
+            key={card.id}
+            threadNumber={index + 1}
+            value={card.text}
+            onChange={(val) => handleTextareaChange(card.id, val)}
+            setCards={setCards}
+            cards={cards}
+            textareaRef={(el) => (textAreaRefs.current[index] = el)}
+          />
+        ))}
+        </form>
+      </Form>
     </div>
   );
 };
