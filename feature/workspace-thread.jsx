@@ -66,7 +66,7 @@ const WorkSpaceThread = ({ accountId, workSpaceId }) => {
       console.log("Step 1: Sending initial data:", formData);
 
       const presignedResponse = await axios.post(
-        `https://api.bot.thesquirrel.site/workspace/posts/create/presigned-url/${workSpaceId}`,
+        `${process.env.NEXT_PUBLIC_SERVER_URI}/workspace/posts/create/presigned-url/${workSpaceId}`,
         formData,
         {
           headers: {
@@ -137,7 +137,7 @@ const WorkSpaceThread = ({ accountId, workSpaceId }) => {
       console.log("Step 3: Creating final post");
 
       const finalResponse = await axios.post(
-        `https://api.bot.thesquirrel.site/workspace/posts/create/${workSpaceId}`,
+        `${process.env.NEXT_PUBLIC_SERVER_URI}/workspace/posts/create/${workSpaceId}`,
         {
           posts: presignedResponse.data.data,
         },

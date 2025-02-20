@@ -60,7 +60,7 @@ const Page = () => {
     const fetchWorkspaces = async () => {
       try {
         const response = await axios.get(
-          "https://api.bot.thesquirrel.site/workspace/get",
+          `${process.env.NEXT_PUBLIC_SERVER_URI}/workspace/get`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -81,7 +81,7 @@ const Page = () => {
   const connectTwitter = async (workspaceId) => {
     try {
       const response = await axios.post(
-        `https://api.bot.thesquirrel.site/workspace/twitter/connect/${workspaceId}`,
+        `${process.env.NEXT_PUBLIC_SERVER_URI}/workspace/twitter/connect/${workspaceId}`,
         {},
         {
           headers: {
@@ -99,7 +99,7 @@ const Page = () => {
   const disconnectTwitter = async (workspaceId, userId) => {
     try {
       const response = await axios.post(
-        `https://api.bot.thesquirrel.site/workspace/twitter/disconnect/${workspaceId}/${userId}`,
+        `${process.env.NEXT_PUBLIC_SERVER_URI}/workspace/twitter/disconnect/${workspaceId}/${userId}`,
         {},
         {
           headers: {
@@ -115,7 +115,7 @@ const Page = () => {
   const deleteWorkspace = async (workspaceId) => {
     try {
       await axios.delete(
-        `https://api.bot.thesquirrel.site/workspace/delete/${workspaceId}`,
+        `${process.env.NEXT_PUBLIC_SERVER_URI}/workspace/delete/${workspaceId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
