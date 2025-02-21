@@ -59,8 +59,7 @@ const WorkSpaceThread = ({ accountId, workSpaceId }) => {
 
   const handleSubmit = async () => {
     try {
-      const posts = form.getValues("posts");
-      const [rootPost, ...remainingPosts] = posts; // Separate root post from remaining posts
+      const data = form.getValues();
 
       const formData = {
         posts: [
@@ -68,33 +67,20 @@ const WorkSpaceThread = ({ accountId, workSpaceId }) => {
             type: "twitter",
             posttype: "thread",
             mode: "create",
-            content: rootPost?.content || "", // Get content from first post
-            publishnow: form.getValues("publishnow"),
-            tobePublishedAt: form.getValues("tobePublishedAt"),
-            media: rootPost?.media?.map(media => ({
-              originalname: media.originalname,
-              size: media.size,
-              mimetype: media.mimetype
-            })) || [], // Get media from first post
-            posts: remainingPosts?.map(post => ({  // Only map remaining posts
+            publishnow: data.publishnow,
+            tobePublishedAt: data.tobePublishedAt,
+            accountId: accountId,
+            posts: data.posts.map(post => ({
               mode: "create",
-              posttype: "thread",
               content: post.content,
-              media: post.media.map(media => ({
-                originalname: media.originalname,
-                size: media.size,
-                mimetype: media.mimetype
-              })),
-              accountId: accountId
-            })),
-            accountId: accountId
+              media: post.media || [],
+            }))
           }
         ]
       };
 
-      console.log("Sending Data:", formData);
-      
-      // First API call to get presigned URLs
+      console.log("Step 1: Sending initial data:", formData);
+
       const presignedResponse = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER_URI}/workspace/posts/create/presigned-url/${workSpaceId}`,
         formData,
@@ -107,49 +93,68 @@ const WorkSpaceThread = ({ accountId, workSpaceId }) => {
 
       console.log("Presigned Response:", presignedResponse);
 
-      // Filter posts that have media
-      const postsWithMedia = [
-        { ...rootPost, isRoot: true },
-        ...remainingPosts
-      ].filter(post => post.media && post.media.length > 0);
+      // Get the thread data from the response
+      const threadData = presignedResponse.data.data[0];
+      
+      if (threadData && threadData.posts && threadData.posts.length > 0) {
+        console.log("Step 2: Uploading media files for posts", threadData.posts);
 
-      if (postsWithMedia.length > 0) {
-        console.log("Step 2: Uploading media files for posts", postsWithMedia);
+        // Iterate through each post in the thread
+        for (const responsePost of threadData.posts) {
 
-        for (let postIndex = 0; postIndex < postsWithMedia.length; postIndex++) {
-          const post = postsWithMedia[postIndex];
-          const responsePost = post.isRoot 
-            ? presignedResponse.data.data[0] 
-            : presignedResponse.data.data[0].posts[postIndex - 1]; // Subtract 1 to account for root post
+          console.log("Response Post:", responsePost);
+          if (responsePost.media && responsePost.media.length > 0) {
+            console.log(`Processing media for post ID: ${responsePost._id}`);
 
-          console.log("Processing post:", responsePost);
+            // Find matching original post by comparing content
+            const originalPost = data.posts.find(p => p.content === responsePost.content);
 
-          if (post.media && responsePost.media) {
-            for (let mediaIndex = 0; mediaIndex < post.media.length; mediaIndex++) {
-              const mediaItem = post.media[mediaIndex];
-              const presignedMediaItem = responsePost.media[mediaIndex];
+            console.log("Original Post:", originalPost);
 
-              console.log("Processing media item:", presignedMediaItem);
+            if (originalPost && originalPost.media) {
 
-              if (mediaItem && presignedMediaItem && mediaItem.blobUrl) {
-                console.log(`Uploading file ${mediaIndex + 1} for post ${postIndex + 1}`);
+              console.log("Original post media:", originalPost.media);
 
-                try {
-                  const imageBlob = await fetch(mediaItem.blobUrl).then(r => r.blob());
-                  const uploadResult = await axios.put(
-                    presignedMediaItem.presignedUrl,
-                    imageBlob,
-                    {
-                      headers: {
-                        'Content-Type': mediaItem.mimetype,
-                      },
+              // Process each media item
+              for (let i = 0; i < responsePost.media.length; i++) {
+                const presignedMedia = responsePost.media[i];
+                const originalMedia = originalPost.media[i];
+
+                console.log("Presigned media:", presignedMedia);
+                console.log("Original media:", originalMedia);
+
+                // Check for either blobUrl (for uploaded files) or imageUrl (for selected images)
+                const mediaUrl = originalMedia.type === 'blob' ? originalMedia.blobUrl : originalMedia.imageUrl;
+
+                if (presignedMedia.presignedUrl && mediaUrl) {
+                  try {
+                    console.log(`Uploading media ${i + 1} for post ${responsePost._id}`);
+                    
+                    let imageBlob;
+                    if (originalMedia.type === 'blob') {
+                      // For uploaded files, use the blob URL
+                      imageBlob = await fetch(originalMedia.blobUrl).then(r => r.blob());
+                    } else {
+                      // For selected images (from search), use the image URL
+                      imageBlob = await fetch(originalMedia.imageUrl).then(r => r.blob());
                     }
-                  );
+                    
+                    // Upload to presigned URL
+                    const uploadResult = await axios.put(
+                      presignedMedia.presignedUrl,
+                      imageBlob,
+                      {
+                        headers: {
+                          'Content-Type': presignedMedia.mimetype,
+                        },
+                      }
+                    );
 
-                  console.log(`File upload status:`, uploadResult.status);
-                } catch (uploadError) {
-                  console.error(`Error uploading file:`, uploadError);
-                  throw uploadError;
+                    console.log(`Media ${i + 1} upload status:`, uploadResult);
+                  } catch (error) {
+                    console.error(`Error uploading media ${i + 1} for post ${responsePost._id}:`, error);
+                    throw new Error(`Failed to upload media: ${error.message}`);
+                  }
                 }
               }
             }
