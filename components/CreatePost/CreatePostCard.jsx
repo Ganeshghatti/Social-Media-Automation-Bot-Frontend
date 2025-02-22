@@ -16,6 +16,7 @@ export const CreatePostCard = ({
   setCards,
   cards,
   textareaRef,
+  setNewCardAdded,
 }) => {
   return (
     <Card className="w-2/4 flex flex-col bg-transparent border-transparent mx-auto">
@@ -25,19 +26,25 @@ export const CreatePostCard = ({
           <h2 className="font-semibold text-xl text-white">Jatin</h2>
         </div>
         <div className="w-8 h-8 bg-headerBg rounded-sm cursor-pointer flex justify-center items-center">
-          <Image src="/ThreeDots.png" alt="More" width={20} height={20} className="h-5 w-5 object-contain" />
+          <Image
+            src="/ThreeDots.png"
+            alt="More"
+            width={20}
+            height={20}
+            className="h-5 w-5 object-contain"
+          />
         </div>
       </CardTitle>
-      <CardContent className="w-full flex pl-16">
+      <CardContent className="w-full flex pl-16 ">
         <CustomTextarea value={value} onChange={onChange} ref={textareaRef} />
       </CardContent>
 
-
       <CardFooter className=" flex w-full gap-3 px-2 py-3 pt-5  justify-end items-center">
         <div
-          onClick={() =>
-            setCards((prev) => [...prev, { id: prev.length, text: "" }])
-          }
+          onClick={() => {
+            setCards((prev) => [...prev, { id: prev.length, text: "" }]);
+            setNewCardAdded(true);
+          }}
           className="w-8 h-8  rounded-sm flex bg-headerBg  justify-center items-center cursor-pointer"
         >
           <Image

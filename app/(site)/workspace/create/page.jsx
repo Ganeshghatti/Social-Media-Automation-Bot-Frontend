@@ -151,7 +151,7 @@ const Page = () => {
         });
         console.log("File upload complete");
       }
-
+      
       console.log("Redirecting to workspaces page");
       router.push("/workspaces");
     } catch (error) {
@@ -189,7 +189,7 @@ const Page = () => {
   }
 
   return (
-    <div className="flex items-start gap-4 justify-start w-full flex-col ">
+    <div className="flex items-start gap-4 justify-start min-h-screen w-full flex-col ">
       <CreatePostHeader />
 
       <div className="flex gap-6 flex-col w-[96%] mx-auto py-3 ">

@@ -70,18 +70,15 @@ const WorkspacePage = () => {
   const { workspaceId } = useParams();
   const router = useRouter();
   const token = useAuthToken();
-  const [dialogState, setDialogState] = useState(false);
-  const [createWorkSpaceState, setCreateWorkSpaceState] = useState(false);
-  const [editWorkSpaceState, setEditWorkSpaceState] = useState(false);
-  const [workSpaceData, setWorkSpaceData] = useState();
   const [accountId, setAccountId] = useState();
-  const [workSpaceApiId, setWorkSpaceApiId] = useState();
-  const [postType, setPostType] = useState("post");
   const { user, fetchUser } = useUserStore();
   const [loading, setLoading] = useState(false);
   const [singleWorkspace, setSingleWorkspace] = useState(null);
+  const [postType, setPostType] = useState("post");
   const [cards, setCards] = useState([{ id: 0, text: "" }]);
   const textAreaRefs = useRef([]); // Refs for all textareas
+  const [newCardAdded, setNewCardAdded] = useState(false); // Track new card addition
+  const [activeButtons, setActiveButtons] = useState(false);
 
   useEffect(() => {
     if (token) {
@@ -109,6 +106,7 @@ const WorkspacePage = () => {
     const handleKeyPress = (e) => {
       if (e.ctrlKey && e.shiftKey) {
         setCards((prev) => [...prev, { id: prev.length, text: "" }]);
+        setNewCardAdded(true); // Set to true when a new card is added
       }
       if (cards.length > 1) setPostType("thread");
 
@@ -123,9 +121,15 @@ const WorkspacePage = () => {
   }, [cards]);
 
   useEffect(() => {
-    focusLastTextarea(); // Focus new card textarea after card addition
-  }, [cards]);
-
+    if (newCardAdded) {
+      setTimeout(() => {
+        const lastTextarea =
+          textAreaRefs.current[textAreaRefs.current.length - 1];
+        if (lastTextarea) lastTextarea.focus();
+        setNewCardAdded(false); // Reset after focusing
+      }, 0);
+    }
+  }, [cards, newCardAdded]);
 
   const SingleWorkspaceData = useCallback(async (workspaceId, token) => {
     try {
@@ -152,13 +156,18 @@ const WorkspacePage = () => {
     if (workspaceId && token) {
       SingleWorkspaceData(workspaceId, token);
     }
-    console.log("Workspace data ", singleWorkspace);
   }, [workspaceId, token, SingleWorkspaceData]);
 
   const handleTextareaChange = (id, val) => {
-    setCards((prev) =>
-      prev.map((card) => (card.id === id ? { ...card, text: val } : card))
-    );
+    setCards((prev) => {
+      const updatedCards = prev.map((card) =>
+        card.id === id ? { ...card, text: val } : card
+      );
+      const hasText = updatedCards.some((card) => card.text.trim() !== "");
+      setActiveButtons(hasText);
+
+      return updatedCards;
+    });
   };
 
   const onPublish = async () => {
@@ -209,7 +218,6 @@ const WorkspacePage = () => {
           },
         }
       );
-      console.log("Presigned URL Response:", presignedResponse.data);
 
       // Step 2: Final create post request
       const finalData = {
@@ -243,20 +251,21 @@ const WorkspacePage = () => {
   return (
     <div className="flex-1 flex flex-col h-screen">
       <CreatePostHeader />
-      <ButtonsHeader onPublish={onPublish} />
+      <ButtonsHeader onPublish={onPublish} activeButtons={activeButtons} />
       <Form>
         <form className="w-full flex-1 p-4 py-10 overflow-y-auto justify-center items-center">
-        {cards.map((card, index) => (
-          <CreatePostCard
-            key={card.id}
-            threadNumber={index + 1}
-            value={card.text}
-            onChange={(val) => handleTextareaChange(card.id, val)}
-            setCards={setCards}
-            cards={cards}
-            textareaRef={(el) => (textAreaRefs.current[index] = el)}
-          />
-        ))}
+          {cards.map((card, index) => (
+            <CreatePostCard
+              key={card.id}
+              threadNumber={index + 1}
+              value={card.text}
+              onChange={(val) => handleTextareaChange(card.id, val)}
+              setCards={setCards}
+              cards={cards}
+              textareaRef={(el) => (textAreaRefs.current[index] = el)}
+              setNewCardAdded={setNewCardAdded}
+            />
+          ))}
         </form>
       </Form>
     </div>

@@ -26,6 +26,7 @@ export const Sidebar = ({ workspaceId, token }) => {
   const router = useRouter();
   const [workspaces, setWorkspaces] = useState([]);
   const [loading, setLoading] = useState(false);
+
   const GetAllWorkspaces = async (token) => {
     try {
       setLoading(true);
@@ -37,9 +38,12 @@ export const Sidebar = ({ workspaceId, token }) => {
           },
         }
       );
-      console.log("Response workspaces ", response.data);
-      if (response.data.success) {
-        setWorkspaces(response.data.data);
+      if (response.data.success && singleWorkspace) {
+        const filteredWorkspaces = response.data.data.filter(
+          (workspace) => workspace.name !== singleWorkspace?.name
+        );
+
+        setWorkspaces(filteredWorkspaces);
       } else {
         setWorkspaces([]);
       }
@@ -50,12 +54,13 @@ export const Sidebar = ({ workspaceId, token }) => {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     if (!token) {
       return;
     }
     GetAllWorkspaces(token);
-  }, [token]);
+  }, [token, singleWorkspace]);
 
   const SingleWorkspaceData = useCallback(async (workspaceId, token) => {
     try {
@@ -99,10 +104,37 @@ export const Sidebar = ({ workspaceId, token }) => {
           </div>
         </div>
         <div className="flex flex-col w-full gap-3">
-          <Sidebar_Card imageUrl={"/dashboard_icon.png"} text={"Dashboard"} />
-          <Sidebar_Card imageUrl={"/Analytics.png"} text={"Anlaytics"} />
-          <div className="w-full h-[1px] bg-white opacity-20" />
-          <Sidebar_Card imageUrl={"/Create-Post.png"} text={"Create post"} />
+          <Sidebar_Card
+            imageUrl={"/dashboard_icon.png"}
+            text={"Dashboard"}
+            onClickFunction={() => {
+              router.push("dashboard");
+            }}
+          />
+          <Sidebar_Card
+            imageUrl={"/Analytics.png"}
+            text={"Anlaytics"}
+            onClickFunction={() => {
+              router.push("Analytics");
+            }}
+          />
+          <div className="w-full h-[1px] bg-white opacity-40" />
+          <Sidebar_Card
+            imageUrl={"/Create-Post.png"}
+            text={"Create post"}
+            onClickFunction={() => {
+              router.push(`/workspace/${workspaceId}`);
+            }}
+          />
+
+          <Sidebar_Card
+            imageUrl={"/Create-Post.png"}
+            text={"Edit Workspace"}
+            onClickFunction={() => {
+              router.push(`/workspace/${workspaceId}/edit`);
+            }}
+          />
+
           <Sidebar_Card
             onClickFunction={() => connectTwitter(workspaceId, router, token)}
             imageUrl={"/twitter.png"}
@@ -156,17 +188,13 @@ export const Sidebar = ({ workspaceId, token }) => {
                 height={30}
               />
               <span className="text-base text-white font-semibold">
-                Dezign Plex
+                {singleWorkspace?.name}
               </span>
               <ChevronsUpDown className="h-6 w-6 object-contain" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-[300px] flex flex-col gap-4 items-center bg-headerBg">
-            {workspaces?.length === 0 ? (
-              <DropdownMenuItem className="text-2xl font-semibold text-white">
-                No Workspaces Found
-              </DropdownMenuItem>
-            ) : (
+            {workspaces?.length !== 0 &&
               workspaces?.map((workspace, i) => (
                 <Link
                   href={`/workspace/${workspace._id}`}
@@ -175,8 +203,14 @@ export const Sidebar = ({ workspaceId, token }) => {
                 >
                   {workspace.name}
                 </Link>
-              ))
-            )}
+              ))}
+
+            <Link
+              href={`/workspaces`}
+              className="text-white  border-0  rounded-sm px-6 py-4 "
+            >
+              Manage Workspcaes
+            </Link>
           </DropdownMenuContent>
         </DropdownMenu>
       )}
