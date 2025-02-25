@@ -79,6 +79,7 @@ const WorkspacePage = () => {
   const textAreaRefs = useRef([]); // Refs for all textareas
   const [newCardAdded, setNewCardAdded] = useState(false); // Track new card addition
   const [activeButtons, setActiveButtons] = useState(false);
+  console.log("Workspace id ",workspaceId)
 
   useEffect(() => {
     if (token) {
@@ -256,7 +257,7 @@ const WorkspacePage = () => {
         <form className="w-full flex-1 p-4 py-10 overflow-y-auto justify-center items-center">
           {cards.map((card, index) => (
             <CreatePostCard
-              key={card.id}
+              key={index}
               threadNumber={index + 1}
               value={card.text}
               onChange={(val) => handleTextareaChange(card.id, val)}
@@ -264,6 +265,8 @@ const WorkspacePage = () => {
               cards={cards}
               textareaRef={(el) => (textAreaRefs.current[index] = el)}
               setNewCardAdded={setNewCardAdded}
+              isFirst={index === 0} // First card in the list
+              isLast={index === cards.length - 1} // Last card in the list
             />
           ))}
         </form>

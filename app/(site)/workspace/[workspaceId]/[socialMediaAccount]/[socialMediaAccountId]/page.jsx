@@ -47,9 +47,7 @@ const SocialMediaAccount = () => {
           <h1>Published Posts</h1>
           {published &&
             published.map((post, i) => {
-              return <div key={i}>
-                
-              </div>;
+              return <div key={i}></div>;
             })}
         </div>
       </div>

@@ -30,7 +30,8 @@ import {
 } from "@components/ui/select";
 import { TIMEZONES } from "@constants/create-workspace/index";
 import Image from "next/image";
-
+import { Sidebar_Card } from "@components/single-workspace/Sidebar_Card";
+import { disconnectLinkedIn, disconnectTwitter } from "@functions/social";
 const EditWorkspace = () => {
   const [loading, setLoading] = useState(false);
   const [singleWorkspace, setSingleWorkspace] = useState(null);
@@ -107,7 +108,6 @@ const EditWorkspace = () => {
         }
       );
       setSingleWorkspace(response.data.data);
-      console.log("Update Workspace ", response.data.data);
       if (response.data.data) {
         setIconPreview(response.data.data.icon);
         form.reset({
@@ -397,6 +397,57 @@ const EditWorkspace = () => {
             </Button>
           </form>
         </Form>
+        <div className="flex gap-6 flex-col w-[96%] mx-auto py-3 ">
+          <h1 className="text-4xl font-semibold  text-white">
+            Disconnect Accounts
+          </h1>
+          {singleWorkspace?.connectedAccounts?.length === 0 && (
+            <h3 className="text-2xl font-medium text-gray-100">
+              No Account To Disconnect
+            </h3>
+          )}
+          {singleWorkspace?.connectedAccounts?.length > 0 && (
+            <div className="flex w-full gap-6 items-center">
+              <div className="max-w-max rounded-xl bg-headerBg border-[#ffffff30] px-5 py-6 flex flex-col gap-6">
+                {singleWorkspace?.connectedAccounts?.map((account, i) => {
+                  if (account?.type === "linkedin") {
+                    return (
+                      <Sidebar_Card
+                        key={i}
+                        onClickFunction={() => {
+                          disconnectLinkedIn(
+                            workspaceId,
+                            account?.userId,
+                            token
+                          );
+                          router.push(`/workspace/${workspaceId}`);
+                        }}
+                        imageUrl={"/linkedIn.png"}
+                        text={"Disconnect LinkedIn"}
+                      />
+                    );
+                  } else if (account?.type === "twitter") {
+                    return (
+                      <Sidebar_Card
+                        onClickFunction={() => {
+                          disconnectTwitter(
+                            workspaceId,
+                            account?.userId,
+                            token
+                          );
+                          router.push(`/workspace/${workspaceId}`);
+                        }}
+                        key={i}
+                        imageUrl={"/twitter.png"}
+                        text={"Disconnect Twitter"}
+                      />
+                    );
+                  }
+                })}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -4,12 +4,7 @@ import Image from "next/image";
 import React, { useCallback, useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { Sidebar_Card } from "../single-workspace/Sidebar_Card";
-import {
-  connectLinkedin,
-  connectTwitter,
-  disconnectLinkedIn,
-  disconnectTwitter,
-} from "@functions/social";
+import { connectLinkedin, connectTwitter } from "@functions/social";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import {
@@ -88,7 +83,7 @@ export const Sidebar = ({ workspaceId, token }) => {
   }, [workspaceId, token, SingleWorkspaceData]);
 
   return (
-    <div className="flex flex-col items-start justify-between bg-darkBg px-4 py-6 shadow-sm text-white w-1/6 h-screen overflow-y-auto sticky top-0">
+    <div className="flex flex-col items-start justify-between bg-darkBg px-4 py-6 shadow-sm text-white w-[25%] h-screen overflow-y-auto sticky top-0">
       <div className="flex flex-col gap-14 items-center w-full">
         <div className="flex w-full items-center gap-4">
           <Image
@@ -128,7 +123,7 @@ export const Sidebar = ({ workspaceId, token }) => {
           />
 
           <Sidebar_Card
-            imageUrl={"/Create-Post.png"}
+            imageUrl={"/edit.png"}
             text={"Edit Workspace"}
             onClickFunction={() => {
               router.push(`/workspace/${workspaceId}/edit`);
@@ -177,12 +172,12 @@ export const Sidebar = ({ workspaceId, token }) => {
       {loading ? (
         <h1 className="text-2xl font-semibold">Loading...</h1>
       ) : (
-        <DropdownMenu className="w-full">
+        <DropdownMenu className="w-full mt-6">
           <DropdownMenuTrigger asChild>
             <Button className="bg-primary rounded-2xl w-full py-8 px-4 flex items-center gap-2 mt-auto">
               <Image
                 alt="Paw image"
-                src={"/pet-paw.png"}
+                src={`${singleWorkspace?.icon}`}
                 width={30}
                 className="object-contain"
                 height={30}
