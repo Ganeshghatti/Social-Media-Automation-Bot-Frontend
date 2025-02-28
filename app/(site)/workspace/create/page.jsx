@@ -189,7 +189,7 @@ const Page = () => {
   }
 
   return (
-    <div className="flex items-start gap-4 justify-start min-h-screen w-full flex-col ">
+    <div className="flex items-start gap-4 justify-start bg-navBg min-h-screen w-full flex-col ">
       <CreatePostHeader />
 
       <div className="flex gap-6 flex-col w-[96%] mx-auto py-3 ">

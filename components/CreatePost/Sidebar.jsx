@@ -4,7 +4,12 @@ import Image from "next/image";
 import React, { useCallback, useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { Sidebar_Card } from "../single-workspace/Sidebar_Card";
-import { connectLinkedin, connectTwitter } from "@functions/social";
+import {
+  connectLinkedin,
+  connectTwitter,
+  disconnectLinkedIn,
+  disconnectTwitter,
+} from "@functions/social";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import {
@@ -68,7 +73,6 @@ export const Sidebar = ({ workspaceId, token }) => {
         }
       );
 
-      console.log("response ", response.data?.data);
       setSingleWorkspace(response.data.data);
     } catch (error) {
       console.log("Error ", error);
@@ -175,13 +179,16 @@ export const Sidebar = ({ workspaceId, token }) => {
         <DropdownMenu className="w-full mt-6">
           <DropdownMenuTrigger asChild>
             <Button className="bg-primary rounded-2xl w-full py-8 px-4 flex items-center gap-2 mt-auto">
-              <Image
-                alt="Paw image"
-                src={`${singleWorkspace?.icon}`}
-                width={30}
-                className="object-contain"
-                height={30}
-              />
+              {singleWorkspace?.icon && (
+                <Image
+                  alt="Paw image"
+                  src={singleWorkspace?.icon}
+                  width={30}
+                  className="object-contain"
+                  height={30}
+                />
+              )}
+
               <span className="text-base text-white font-semibold">
                 {singleWorkspace?.name}
               </span>

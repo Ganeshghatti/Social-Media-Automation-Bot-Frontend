@@ -23,7 +23,7 @@ export const CustomTextarea = forwardRef(({ value, onChange }, ref) => {
         onChange(e.target.value);
         adjustHeight(); // Adjust height on every change
       }}
-      className="w-full bg-transparent border-0 focus:outline-none p-2 rounded-md text-white resize-none overflow-hidden"
+      className="w-full bg-transparent  border-0 focus:outline-none p-2 rounded-md text-white resize-none overflow-hidden"
       style={{ minHeight: "120px" }}
     />
   );

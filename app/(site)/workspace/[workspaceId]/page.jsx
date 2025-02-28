@@ -1,70 +1,18 @@
 "use client";
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { Button } from "@components/ui/button";
-import {
-  ChevronsUpDown,
-  EllipsisVertical,
-  MoonIcon,
-  Plus,
-  Settings,
-  SettingsIcon,
-} from "lucide-react";
-import axios from "axios";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@components/ui/accordion";
-
-import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuTrigger,
-} from "@components/ui/context-menu";
-
-import {
-  connectTwitter,
-  disconnectTwitter,
-  connectLinkedin,
-  disconnectLinkedIn,
-} from "@functions/social/index";
 
 import { CreatePostCard } from "@components/CreatePost/CreatePostCard";
-import { Sidebar } from "@components/CreatePost/Sidebar";
 import { CreatePostHeader } from "@components/CreatePost/CreatePostHeader";
 import { ButtonsHeader } from "@components/CreatePost/ButtonsHeader";
+import {DraftPosts} from "@components/CreatePost/DraftPosts";
+import { toast } from "sonner"
 
-import WorkspaceSettings from "@feature/workspace/components/workspace-setting";
-import WorkspaceCreate from "@feature/workspace/components/workspace-create";
-import WorkspaceEdit from "@feature/workspace/components/workspace-edit";
-import WorkSpacePost from "@feature/workspace/components/workspace-post";
 import useAuthToken from "@hooks/useAuthToken";
-import WorkSpaceThread from "@feature/workspace-thread";
 import { useUserStore } from "@/store/userStore";
 import { useParams, useRouter } from "next/navigation";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@components/ui/dialog";
-import Link from "next/link";
-import { Label } from "@components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@components/ui/select";
-import Image from "next/image";
-import { Switch } from "@components/ui/switch";
-import { Card, CardContent, CardFooter, CardTitle } from "@components/ui/card";
-import { Textarea } from "@components/ui/textarea";
+
 import { Form } from "@components/ui/form";
+import axios from "axios";
 
 const WorkspacePage = () => {
   const { workspaceId } = useParams();
@@ -79,7 +27,6 @@ const WorkspacePage = () => {
   const textAreaRefs = useRef([]); // Refs for all textareas
   const [newCardAdded, setNewCardAdded] = useState(false); // Track new card addition
   const [activeButtons, setActiveButtons] = useState(false);
-  console.log("Workspace id ",workspaceId)
 
   useEffect(() => {
     if (token) {
@@ -242,6 +189,104 @@ const WorkspacePage = () => {
     }
   };
 
+  const createDraftPosts = async () => {
+    console.log("Hii");
+
+    if (!cards.length) {
+      console.error("No cards available");
+      return;
+    }
+
+    const isThread = cards.length > 1 && postType === "thread";
+
+    const formData = {
+      mode: "create",
+      posts: [
+        isThread
+          ? {
+              mode: "create",
+              type: "twitter",
+              posttype: "thread",
+              publishnow: true,
+              tobePublishedAt: "",
+              accountId: accountId,
+              posts: cards.map((card) => ({
+                mode: "create",
+                content: card.text,
+                type: "twitter",
+                posttype: "post",
+                publishnow: true,
+                tobePublishedAt: "",
+                media: [],
+              })),
+            }
+          : {
+              mode: "create",
+              type: "post",
+              posttype: "post",
+              content: cards[0].text || "",
+              publishnow: true,
+              tobePublishedAt: "",
+              accountId: accountId,
+              media: [],
+            },
+      ],
+    };
+
+    try {
+      const token = localStorage.getItem("token");
+
+      // Step 1: Get presigned URL response
+      const presignedResponse = await axios.post(
+        `https://api.bot.thesquirrel.site/workspace/posts/create/presigned-url/${workspaceId}`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      let postData = presignedResponse.data?.data?.[0];
+
+      if (!postData) {
+        console.error("Invalid response structure:", presignedResponse.data);
+        return;
+      }
+
+      // Step 2: Modify data for thread structure
+      if (isThread) {
+        postData = {
+          type: "thread",
+          threadPosts: postData.posts.map((post) => {
+            const { mode, posttype, ...cleanedPost } = post;
+            return cleanedPost; // Removing "mode" and "posttype"
+          }),
+        };
+      } else {
+        // For a normal post, remove "mode" and "posttype"
+        delete postData.mode;
+        delete postData.posttype;
+      }
+
+      // Step 3: Send final request to draft API
+      const finalResponse = await axios.post(
+        `https://api.bot.thesquirrel.site/workspace/draft/create/${workspaceId}`,
+        postData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      console.log("Final Response:", finalResponse.data);
+      toast("Draft Post Has been created")
+    } catch (error) {
+      console.error("Error making draft post:", error);
+    }
+  };
+
   if (user === null)
     return (
       <div className="flex flex-col">
@@ -250,11 +295,15 @@ const WorkspacePage = () => {
     );
 
   return (
-    <div className="flex-1 flex flex-col h-screen">
+    <main className="flex-1 flex flex-col h-screen overflow-y-auto">
       <CreatePostHeader />
-      <ButtonsHeader onPublish={onPublish} activeButtons={activeButtons} />
+      <ButtonsHeader
+        onPublish={onPublish}
+        createDraftPosts={createDraftPosts}
+        activeButtons={activeButtons}
+      />
       <Form>
-        <form className="w-full flex-1 p-4 py-10 overflow-y-auto justify-center items-center">
+        <form className="w-full flex-1 p-4 py-10 mb-8 overflow-y-auto justify-center items-center">
           {cards.map((card, index) => (
             <CreatePostCard
               key={index}
@@ -271,7 +320,9 @@ const WorkspacePage = () => {
           ))}
         </form>
       </Form>
-    </div>
+
+      <DraftPosts workspaceId={workspaceId} token={token}/>
+    </main>
   );
 };
 
