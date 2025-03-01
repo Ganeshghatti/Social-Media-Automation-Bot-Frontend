@@ -2,17 +2,19 @@ import React from "react";
 import CustomButtonHeader from "./CustomButtonHeader";
 
 export const ButtonsHeader = ({
+  isEditingDraft,
   onPublish,
   activeButtons,
   createDraftPosts,
+  EditDraftPosts,
 }) => {
   return (
     <div className="w-full px-8 py-3 gap-3 flex justify-end  ">
       <CustomButtonHeader
         buttonColor={"#FF9900"}
         activeButtons={activeButtons}
-        actionButton={createDraftPosts}
-        buttonText={"Save as Draft"}
+        actionButton={isEditingDraft ? EditDraftPosts : createDraftPosts}
+        buttonText={isEditingDraft?"Edit the Draft":"Save as Draft"}
       />
       <CustomButtonHeader
         activeButtons={activeButtons}

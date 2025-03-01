@@ -4,8 +4,8 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import { CreatePostCard } from "@components/CreatePost/CreatePostCard";
 import { CreatePostHeader } from "@components/CreatePost/CreatePostHeader";
 import { ButtonsHeader } from "@components/CreatePost/ButtonsHeader";
-import {DraftPosts} from "@components/CreatePost/DraftPosts";
-import { toast } from "sonner"
+import { DraftPosts } from "@components/CreatePost/DraftPosts";
+import { toast } from "sonner";
 
 import useAuthToken from "@hooks/useAuthToken";
 import { useUserStore } from "@/store/userStore";
@@ -27,6 +27,7 @@ const WorkspacePage = () => {
   const textAreaRefs = useRef([]); // Refs for all textareas
   const [newCardAdded, setNewCardAdded] = useState(false); // Track new card addition
   const [activeButtons, setActiveButtons] = useState(false);
+  const [isEditingDraft, setIsEditingDraft] = useState(false);
 
   useEffect(() => {
     if (token) {
@@ -190,8 +191,6 @@ const WorkspacePage = () => {
   };
 
   const createDraftPosts = async () => {
-    console.log("Hii");
-
     if (!cards.length) {
       console.error("No cards available");
       return;
@@ -281,7 +280,54 @@ const WorkspacePage = () => {
       );
 
       console.log("Final Response:", finalResponse.data);
-      toast("Draft Post Has been created")
+      toast("Draft Post Has been created");
+    } catch (error) {
+      console.error("Error making draft post:", error);
+    }
+  };
+
+  const EditDraftPosts = async (postId) => {
+    if (!cards.length) {
+      console.error("No cards available");
+      return;
+    }
+
+    console.log("Cards ",cards)
+
+    const isThread = cards.length > 1 && postType === "thread";
+
+    const formData =
+      postType === "thread"
+        ? {
+            type: "thread",
+            threadId: "67c353fbeea397f07e82c32b",
+            threadPosts: cards.map((card, index) => ({
+              _id: card.id,
+              content: card.text || "",
+              media: [],
+              threadPosition: index + 1,
+              previousPost: index > 0 ? cards[index - 1]._id : null,
+              nextPost: index < cards.length - 1 ? cards[index + 1]._id : null,
+            })),
+          }
+        : {
+            type: "post",
+            content: cards[0].text || "",
+            _id: "67c34e60eea397f07e82c152",
+            media: [],
+          };
+
+    try {
+      const token = localStorage.getItem("token");
+
+      const finalResponse = await axios.put(
+        `https://api.bot.thesquirrel.site/workspace/draft/edit/${workspaceId}`,
+        formData,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      console.log("Final Response:", finalResponse.data);
+      toast("Draft Post Has been Edited");
     } catch (error) {
       console.error("Error making draft post:", error);
     }
@@ -298,9 +344,11 @@ const WorkspacePage = () => {
     <main className="flex-1 flex flex-col h-screen overflow-y-auto">
       <CreatePostHeader />
       <ButtonsHeader
+        isEditingDraft={isEditingDraft}
         onPublish={onPublish}
         createDraftPosts={createDraftPosts}
         activeButtons={activeButtons}
+        EditDraftPosts={EditDraftPosts}
       />
       <Form>
         <form className="w-full flex-1 p-4 py-10 mb-8 overflow-y-auto justify-center items-center">
@@ -321,7 +369,16 @@ const WorkspacePage = () => {
         </form>
       </Form>
 
-      <DraftPosts workspaceId={workspaceId} token={token}/>
+      <DraftPosts
+        workspaceId={workspaceId}
+        token={token}
+        setCards={setCards}
+        cards={cards}
+        postType={postType}
+        setPostType={setPostType}
+        isEditingDraft={isEditingDraft}
+        setIsEditingDraft={setIsEditingDraft}
+      />
     </main>
   );
 };

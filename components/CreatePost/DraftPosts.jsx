@@ -14,9 +14,18 @@ import {
   CardFooter,
   CardTitle,
 } from "@components/ui/card";
-import { Trash } from "lucide-react";
+import { Edit, Trash } from "lucide-react";
 
-export const DraftPosts = ({ workspaceId, token }) => {
+export const DraftPosts = ({
+  workspaceId,
+  token,
+  setCards,
+  cards,
+  postType,
+  setPostType,
+  isEditingDraft,
+  setIsEditingDraft,
+}) => {
   const [draftPosts, setDraftPosts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
@@ -42,17 +51,21 @@ export const DraftPosts = ({ workspaceId, token }) => {
     }
   }, []);
 
-  const DeleteDraftPost = async (draftPostId) => {
+  const DeleteDraftPost = async (draftType, draftPostId) => {
     try {
       setLoading(true);
+
+      console.log("Deelete Draft Type ", draftType);
 
       const response = await axios.delete(
         `https://api.bot.thesquirrel.site/workspace/draft/delete/${workspaceId}`, // Correct API endpoint
         {
           data: {
-            type: "post",
-            postId: draftPostId,
-          }, // Request body goes inside "data"
+            type: draftType,
+            ...(draftType === "thread"
+              ? { threadId: draftPostId }
+              : { postId: draftPostId }),
+          },
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -66,6 +79,20 @@ export const DraftPosts = ({ workspaceId, token }) => {
       SingleWorkspaceData(workspaceId, token);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const EditDraftPosts = (draftType, draftPostId, draft) => {
+    setIsEditingDraft(true);
+    if (draft?.type === "thread") {
+      setCards(
+        draft.threadPosts.map((post, index) => ({
+          id: index,
+          text: post.content,
+        }))
+      );
+    } else {
+      setCards([{ id: 0, text: draft.content }]); // For non-thread drafts
     }
   };
 
@@ -99,20 +126,48 @@ export const DraftPosts = ({ workspaceId, token }) => {
                   key={i}
                   onMouseEnter={() => setIsHovering(true)}
                   onMouseLeave={() => setIsHovering(false)}
-                  className=" bg-navBg text-white py-4  border rounded-[20px] border-[#ffffff30] 
-                  px-4"
+                  className={` bg-navBg text-white py-4  border rounded-[20px] border-[#ffffff30] 
+                  px-4`}
                 >
                   <CardContent className="px-0">
                     <CardDescription className="text-white text-lg">
-                      {draft.content}
+                      {draft.type === "thread"
+                        ? draft?.threadPosts?.[0]?.content
+                        : draft.content}
                     </CardDescription>
                   </CardContent>
-                  <CardFooter className="p-0 ">
+                  <CardFooter className="p-0 space-x-3 ">
                     <div
-                      onClick={() => DeleteDraftPost(draft._id)}
-                      className="px-3 py-2 rounded-sm bg-headerBg cursor-pointer"
+                      onClick={() => {
+                        if (draft?.type) {
+                          DeleteDraftPost(
+                            draft.type,
+                            draft?.type === "thread"
+                              ? draft.threadId
+                              : draft._id
+                          );
+                        }
+                      }}
+                      className={`px-3 py-2 rounded-sm bg-headerBg cursor-pointer  ${
+                        isHovering ? "scale-100" : "scale-0"
+                      } duration-300`}
                     >
                       <Trash className="text-red-500" />
+                    </div>
+
+                    <div
+                      onClick={() =>
+                        EditDraftPosts(
+                          draft.type,
+                          draft?.type === "thread" ? draft.threadId : draft._id,
+                          draft
+                        )
+                      }
+                      className={`px-3 py-2 rounded-sm bg-headerBg cursor-pointer ${
+                        isHovering ? "scale-100" : "scale-0"
+                      } duration-300`}
+                    >
+                      <Edit className="text-green-500" />
                     </div>
                   </CardFooter>
                 </Card>
