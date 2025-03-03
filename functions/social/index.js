@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const connectTwitter = async (workspaceId, router,  token) => {
+export const connectTwitter = async (workspaceId, router, token) => {
     try {
         const response = await axios.post(
             `https://api.bot.thesquirrel.site/workspace/twitter/connect/${workspaceId}`,
@@ -33,7 +33,7 @@ export const disconnectTwitter = async (workspaceId, userId, token) => {
     }
 };
 
-export const connectLinkedin = async (workspaceId, router, setWorkSpaceApiId, token) => {
+export const connectLinkedin = async (workspaceId, router, token) => {
     try {
         const response = await axios.post(
             `https://api.bot.thesquirrel.site/workspace/linkedin/connect/${workspaceId}`,
@@ -45,7 +45,6 @@ export const connectLinkedin = async (workspaceId, router, setWorkSpaceApiId, to
             }
         );
         router.push(response.data.data);
-        setWorkSpaceApiId(workspaceId);
     } catch (error) {
         console.error("Error connecting linked in: ", error);
     }

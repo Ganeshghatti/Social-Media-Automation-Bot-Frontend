@@ -10,7 +10,6 @@ const WorkspaceLayout = ({ children }) => {
   return (
     <div className="flex min-h-screen bg-navBg w-full">
       <Sidebar workspaceId={workspaceId} token={token} />
-
       {children}
     </div>
   );

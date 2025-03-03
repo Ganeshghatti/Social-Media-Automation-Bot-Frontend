@@ -26,6 +26,7 @@ export const Sidebar = ({ workspaceId, token }) => {
   const router = useRouter();
   const [workspaces, setWorkspaces] = useState([]);
   const [loading, setLoading] = useState(false);
+
   const GetAllWorkspaces = async (token) => {
     try {
       setLoading(true);
@@ -37,9 +38,12 @@ export const Sidebar = ({ workspaceId, token }) => {
           },
         }
       );
-      console.log("Response workspaces ", response.data);
-      if (response.data.success) {
-        setWorkspaces(response.data.data);
+      if (response.data.success && singleWorkspace) {
+        const filteredWorkspaces = response.data.data.filter(
+          (workspace) => workspace.name !== singleWorkspace?.name
+        );
+
+        setWorkspaces(filteredWorkspaces);
       } else {
         setWorkspaces([]);
       }
@@ -50,12 +54,13 @@ export const Sidebar = ({ workspaceId, token }) => {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     if (!token) {
       return;
     }
     GetAllWorkspaces(token);
-  }, [token]);
+  }, [token, singleWorkspace]);
 
   const SingleWorkspaceData = useCallback(async (workspaceId, token) => {
     try {
@@ -68,7 +73,6 @@ export const Sidebar = ({ workspaceId, token }) => {
         }
       );
 
-      console.log("response ", response.data?.data);
       setSingleWorkspace(response.data.data);
     } catch (error) {
       console.log("Error ", error);
@@ -83,7 +87,7 @@ export const Sidebar = ({ workspaceId, token }) => {
   }, [workspaceId, token, SingleWorkspaceData]);
 
   return (
-    <div className="flex flex-col items-start justify-between bg-darkBg px-4 py-6 shadow-sm text-white w-1/6 h-screen overflow-y-auto sticky top-0">
+    <div className="flex flex-col items-start justify-between bg-darkBg px-4 py-6 shadow-sm text-white w-[25%] h-screen overflow-y-auto sticky top-0">
       <div className="flex flex-col gap-14 items-center w-full">
         <div className="flex w-full items-center gap-4">
           <Image
@@ -99,10 +103,37 @@ export const Sidebar = ({ workspaceId, token }) => {
           </div>
         </div>
         <div className="flex flex-col w-full gap-3">
-          <Sidebar_Card imageUrl={"/dashboard_icon.png"} text={"Dashboard"} />
-          <Sidebar_Card imageUrl={"/Analytics.png"} text={"Anlaytics"} />
-          <div className="w-full h-[1px] bg-white opacity-20" />
-          <Sidebar_Card imageUrl={"/Create-Post.png"} text={"Create post"} />
+          <Sidebar_Card
+            imageUrl={"/dashboard_icon.png"}
+            text={"Dashboard"}
+            onClickFunction={() => {
+              router.push("dashboard");
+            }}
+          />
+          <Sidebar_Card
+            imageUrl={"/Analytics.png"}
+            text={"Anlaytics"}
+            onClickFunction={() => {
+              router.push("Analytics");
+            }}
+          />
+          <div className="w-full h-[1px] bg-white opacity-40" />
+          <Sidebar_Card
+            imageUrl={"/Create-Post.png"}
+            text={"Create post"}
+            onClickFunction={() => {
+              router.push(`/workspace/${workspaceId}`);
+            }}
+          />
+
+          <Sidebar_Card
+            imageUrl={"/edit.png"}
+            text={"Edit Workspace"}
+            onClickFunction={() => {
+              router.push(`/workspace/${workspaceId}/edit`);
+            }}
+          />
+
           <Sidebar_Card
             onClickFunction={() => connectTwitter(workspaceId, router, token)}
             imageUrl={"/twitter.png"}
@@ -145,28 +176,27 @@ export const Sidebar = ({ workspaceId, token }) => {
       {loading ? (
         <h1 className="text-2xl font-semibold">Loading...</h1>
       ) : (
-        <DropdownMenu className="w-full">
+        <DropdownMenu className="w-full mt-6">
           <DropdownMenuTrigger asChild>
             <Button className="bg-primary rounded-2xl w-full py-8 px-4 flex items-center gap-2 mt-auto">
-              <Image
-                alt="Paw image"
-                src={"/pet-paw.png"}
-                width={30}
-                className="object-contain"
-                height={30}
-              />
+              {singleWorkspace?.icon && (
+                <Image
+                  alt="Paw image"
+                  src={singleWorkspace?.icon}
+                  width={30}
+                  className="object-contain"
+                  height={30}
+                />
+              )}
+
               <span className="text-base text-white font-semibold">
-                Dezign Plex
+                {singleWorkspace?.name}
               </span>
               <ChevronsUpDown className="h-6 w-6 object-contain" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-[300px] flex flex-col gap-4 items-center bg-headerBg">
-            {workspaces?.length === 0 ? (
-              <DropdownMenuItem className="text-2xl font-semibold text-white">
-                No Workspaces Found
-              </DropdownMenuItem>
-            ) : (
+            {workspaces?.length !== 0 &&
               workspaces?.map((workspace, i) => (
                 <Link
                   href={`/workspace/${workspace._id}`}
@@ -175,8 +205,14 @@ export const Sidebar = ({ workspaceId, token }) => {
                 >
                   {workspace.name}
                 </Link>
-              ))
-            )}
+              ))}
+
+            <Link
+              href={`/workspaces`}
+              className="text-white  border-0  rounded-sm px-6 py-4 "
+            >
+              Manage Workspcaes
+            </Link>
           </DropdownMenuContent>
         </DropdownMenu>
       )}
