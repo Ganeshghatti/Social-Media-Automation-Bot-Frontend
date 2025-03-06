@@ -8,6 +8,7 @@ const WorkspacesPage = () => {
   const token = useAuthToken();
   const [workspaces, setWorkspaces] = useState([]);
   const [loading, setLoading] = useState(false);
+
   const GetAllWorkspaces = async (token) => {
     try {
       setLoading(true);

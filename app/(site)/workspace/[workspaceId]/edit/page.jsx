@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -19,12 +19,26 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import axios from "axios";
 import useAuthToken from "@hooks/useAuthToken";
-
+import { Textarea } from "@components/ui/textarea";
+import { CreatePostHeader } from "@components/CreatePost/CreatePostHeader";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@components/ui/select";
+import { TIMEZONES } from "@constants/create-workspace/index";
+import Image from "next/image";
+import { Sidebar_Card } from "@components/single-workspace/Sidebar_Card";
+import { disconnectLinkedIn, disconnectTwitter } from "@functions/social";
 const EditWorkspace = () => {
   const [loading, setLoading] = useState(false);
   const [singleWorkspace, setSingleWorkspace] = useState(null);
   const [keywordInput, setKeywordInput] = useState("");
   const [iconPreview, setIconPreview] = useState(null);
+  const [selectedTimezone, setSelectedTimezone] = useState("");
+  const fileInputRef = useRef(null);
   const router = useRouter();
   const token = useAuthToken() || "";
   const params = useParams();
@@ -32,35 +46,41 @@ const EditWorkspace = () => {
 
   const formSchema = z.object({
     name: z.string().min(1, "Name is required"),
-    about: z.string().min(1, "About is required"),
     description: z.string().min(1, "Description is required"),
     keywords: z.array(z.string()),
-    icon: z.any().optional(),
+    icon: z.any().optional().nullable(),
+    timezone: z.string().optional(),
   });
 
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
-      about: "",
       description: "",
       keywords: [],
       icon: null,
+      timezone: "",
     },
   });
 
   const keywords = form.watch("keywords");
 
-  const handleFileChange = (e, onChange) => {
+  const handleFileChange = (e) => {
+    console.log("File input changed"); // Debugging
     const file = e.target.files[0];
-    if (!file) return;
+    if (!file) {
+      console.log("No file selected");
+      return;
+    }
+
+    console.log("File selected:", file.name);
 
     if (!file.type.startsWith("image/")) {
       alert("Please upload an image file");
       return;
     }
 
-    const maxSize = 5 * 1024 * 1024;
+    const maxSize = 5 * 1024 * 1024; // 5MB
     if (file.size > maxSize) {
       alert("File size must be less than 5MB");
       return;
@@ -73,8 +93,9 @@ const EditWorkspace = () => {
       file: file,
     };
 
-    onChange(fileData);
+    form.setValue("icon", fileData);
     setIconPreview(URL.createObjectURL(file));
+    console.log("Preview set:", URL.createObjectURL(file));
   };
 
   const SingleWorkspaceData = async (workspaceId, token) => {
@@ -91,9 +112,9 @@ const EditWorkspace = () => {
         setIconPreview(response.data.data.icon);
         form.reset({
           name: response.data.data.name || "",
-          about: response.data.data.about || "",
           description: response.data.data.settings.description || "",
           keywords: response.data.data.settings.keywords || [],
+          timezone: response.data.data.timezone || "ISD",
         });
       }
     } catch (error) {
@@ -115,10 +136,10 @@ const EditWorkspace = () => {
 
       const payload = {
         name: data.name,
-        about: data.about,
+        timezone: data.timezone || "IST", // Default to IST if not selected
         settings: {
           description: data.description,
-          keywords: data.keywords,
+          keywords: data.keywords || [],
         },
       };
 
@@ -177,156 +198,256 @@ const EditWorkspace = () => {
   if (loading) return <div>Loading...</div>;
 
   return (
-    <div className="flex items-center justify-center w-full">
-      <div className="flex flex-col gap-6 w-full max-w-3xl">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-2xl text-center">
-              Update Workspace
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-2"
-              >
-                <FormField
-                  control={form.control}
-                  name="icon"
-                  render={({ field: { onChange } }) => (
-                    <FormItem>
-                      <FormLabel>Workspace Icon</FormLabel>
-                      <FormControl>
-                        <div className="space-y-4">
-                          <Input
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) => handleFileChange(e, onChange)}
-                          />
-                          {iconPreview && (
-                            <div className="relative w-24 h-24">
-                              <img
-                                src={iconPreview}
-                                alt="Icon preview"
-                                className="w-full h-full object-cover rounded-lg"
-                              />
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setIconPreview(singleWorkspace?.icon || null);
-                                  onChange(null);
-                                }}
-                                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1"
-                              >
-                                <X size={14} />
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                {/* Rest of the form fields remain the same */}
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Name</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter workspace name" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="about"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>About</FormLabel>
-                      <FormControl>
-                        <Input placeholder="About workspace" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="description"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Description</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter description" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="keywords"
-                  render={() => (
-                    <FormItem>
-                      <FormLabel>Keywords</FormLabel>
-                      <FormControl>
-                        <div className="flex gap-2">
-                          <Input
-                            placeholder="Add keyword"
-                            value={keywordInput}
-                            onChange={(e) => setKeywordInput(e.target.value)}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter") {
-                                e.preventDefault();
-                                addKeyword(keywordInput);
-                              }
-                            }}
-                          />
-                          <Button
-                            type="button"
-                            onClick={() => addKeyword(keywordInput)}
-                          >
-                            Add
-                          </Button>
-                        </div>
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-                <div className="flex flex-wrap gap-2">
-                  {keywords.map((keyword, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center gap-1 bg-secondary px-3 py-1 rounded-full"
+    <div className="flex items-start gap-4 justify-start min-h-screen w-full flex-col ">
+      <CreatePostHeader />
+
+      <div className="flex gap-6 flex-col w-[96%] mx-auto py-3 ">
+        <h1 className="text-4xl font-semibold  text-white">Edit Workspace</h1>
+
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="w-full rounded-xl bg-headerBg
+           border-[#ffffff30] px-5 py-6 flex flex-col gap-6"
+          >
+            <div className="w-full flex gap-3 items-center justify-between">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem className="flex-1 bg-navBg text-white py-4 border rounded-[20px] border-[#ffffff30] px-2">
+                    <FormControl>
+                      <Input
+                        className="bg-transparent border-transparent focus:border-transparent focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-[24px] placeholder:text-[24px]"
+                        placeholder="Workspace name"
+                        {...field}
+                        value={field.value ?? ""}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="timezone"
+                render={({ field }) => (
+                  <div
+                    className="flex-1 flex gap-3 bg-navBg text-white py-4
+                   border rounded-[20px] justify-center items-center border-[#ffffff30] px-2"
+                  >
+                    <Select
+                      onValueChange={(value) => {
+                        field.onChange(value);
+                        setSelectedTimezone(value);
+                      }}
+                      value={field.value}
                     >
-                      {keyword}
-                      <button
-                        type="button"
-                        onClick={() => removeKeyword(keyword)}
-                        className="text-muted-foreground hover:text-foreground"
-                      >
-                        <X size={14} />
-                      </button>
+                      <SelectTrigger className="bg-transparent border-transparent focus:border-transparent focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 flex-1 text-xl text-[#ffffff60]">
+                        <SelectValue
+                          placeholder="Timezone = (08:00)"
+                          className="bg-transparent"
+                        />
+                      </SelectTrigger>
+                      <SelectContent className="bg-navBg text-white">
+                        {TIMEZONES.map((time_zone, i) => (
+                          <SelectItem
+                            key={i}
+                            className="cursor-pointer bg-navBg hover:opacity-90
+                             hover:bg-navBg focus:bg-navBg focus:opacity-70 focus:text-white
+                             "
+                            value={time_zone.name} // Just use the timezone name like "IST"
+                          >
+                            {time_zone.name} ({time_zone.offset})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="icon"
+                render={({ field }) => (
+                  <div className="flex-1 relative">
+                    <input
+                      type="file"
+                      id="fileInput"
+                      ref={fileInputRef}
+                      className="hidden"
+                      accept="image/*"
+                      onChange={(e) => handleFileChange(e)}
+                    />
+                    <div
+                      onClick={() => fileInputRef.current.click()}
+                      className="flex gap-3 cursor-pointer
+                     bg-navBg text-white py-5 border rounded-[20px] justify-center 
+                     items-center border-[#ffffff30] px-2"
+                    >
+                      {iconPreview ? (
+                        <div className="relative h-8 w-8 rounded-full overflow-hidden">
+                          <Image
+                            src={iconPreview}
+                            alt="Preview"
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                      ) : (
+                        <Image
+                          src="/Upload-Workspace.png"
+                          alt="Upload Image"
+                          height={24}
+                          width={24}
+                          className="object-contain h-6 w-6"
+                        />
+                      )}
+
+                      <span className="text-2xl text-white opacity-50">
+                        {iconPreview ? "Change Image" : "Upload Image"}
+                      </span>
                     </div>
-                  ))}
-                </div>
-                <Button
-                  type="submit"
-                  className="w-full mt-6"
-                  disabled={loading}
+                  </div>
+                )}
+              />
+            </div>
+
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem
+                  className="flex-1 bg-navBg
+               text-white py-4 border rounded-[20px] border-[#ffffff30] px-2"
                 >
-                  {loading ? "Updating..." : "Update Workspace"}
-                </Button>
-              </form>
-            </Form>
-          </CardContent>
-        </Card>
+                  <FormControl className="text-2xl">
+                    <Textarea
+                      className="bg-navBg text-white border-transparent 
+                      focus:border-transparent focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-[24px] placeholder:text-[24px] rounded-xl py-4"
+                      rows={10}
+                      placeholder="Enter Description"
+                      {...field}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="keywords"
+              render={({ field }) => (
+                <FormItem
+                  className="flex-1 bg-navBg text-white py-4 border 
+              rounded-[20px] border-[#ffffff30] px-2"
+                >
+                  <FormControl>
+                    <Input
+                      placeholder="Add keyword"
+                      value={keywordInput}
+                      className="bg-navBg text-white
+                     border-transparent focus:border-transparent focus:outline-none 
+                     focus-visible:bg-transparent focus-within:bg-transparent focus:ring-0
+                      focus-visible:ring-0 focus-visible:ring-offset-0 text-[24px] 
+                      placeholder:text-[24px] rounded-xl py-2 focus:bg-transparent"
+                      onChange={(e) => setKeywordInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          addKeyword(keywordInput);
+                        }
+                      }}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            {/* Keywords Display */}
+            <div className="flex flex-wrap gap-2 px-3">
+              {keywords.map((keyword, index) => (
+                <div
+                  key={index}
+                  className="flex items-center text-white gap-4
+                 bg-primary px-3 py-2 rounded-full"
+                >
+                  {keyword}
+                  <button
+                    type="button"
+                    onClick={() => removeKeyword(keyword)}
+                    className="text-white hover:text-foreground"
+                  >
+                    <X size={16} className="text-white" />
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            {/* Submit Button */}
+            <Button
+              type="submit"
+              disabled={loading}
+              className="bg-primary 
+            hover:bg-primary/90 text-white py-6 text-xl rounded-[20px]"
+            >
+              {loading ? "Updating..." : "Update Workspace"}
+            </Button>
+          </form>
+        </Form>
+        <div className="flex gap-6 flex-col w-[96%] mx-auto py-3 ">
+          <h1 className="text-4xl font-semibold  text-white">
+            Disconnect Accounts
+          </h1>
+          {singleWorkspace?.connectedAccounts?.length === 0 && (
+            <h3 className="text-2xl font-medium text-gray-100">
+              No Account To Disconnect
+            </h3>
+          )}
+          {singleWorkspace?.connectedAccounts?.length > 0 && (
+            <div className="flex w-full gap-6 items-center">
+              <div className="max-w-max rounded-xl bg-headerBg border-[#ffffff30] px-5 py-6 flex flex-col gap-6">
+                {singleWorkspace?.connectedAccounts?.map((account, i) => {
+                  if (account?.type === "linkedin") {
+                    return (
+                      <Sidebar_Card
+                        key={i}
+                        onClickFunction={() => {
+                          disconnectLinkedIn(
+                            workspaceId,
+                            account?.userId,
+                            token
+                          );
+                          router.push(`/workspace/${workspaceId}`);
+                        }}
+                        imageUrl={"/linkedIn.png"}
+                        text={"Disconnect LinkedIn"}
+                      />
+                    );
+                  } else if (account?.type === "twitter") {
+                    return (
+                      <Sidebar_Card
+                        onClickFunction={() => {
+                          disconnectTwitter(
+                            workspaceId,
+                            account?.userId,
+                            token
+                          );
+                          router.push(`/workspace/${workspaceId}`);
+                        }}
+                        key={i}
+                        imageUrl={"/twitter.png"}
+                        text={"Disconnect Twitter"}
+                      />
+                    );
+                  }
+                })}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

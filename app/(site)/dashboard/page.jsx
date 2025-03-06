@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { Button } from "@components/ui/button";
-import { Plus, X } from "lucide-react";
+import { Plus } from "lucide-react";
 import axios from "axios";
 import {
   Accordion,
@@ -25,7 +25,6 @@ import useAuthToken from "@hooks/useAuthToken";
 import WorkSpaceThread from "@feature/workspace-thread";
 import { useUserStore } from "@/store/userStore";
 import { useRouter } from "next/navigation";
-import ImageFetch from "@feature/post/components/image-fetch" 
 
 const Page = () => {
   const token = useAuthToken();
@@ -60,7 +59,7 @@ const Page = () => {
     const fetchWorkspaces = async () => {
       try {
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_SERVER_URI}/workspace/get`,
+          "https://api.bot.thesquirrel.site/workspace/get",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -81,7 +80,7 @@ const Page = () => {
   const connectTwitter = async (workspaceId) => {
     try {
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_URI}/workspace/twitter/connect/${workspaceId}`,
+        `https://api.bot.thesquirrel.site/workspace/twitter/connect/${workspaceId}`,
         {},
         {
           headers: {
@@ -99,7 +98,7 @@ const Page = () => {
   const disconnectTwitter = async (workspaceId, userId) => {
     try {
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_URI}/workspace/twitter/disconnect/${workspaceId}/${userId}`,
+        `https://api.bot.thesquirrel.site/workspace/twitter/disconnect/${workspaceId}/${userId}`,
         {},
         {
           headers: {
@@ -115,7 +114,7 @@ const Page = () => {
   const deleteWorkspace = async (workspaceId) => {
     try {
       await axios.delete(
-        `${process.env.NEXT_PUBLIC_SERVER_URI}/workspace/delete/${workspaceId}`,
+        `https://api.bot.thesquirrel.site/workspace/delete/${workspaceId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -274,9 +273,7 @@ const Page = () => {
         ) : (
           <WorkSpacePost accountId={accountId} workSpaceId={workSpaceApiId} />
         )}
-
       </div>
-     
     </div>
   );
 };
