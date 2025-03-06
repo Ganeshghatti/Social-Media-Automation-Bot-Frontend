@@ -120,6 +120,7 @@ const WorkspacePage = () => {
   };
 
   const onPublish = async () => {
+    console.log("function is invoked ")
     const isThread = cards.length > 1 && postType === "thread";
 
     const formData = {
@@ -350,6 +351,9 @@ const WorkspacePage = () => {
         activeButtons={activeButtons}
         EditDraftPosts={EditDraftPosts}
       />
+      <button className="bg-blue-500 max-w-[150px] w-full text-white text-xl px-4 py-2 rounded" onClick={() => onPublish()}>
+        Create Post
+      </button>
       <Form>
         <form className="w-full flex-1 p-4 py-10 mb-8 overflow-y-auto justify-center items-center">
           {cards.map((card, index) => (

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Plus, X } from "lucide-react";
 
 import { workSpacePostSchema } from "@/schema/index";
 
@@ -24,13 +25,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import ImageFetch from "@feature/post/components/image-fetch";
 
 import axios from "axios";
 import useAuthToken from "@/hooks/useAuthToken";
 
 const WorkSpacePost = ({ accountId, workSpaceId }) => {
-  const [postId, setPostId] = useState();
   const token = useAuthToken();
+  const [selectedImages, setSelectedImages] = useState([]);
+  const [postId, setPostId] = useState();
 
   const form = useForm({
     resolver: zodResolver(workSpacePostSchema),
@@ -45,23 +48,65 @@ const WorkSpacePost = ({ accountId, workSpaceId }) => {
 
   const onSubmit = async (data) => {
     try {
+      // Format selected images to match API requirements
+      const formattedSelectedImages = selectedImages.map((image) => {
+        // Extract filename from URL or use a default name
+        const originalname = image.imageUrl.split('/').pop() || 'image.jpg';
+        return {
+          originalname,
+          size: image.size || 0,
+          mimetype: image.type || 'image/jpeg'
+        };
+      });
 
+      // Format form media to match API requirements
+      const formattedFormImages = (data.media || [])
+        .filter(image => image && image.blobUrl)
+        .map((image) => ({
+          originalname: image.name || image.blobUrl.split('/').pop() || 'image.jpg',
+          size: image.size || 0,
+          mimetype: image.type || 'image/jpeg'
+        }));
+
+      // Combine and remove duplicates
+      const uniqueUrls = new Set();
+      const mergedImages = [...formattedSelectedImages, ...formattedFormImages].filter(image => {
+        if (!uniqueUrls.has(image.originalname)) {
+          uniqueUrls.add(image.originalname);
+          return true;
+        }
+        return false;
+      });
+
+      // Check if total images exceed 4
+      if (mergedImages.length > 4) {
+        throw new Error("Cannot upload more than 4 images");
+      }
+
+      // Store original media data for upload
+      const mediaForUpload = selectedImages.concat(
+        (data.media || []).filter(image => image && image.blobUrl)
+      );
+
+      // Create form data with proper media format
       const formData = {
         posts: [
           {
             accountId: accountId,
             type: "twitter",
-            ...data,
-            media: data.media.map(({ blobUrl, ...rest }) => rest),
+            mode: "create",
+            posttype: data.posttype,
+            content: data.content,
+            publishnow: data.publishnow,
+            tobePublishedAt: data.tobePublishedAt,
+            media: mergedImages // Using properly formatted media objects
           },
         ],
       };
 
-      console.log("Step 1: Sending initial request with data:", formData);
-
       // Step 1: Get presigned URLs
       const presignedResponse = await axios.post(
-        `https://api.bot.thesquirrel.site/workspace/posts/create/presigned-url/${workSpaceId}`,
+        `${process.env.NEXT_PUBLIC_SERVER_URI}/workspace/posts/create/presigned-url/${workSpaceId}`,
         formData,
         {
           headers: {
@@ -70,49 +115,38 @@ const WorkSpacePost = ({ accountId, workSpaceId }) => {
         }
       );
 
-      console.log("Step 1 Response:", presignedResponse.data);
+      const mediaFromResponse = presignedResponse.data.data[0]?.media || [];
 
-      const mediaFromResponse = presignedResponse.data.data[0]?.media;
+      if (mediaFromResponse.length > 0) {
+        // Ensure we have matching media items
+        if (mediaFromResponse.length !== mediaForUpload.length) {
+          throw new Error("Mismatch between uploaded media and server response");
+        }
 
-      if (mediaFromResponse && mediaFromResponse.length > 0) {
-        console.log(
-          "Step 2: Uploading media files. Count:",
-          mediaFromResponse.length
-        );
-
+        // Upload each media file
         for (let i = 0; i < mediaFromResponse.length; i++) {
-          const media = mediaFromResponse[i];
-          const imageFile = data.media[i];
-
-          console.log(`Uploading file ${i + 1}/${mediaFromResponse.length}`);
-
+          const mediaResponse = mediaFromResponse[i];
+          const originalMedia = mediaForUpload[i];
+          
           try {
-            const imageBlob = await fetch(imageFile.blobUrl).then((r) =>
-              r.blob()
-            );
-
-            const uploadResult = await axios.put(
-              media.presignedUrl,
-              imageBlob,
-              {
-                headers: {
-                  "Content-Type": imageFile.mimetype,
-                },
-              }
-            );
-
-            console.log(`File ${i + 1} upload status:`, uploadResult.status);
+            // Get the blob URL from either selected images or form media
+            const blobUrl = originalMedia.imageUrl || originalMedia.blobUrl;
+            const imageBlob = await fetch(blobUrl).then(r => r.blob());
+            
+            await axios.put(mediaResponse.presignedUrl, imageBlob, {
+              headers: {
+                "Content-Type": mediaResponse.mimetype,
+              },
+            });
           } catch (uploadError) {
             console.error(`Error uploading file ${i + 1}:`, uploadError);
             throw uploadError;
           }
         }
 
-        console.log("Step 3: Creating final post");
-
-        // Step 3: Create final post with all media
+        // Create final post with uploaded media
         const finalResponse = await axios.post(
-          `https://api.bot.thesquirrel.site/workspace/posts/create/${workSpaceId}`,
+          `${process.env.NEXT_PUBLIC_SERVER_URI}/workspace/posts/create/${workSpaceId}`,
           {
             posts: presignedResponse.data.data,
           },
@@ -127,7 +161,7 @@ const WorkSpacePost = ({ accountId, workSpaceId }) => {
       } else {
         // Handle post without media
         const finalResponse = await axios.post(
-          `https://api.bot.thesquirrel.site/workspace/posts/create/${workSpaceId}`,
+          `${process.env.NEXT_PUBLIC_SERVER_URI}/workspace/posts/create/${workSpaceId}`,
           {
             posts: presignedResponse.data.data,
           },
@@ -138,18 +172,16 @@ const WorkSpacePost = ({ accountId, workSpaceId }) => {
           }
         );
 
-        console.log(
-          "Post created successfully (no media):",
-          finalResponse.data
-        );
+        console.log("Post created successfully (no media):", finalResponse.data);
       }
+
+      // Reset form and selected images after successful submission
+      form.reset();
+      setSelectedImages([]);
+      
     } catch (error) {
-      console.error("Detailed error:", {
-        message: error.message,
-        response: error.response?.data,
-        request: error.config,
-      });
-      throw error;
+      console.error("Error creating post:", error);
+      // Handle error appropriately (show toast/notification)
     }
   };
 
@@ -197,6 +229,12 @@ const WorkSpacePost = ({ accountId, workSpaceId }) => {
     }));
 
     onChange([...currentFiles, ...fileData]);
+  };
+
+  const handleRemoveImages = (imageToRemove) => {
+    setSelectedImages(
+      selectedImages.filter((img) => img.imageUrl !== imageToRemove.imageUrl)
+    );
   };
 
   const handleRemoveImage = (index, onChange) => {
@@ -327,11 +365,40 @@ const WorkSpacePost = ({ accountId, workSpaceId }) => {
               </FormItem>
             )}
           />
+
+          {selectedImages.length > 0 && (
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold mb-3">Selected Images</h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {selectedImages.map((image, index) => (
+                  <div key={index} className="relative group">
+                    <img
+                      src={image.imageUrl}
+                      alt={image.title}
+                      className="w-full h-48 object-cover rounded-lg shadow-md"
+                    />
+                    <button
+                      onClick={() => handleRemoveImages(image)}
+                      className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition-colors"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           <Button type="submit" className="focus:outline-none">
             Submit
           </Button>
         </form>
       </Form>
+      <ImageFetch
+            token={token}
+            selectedImages={selectedImages}
+            setSelectedImages={setSelectedImages}
+          />
     </div>
   );
 };
