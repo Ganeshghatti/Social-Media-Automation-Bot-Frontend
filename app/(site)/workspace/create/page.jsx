@@ -47,7 +47,7 @@ const Page = () => {
     description: z.string().min(1, "Description is required"),
     keywords: z.array(z.string()),
     icon: z.any().optional().nullable(),
-    timezone: z.string().optional(),
+    timezone: z.string(),
   });
 
   const form = useForm({

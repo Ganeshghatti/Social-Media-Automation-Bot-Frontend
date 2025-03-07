@@ -25,6 +25,8 @@ export const DraftPosts = ({
   setPostType,
   isEditingDraft,
   setIsEditingDraft,
+  threadIdForEdit,
+  setThreadIdForEdit,
 }) => {
   const [draftPosts, setDraftPosts] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -82,17 +84,27 @@ export const DraftPosts = ({
     }
   };
 
-  const EditDraftPosts = (draftType, draftPostId, draft) => {
+  const EditDraftPosts = (
+    draftType,
+    draftPostId,
+    draft,
+    setThreadIdForEdit
+  ) => {
+    console.log("Draft ", draft);
+    console.log("cards ", cards);
+
     setIsEditingDraft(true);
     if (draft?.type === "thread") {
+      setThreadIdForEdit(draft?.threadId);
       setCards(
-        draft.threadPosts.map((post, index) => ({
-          id: index,
+        draft?.threadPosts.map((post) => ({
+          id: post?._id,
           text: post.content,
         }))
       );
+      
     } else {
-      setCards([{ id: 0, text: draft.content }]); // For non-thread drafts
+      setCards([{ id: draft?._id, text: draft.content }]); // For non-thread drafts
     }
   };
 
@@ -117,7 +129,8 @@ export const DraftPosts = ({
           {" "}
           <AccordionTrigger>Draft Posts</AccordionTrigger>
           <AccordionContent
-            className=" grid md:grid-cols-4 items-center grid-cols-2 justify-around w-full rounded-xl bg-headerBg
+            className=" grid md:grid-cols-4 items-center grid-cols-2 justify-around
+             w-full rounded-xl bg-headerBg
              border-[#ffffff30] px-5 py-6   gap-6"
           >
             {draftPosts?.length > 0 &&
@@ -126,7 +139,8 @@ export const DraftPosts = ({
                   key={i}
                   onMouseEnter={() => setIsHovering(true)}
                   onMouseLeave={() => setIsHovering(false)}
-                  className={` bg-navBg text-white py-4  border rounded-[20px] border-[#ffffff30] 
+                  className={` bg-navBg text-white py-4  border rounded-[20px]
+                     border-[#ffffff30] 
                   px-4`}
                 >
                   <CardContent className="px-0">
@@ -160,7 +174,8 @@ export const DraftPosts = ({
                         EditDraftPosts(
                           draft.type,
                           draft?.type === "thread" ? draft.threadId : draft._id,
-                          draft
+                          draft,
+                          setThreadIdForEdit
                         )
                       }
                       className={`px-3 py-2 rounded-sm bg-headerBg cursor-pointer ${

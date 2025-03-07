@@ -10,18 +10,17 @@ import {
 } from "../ui/dropdown-menu";
 
 export const CreatePostCard = ({
-  threadNumber,
   value,
   onChange,
   setCards,
-  cards,
   textareaRef,
   setNewCardAdded,
-  isFirst, // New prop to indicate if this is the first card
-  isLast, // New prop to indicate if this is the last card
+  width,
 }) => {
   return (
-    <Card className="w-2/4 flex flex-row  gap-4 bg-transparent h-full max-h-[240px] border-transparent mx-auto ">
+    <Card
+      className={`w-1/2 flex flex-row  gap-4 bg-transparent h-full max-h-[240px] border-transparent mx-auto  `}
+    >
       {/* Thread/Line Container */}
 
       <CardTitle className="p-0 justify-between   flex gap-4 h-full items-center">

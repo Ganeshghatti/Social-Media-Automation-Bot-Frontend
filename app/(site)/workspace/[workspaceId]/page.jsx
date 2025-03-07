@@ -9,7 +9,7 @@ import { toast } from "sonner";
 
 import useAuthToken from "@hooks/useAuthToken";
 import { useUserStore } from "@/store/userStore";
-import { useParams, useRouter } from "next/navigation";
+import { notFound, useParams, useRouter } from "next/navigation";
 
 import { Form } from "@components/ui/form";
 import axios from "axios";
@@ -20,7 +20,7 @@ const WorkspacePage = () => {
   const token = useAuthToken();
   const [accountId, setAccountId] = useState();
   const { user, fetchUser } = useUserStore();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [singleWorkspace, setSingleWorkspace] = useState(null);
   const [postType, setPostType] = useState("post");
   const [cards, setCards] = useState([{ id: 0, text: "" }]);
@@ -28,6 +28,7 @@ const WorkspacePage = () => {
   const [newCardAdded, setNewCardAdded] = useState(false); // Track new card addition
   const [activeButtons, setActiveButtons] = useState(false);
   const [isEditingDraft, setIsEditingDraft] = useState(false);
+  const [threadIdForEdit, setThreadIdForEdit] = useState("");
 
   useEffect(() => {
     if (token) {
@@ -82,19 +83,15 @@ const WorkspacePage = () => {
 
   const SingleWorkspaceData = useCallback(async (workspaceId, token) => {
     try {
-      setLoading(true);
       const response = await axios.get(
         `https://api.bot.thesquirrel.site/workspace/get/${workspaceId}`,
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
       setSingleWorkspace(response.data.data);
-      setAccountId(response.data?.data?.connectedAccounts[0]?.userId);
     } catch (error) {
-      console.log("Error ", error);
+      console.error("Error fetching workspace:", error);
       setSingleWorkspace(null);
     } finally {
       setLoading(false);
@@ -119,9 +116,9 @@ const WorkspacePage = () => {
     });
   };
 
-  const onPublish = async () => {
+  const onPublish = async (scheduledDateTime = null) => {
     const isThread = cards.length > 1 && postType === "thread";
-
+  
     const formData = {
       mode: "create",
       posts: [
@@ -130,16 +127,20 @@ const WorkspacePage = () => {
               mode: "create",
               type: "twitter",
               posttype: "thread",
-              publishnow: true,
-              tobePublishedAt: "",
+              publishnow: scheduledDateTime ? false : true, // Set to false if scheduled
+              tobePublishedAt: scheduledDateTime
+                ? scheduledDateTime.toISOString() // Convert to ISO string if scheduled
+                : "",
               accountId: accountId,
               posts: cards.map((card) => ({
                 mode: "create",
                 content: card.text,
                 type: "twitter",
                 posttype: "post",
-                publishnow: true,
-                tobePublishedAt: "",
+                publishnow: scheduledDateTime ? false : true,
+                tobePublishedAt: scheduledDateTime
+                  ? scheduledDateTime.toISOString()
+                  : "",
               })),
             }
           : {
@@ -147,16 +148,18 @@ const WorkspacePage = () => {
               type: "twitter",
               posttype: "post",
               content: cards[0]?.text || "",
-              publishnow: true,
-              tobePublishedAt: "",
+              publishnow: scheduledDateTime ? false : true,
+              tobePublishedAt: scheduledDateTime
+                ? scheduledDateTime.toISOString()
+                : "",
               accountId: accountId,
             },
       ],
     };
-
+  
     try {
       const token = localStorage.getItem("token");
-
+  
       // Step 1: Get presigned URL
       const presignedResponse = await axios.post(
         `https://api.bot.thesquirrel.site/workspace/posts/create/presigned-url/${workspaceId}`,
@@ -167,13 +170,13 @@ const WorkspacePage = () => {
           },
         }
       );
-
+  
       // Step 2: Final create post request
       const finalData = {
         mode: "create",
         posts: [...presignedResponse.data.data],
       };
-
+  
       const finalResponse = await axios.post(
         `https://api.bot.thesquirrel.site/workspace/posts/create/${workspaceId}`,
         finalData,
@@ -183,10 +186,12 @@ const WorkspacePage = () => {
           },
         }
       );
-
+  
       console.log("Final Response:", finalResponse.data);
+      toast(scheduledDateTime ? "Post scheduled successfully!" : "Post published successfully!");
     } catch (error) {
       console.error("Error posting data:", error);
+      toast.error("Failed to schedule/publish post.");
     }
   };
 
@@ -286,22 +291,18 @@ const WorkspacePage = () => {
     }
   };
 
-  const EditDraftPosts = async (postId) => {
+  const EditDraftPosts = async () => {
     if (!cards.length) {
       console.error("No cards available");
       return;
     }
 
-    console.log("Cards ",cards)
-
-    const isThread = cards.length > 1 && postType === "thread";
-
     const formData =
       postType === "thread"
         ? {
             type: "thread",
-            threadId: "67c353fbeea397f07e82c32b",
-            threadPosts: cards.map((card, index) => ({
+            threadId: threadIdForEdit,
+            threadPosts: cards?.map((card, index) => ({
               _id: card.id,
               content: card.text || "",
               media: [],
@@ -313,7 +314,7 @@ const WorkspacePage = () => {
         : {
             type: "post",
             content: cards[0].text || "",
-            _id: "67c34e60eea397f07e82c152",
+            _id: cards[0]?.id,
             media: [],
           };
 
@@ -333,11 +334,17 @@ const WorkspacePage = () => {
     }
   };
 
-  if (user === null)
+  useEffect(() => {
+    if (!loading && singleWorkspace === null) {
+      notFound();
+    }
+  }, [loading, singleWorkspace]);
+
+  if (loading)
     return (
-      <div className="flex flex-col">
+      <main className="flex-1 flex flex-col h-screen overflow-y-auto">
         <h1 className="text-2xl">Loading...</h1>
-      </div>
+      </main>
     );
 
   return (
@@ -346,24 +353,26 @@ const WorkspacePage = () => {
       <ButtonsHeader
         isEditingDraft={isEditingDraft}
         onPublish={onPublish}
-        createDraftPosts={createDraftPosts}
         activeButtons={activeButtons}
+        createDraftPosts={createDraftPosts}
         EditDraftPosts={EditDraftPosts}
+        singleWorkspace={singleWorkspace}
+        cards={cards} // ✅ Ensure cards are passed
+        setCards={setCards} // ✅ Set function
+        textAreaRefs={textAreaRefs} // ✅ Textarea references
+        setNewCardAdded={setNewCardAdded} // ✅ Track new cards
       />
+
       <Form>
-        <form className="w-full flex-1 p-4 py-10 mb-8 overflow-y-auto justify-center items-center">
+        <form className="w-full flex-1 p-4 py-10 mb-8 no-scrollbar overflow-y-auto justify-center items-center">
           {cards.map((card, index) => (
             <CreatePostCard
               key={index}
-              threadNumber={index + 1}
               value={card.text}
               onChange={(val) => handleTextareaChange(card.id, val)}
               setCards={setCards}
-              cards={cards}
               textareaRef={(el) => (textAreaRefs.current[index] = el)}
               setNewCardAdded={setNewCardAdded}
-              isFirst={index === 0} // First card in the list
-              isLast={index === cards.length - 1} // Last card in the list
             />
           ))}
         </form>
@@ -378,6 +387,8 @@ const WorkspacePage = () => {
         setPostType={setPostType}
         isEditingDraft={isEditingDraft}
         setIsEditingDraft={setIsEditingDraft}
+        threadIdForEdit={threadIdForEdit}
+        setThreadIdForEdit={setThreadIdForEdit}
       />
     </main>
   );

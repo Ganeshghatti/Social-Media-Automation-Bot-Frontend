@@ -15,10 +15,8 @@ import axios from "axios";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@components/ui/dropdown-menu";
-import useAuthToken from "@hooks/useAuthToken";
 import Link from "next/link";
 
 export const Sidebar = ({ workspaceId, token }) => {
@@ -86,8 +84,34 @@ export const Sidebar = ({ workspaceId, token }) => {
     }
   }, [workspaceId, token, SingleWorkspaceData]);
 
+  if (loading) {
+    return (
+      <div className="flex flex-col items-start justify-between  bg-darkBg px-4 py-6 shadow-sm text-white w-[15%] no-scrollbar h-screen overflow-y-auto sticky top-0">
+        <div className="flex w-full items-center gap-4">
+          <Image
+            src={"/sidebar_logo.png"}
+            height={61}
+            alt="Image"
+            width={52}
+            className="object-contain"
+          />
+          <div className="flex flex-col items-start">
+            <h1 className="text-white font-bold text-2xl">The</h1>
+            <h1 className="text-white font-bold text-2xl">Squirrel</h1>
+          </div>
+        </div>
+
+        <h1 className="text-xl text-white">Loading...</h1>
+      </div>
+    );
+  }
+
+  if (!singleWorkspace) {
+    return null;
+  }
+
   return (
-    <div className="flex flex-col items-start justify-between bg-darkBg px-4 py-6 shadow-sm text-white w-[25%] h-screen overflow-y-auto sticky top-0">
+    <div className="flex flex-col items-start justify-between  bg-darkBg px-4 py-6 shadow-sm text-white w-[15%] no-scrollbar h-screen overflow-y-auto sticky top-0">
       <div className="flex flex-col gap-14 items-center w-full">
         <div className="flex w-full items-center gap-4">
           <Image
