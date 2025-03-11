@@ -13,6 +13,7 @@ import { notFound, useParams, useRouter } from "next/navigation";
 
 import { Form } from "@components/ui/form";
 import axios from "axios";
+import { DateTime } from "luxon"; // Install: npm install luxon
 
 const WorkspacePage = () => {
   const { workspaceId } = useParams();
@@ -85,11 +86,19 @@ const WorkspacePage = () => {
     try {
       const response = await axios.get(
         `https://api.bot.thesquirrel.site/workspace/get/${workspaceId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
+      console.log("Workspace Data:", response.data.data);
       setSingleWorkspace(response.data.data);
+      if (response.data.data.connectedAccounts?.length > 0) {
+        setAccountId(response.data.data.connectedAccounts[0].userId);
+        console.log(
+          "Set accountId:",
+          response.data.data.connectedAccounts[0].userId
+        );
+      } else {
+        console.log("No connected accounts found");
+      }
     } catch (error) {
       console.error("Error fetching workspace:", error);
       setSingleWorkspace(null);
@@ -117,8 +126,25 @@ const WorkspacePage = () => {
   };
 
   const onPublish = async (scheduledDateTime = null) => {
+    if (!accountId) {
+      console.error("No accountId set for publishing");
+      toast.error("Please connect an account to publish.");
+      return;
+    }
+
+    // Ensure singleWorkspace and timezone exist
+    const workspaceTimezone = singleWorkspace?.timezone || "UTC";
+
+    // Convert scheduledDateTime to workspace's timezone
+    let formattedDateTime = "";
+    if (scheduledDateTime) {
+      formattedDateTime = DateTime.fromJSDate(scheduledDateTime)
+        .setZone(workspaceTimezone)
+        .toFormat("yyyy-MM-dd HH:mm:ss"); // Format in local timezone
+    }
+
     const isThread = cards.length > 1 && postType === "thread";
-  
+
     const formData = {
       mode: "create",
       posts: [
@@ -127,10 +153,8 @@ const WorkspacePage = () => {
               mode: "create",
               type: "twitter",
               posttype: "thread",
-              publishnow: scheduledDateTime ? false : true, // Set to false if scheduled
-              tobePublishedAt: scheduledDateTime
-                ? scheduledDateTime.toISOString() // Convert to ISO string if scheduled
-                : "",
+              publishnow: scheduledDateTime ? false : true,
+              tobePublishedAt: formattedDateTime,
               accountId: accountId,
               posts: cards.map((card) => ({
                 mode: "create",
@@ -138,9 +162,8 @@ const WorkspacePage = () => {
                 type: "twitter",
                 posttype: "post",
                 publishnow: scheduledDateTime ? false : true,
-                tobePublishedAt: scheduledDateTime
-                  ? scheduledDateTime.toISOString()
-                  : "",
+                tobePublishedAt: formattedDateTime,
+                media: [],
               })),
             }
           : {
@@ -149,49 +172,66 @@ const WorkspacePage = () => {
               posttype: "post",
               content: cards[0]?.text || "",
               publishnow: scheduledDateTime ? false : true,
-              tobePublishedAt: scheduledDateTime
-                ? scheduledDateTime.toISOString()
-                : "",
+              tobePublishedAt: formattedDateTime,
               accountId: accountId,
+              media: [],
             },
       ],
     };
-  
+
+    console.log("FormData being sent:", JSON.stringify(formData, null, 2));
+
     try {
       const token = localStorage.getItem("token");
-  
-      // Step 1: Get presigned URL
+
+      console.log("Fetching presigned URL...");
       const presignedResponse = await axios.post(
         `https://api.bot.thesquirrel.site/workspace/posts/create/presigned-url/${workspaceId}`,
         formData,
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
-  
-      // Step 2: Final create post request
+
+      console.log("Presigned Response:", presignedResponse.data);
+
       const finalData = {
-        mode: "create",
         posts: [...presignedResponse.data.data],
       };
-  
+      console.log("Final Data being sent:", JSON.stringify(finalData, null, 2));
+
       const finalResponse = await axios.post(
         `https://api.bot.thesquirrel.site/workspace/posts/create/${workspaceId}`,
         finalData,
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
-  
+
       console.log("Final Response:", finalResponse.data);
-      toast(scheduledDateTime ? "Post scheduled successfully!" : "Post published successfully!");
+      toast(
+        scheduledDateTime
+          ? "Post scheduled successfully!"
+          : "Post published successfully!"
+      );
     } catch (error) {
-      console.error("Error posting data:", error);
-      toast.error("Failed to schedule/publish post.");
+      console.error(
+        "Error posting data:",
+        JSON.stringify(
+          {
+            message: error.message,
+            status: error.response?.status,
+            data: error.response?.data,
+          },
+          null,
+          2
+        )
+      );
+      toast.error(
+        `Failed to schedule/publish post: ${
+          error.response?.data?.message || error.message
+        }`
+      );
     }
   };
 

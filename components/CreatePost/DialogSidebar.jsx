@@ -1,11 +1,11 @@
 import React from "react";
 import { Sidebar_Card } from "../single-workspace/Sidebar_Card";
 import { Button } from "@components/ui/button";
+import { disconnectLinkedIn, disconnectTwitter } from "@functions/social";
 
-export const DialogSidebar = ({ workspaceData, isSubmitting }) => {
+export const DialogSidebar = ({ workspaceData, isSubmitting, onSubmit }) => {
   return (
-    <div className="flex flex-col items-start justify-between bg-headerBg py-3 shadow-sm
-     text-white h-full min-h-full w-[250px]">
+    <div className="flex flex-col items-start justify-between bg-headerBg py-3 shadow-sm text-white h-full min-h-full w-[250px]">
       <div className="flex flex-col h-full justify-between items-center w-full px-2 gap-3">
         <div className="w-full space-y-3">
           {workspaceData?.connectedAccounts?.length > 0 ? (
@@ -27,9 +27,10 @@ export const DialogSidebar = ({ workspaceData, isSubmitting }) => {
             <p className="text-gray-400 text-sm">No connected accounts</p>
           )}
         </div>
-        
-        <Button 
-          type="submit" 
+
+        <Button
+          type="button" // Change to button to manually trigger onSubmit
+          onClick={onSubmit} // Trigger form submission
           disabled={isSubmitting}
           className="w-full mt-auto"
         >

@@ -4,37 +4,38 @@ import { format } from "date-fns";
 import { cn } from "@lib/utils";
 import { Button } from "@components/ui/button";
 import { Calendar } from "@components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@components/ui/popover";
 import { ScrollArea, ScrollBar } from "@components/ui/scroll-area";
 import { CalendarIcon } from "lucide-react";
 
 export const DateTimePicker = ({ date, setDate }) => {
   const [isOpen, setIsOpen] = React.useState(false);
+  const [tempDate, setTempDate] = React.useState(date || null);
 
   const handleDateSelect = (selectedDate) => {
     if (selectedDate) {
       const newDate = new Date(selectedDate);
-      if (date) {
-        newDate.setHours(date.getHours());
-        newDate.setMinutes(date.getMinutes());
+      if (tempDate) {
+        newDate.setHours(tempDate.getHours(), tempDate.getMinutes(), 0, 0);
       } else {
-        newDate.setHours(0, 0, 0, 0); // Default to midnight if no time set
+        newDate.setHours(0, 0, 0, 0);
       }
-      console.log("Selected Date:", newDate); // Debug log
-      setDate(newDate);
+      console.log("Selected Date:", newDate);
+      setTempDate(newDate);
     }
   };
 
   const handleTimeChange = (type, value) => {
-    const newDate = date ? new Date(date) : new Date();
+    const newDate = tempDate ? new Date(tempDate) : new Date();
     if (type === "hour") {
+      const hour = parseInt(value);
       const currentHour = newDate.getHours();
       const isPM = currentHour >= 12;
-      newDate.setHours((parseInt(value) % 12) + (isPM ? 12 : 0));
+      // Handle 12 explicitly: 12 AM = 0, 12 PM = 12
+      if (hour === 12) {
+        newDate.setHours(isPM ? 12 : 0);
+      } else {
+        newDate.setHours((hour % 12) + (isPM ? 12 : 0));
+      }
     } else if (type === "minute") {
       newDate.setMinutes(parseInt(value));
     } else if (type === "ampm") {
@@ -45,123 +46,135 @@ export const DateTimePicker = ({ date, setDate }) => {
         newDate.setHours(currentHours - 12);
       }
     }
-    console.log("Updated Time:", newDate); // Debug log
-    setDate(newDate);
+    console.log("Updated Time:", newDate);
+    setTempDate(newDate);
   };
 
-  // Prevent popover from closing when clicking inside
-  const handleContentClick = (e) => {
-    console.log("Hii ")
-    e.stopPropagation();
+  const handleApply = () => {
+    console.log("Applying DateTime:", tempDate);
+    setDate(tempDate);
+    setIsOpen(false);
+  };
+
+  const handleClose = () => {
+    console.log("Closing without applying");
+    setTempDate(date);
+    setIsOpen(false);
   };
 
   return (
-    <Popover open={isOpen} onOpenChange={setIsOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          className={cn(
-            "w-full justify-start text-left font-normal",
-            !date && "text-muted-foreground"
-          )}
-          onClick={() => setIsOpen(true)} // Ensure clicking opens the popover
-        >
-          <CalendarIcon className="mr-2 h-4 w-4" />
-          {date ? (
-            format(date, "MM/dd/yyyy hh:mm aa")
-          ) : (
-            <span>Select date and time</span>
-          )}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent
-        className="w-auto p-0"
-       
-        onClick={handleContentClick} // Prevent closing on internal clicks
+    <div className="relative">
+      <Button
+        variant="outline"
+        className={cn(
+          "w-full justify-start text-left font-normal",
+          !date && "text-muted-foreground"
+        )}
+        onClick={() => {
+          console.log("Trigger Clicked - Opening Picker");
+          setIsOpen(true);
+        }}
       >
+        <CalendarIcon className="mr-2 h-4 w-4" />
+        {date ? format(date, "MM/dd/yyyy hh:mm aa") : <span>Select date and time</span>}
+      </Button>
+
+      {isOpen && (
         <div
-          className="sm:flex z-30"
-          onMouseEnter={() => {
-            console.log("hii");
-          }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+          onClick={handleClose}
         >
-          <Calendar
-            mode="single"
-            selected={date}
-            onSelect={handleDateSelect}
-            initialFocus
-          />
-          <div className="flex flex-col sm:flex-row sm:h-[300px] divide-y sm:divide-y-0 sm:divide-x">
-            <ScrollArea className="w-64 sm:w-auto">
-              <div className="flex sm:flex-col p-2">
-                {Array.from({ length: 12 }, (_, i) => i + 1).map((hour) => (
-                  <Button
-                    key={hour}
-                    size="icon"
-                    variant={
-                      date && (date.getHours() % 12 || 12) === hour
-                        ? "default"
-                        : "ghost"
-                    }
-                    className="sm:w-full shrink-0 aspect-square"
-                    onClick={() => handleTimeChange("hour", hour.toString())}
-                  >
-                    {hour}
-                  </Button>
-                ))}
+          <div
+            className="bg-white rounded-lg shadow-lg flex flex-col p-4 w-[600px] max-h-[80vh] overflow-y-auto justify-between"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex flex-row justify-between max-h-[40vh]">
+              <Calendar
+                mode="single"
+                selected={tempDate}
+                onSelect={(day) => {
+                  console.log("Calendar Day Selected:", day);
+                  handleDateSelect(day);
+                }}
+                initialFocus
+                className="mb-4 flex-1"
+              />
+              <div className="flex flex-1 gap-4 h-[32vh] no-scrollbar justify-around">
+                <ScrollArea className="no-scrollbar h-full">
+                  <div className="flex flex-col no-scrollbar">
+                    {Array.from({ length: 12 }, (_, i) => i + 1).map((hour) => (
+                      <Button
+                        key={hour}
+                        variant={
+                          tempDate && (tempDate.getHours() % 12 || 12) === hour
+                            ? "default"
+                            : "ghost"
+                        }
+                        className="w-full h-10"
+                        onClick={() => {
+                          console.log("Hour Clicked:", hour);
+                          handleTimeChange("hour", hour.toString());
+                        }}
+                      >
+                        {hour}
+                      </Button>
+                    ))}
+                  </div>
+                  <ScrollBar orientation="vertical" />
+                </ScrollArea>
+                <ScrollArea className="h-full no-scrollbar">
+                  <div className="flex flex-col">
+                    {Array.from({ length: 12 }, (_, i) => i * 5).map((minute) => (
+                      <Button
+                        key={minute}
+                        variant={
+                          tempDate && tempDate.getMinutes() === minute ? "default" : "ghost"
+                        }
+                        className="w-full h-10"
+                        onClick={() => {
+                          console.log("Minute Clicked:", minute);
+                          handleTimeChange("minute", minute.toString().padStart(2, "0"));
+                        }}
+                      >
+                        {minute.toString().padStart(2, "0")}
+                      </Button>
+                    ))}
+                  </div>
+                  <ScrollBar orientation="vertical" />
+                </ScrollArea>
+                <div className="flex flex-col h-full no-scrollbar gap-2">
+                  {["AM", "PM"].map((ampm) => (
+                    <Button
+                      key={ampm}
+                      variant={
+                        tempDate &&
+                        (ampm === "AM" ? tempDate.getHours() < 12 : tempDate.getHours() >= 12)
+                          ? "default"
+                          : "ghost"
+                      }
+                      className="w-16 h-10"
+                      onClick={() => {
+                        console.log("AM/PM Clicked:", ampm);
+                        handleTimeChange("ampm", ampm);
+                      }}
+                    >
+                      {ampm}
+                    </Button>
+                  ))}
+                </div>
               </div>
-              <ScrollBar orientation="horizontal" className="sm:hidden" />
-            </ScrollArea>
-
-            <ScrollArea className="w-64 sm:w-auto">
-              <div className="flex sm:flex-col p-2">
-                {Array.from({ length: 12 }, (_, i) => i * 5).map((minute) => (
-                  <Button
-                    key={minute}
-                    size="icon"
-                    variant={
-                      date && date.getMinutes() === minute ? "default" : "ghost"
-                    }
-                    className="sm:w-full shrink-0 aspect-square"
-                    onClick={() =>
-                      handleTimeChange(
-                        "minute",
-                        minute.toString().padStart(2, "0")
-                      )
-                    }
-                  >
-                    {minute.toString().padStart(2, "0")}
-                  </Button>
-                ))}
-              </div>
-              <ScrollBar orientation="horizontal" className="sm:hidden" />
-            </ScrollArea>
-
-            <ScrollArea>
-              <div className="flex sm:flex-col p-2">
-                {["AM", "PM"].map((ampm) => (
-                  <Button
-                    key={ampm}
-                    size="icon"
-                    variant={
-                      date &&
-                      (ampm === "AM"
-                        ? date.getHours() < 12
-                        : date.getHours() >= 12)
-                        ? "default"
-                        : "ghost"
-                    }
-                    className="sm:w-full shrink-0 aspect-square"
-                    onClick={() => handleTimeChange("ampm", ampm)}
-                  >
-                    {ampm}
-                  </Button>
-                ))}
-              </div>
-            </ScrollArea>
+            </div>
+            <div className="flex flex-col items-center gap-2 mt-4">
+              <Button variant="outline" className="w-full" onClick={handleClose}>
+                Cancel
+              </Button>
+              <Button className="w-full" onClick={handleApply}>
+                Apply
+              </Button>
+            </div>
           </div>
         </div>
-      </PopoverContent>
-    </Popover>
+      )}
+    </div>
   );
 };

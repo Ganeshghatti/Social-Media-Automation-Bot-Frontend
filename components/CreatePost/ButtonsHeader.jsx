@@ -109,26 +109,28 @@ export const ButtonsHeader = ({
           <DialogTitle></DialogTitle>
 
           <div className="flex relative flex-row gap-3 h-full w-full">
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="flex flex-row w-full h-full"
-              >
-                <DialogSidebar
-                  workspaceData={workspaceData}
-                  isSubmitting={form.formState.isSubmitting}
-                />
-                <div className="flex flex-col gap-4 py-12 items-center justify-center w-full flex-1">
+            <DialogSidebar
+              workspaceData={workspaceData}
+              isSubmitting={form.formState.isSubmitting}
+              onSubmit={form.handleSubmit(onSubmit)}
+            />
+            <div className="flex flex-col gap-4 items-start justify-start h-full w-full pt-20 p-2">
+              <Form {...form}>
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="flex flex-col w-full  justify-center items-center 
+                   "
+                >
                   <FormField
                     control={form.control}
                     name="scheduledDateTime"
                     render={({ field }) => (
-                      <FormItem className="w-64">
+                      <FormItem className="w-1/2">
                         <FormControl>
                           <DateTimePicker
                             date={field.value}
                             setDate={(date) => {
-                              console.log("Data ", date);
+                              console.log("Form Field Updated:", date);
                               field.onChange(date);
                             }}
                           />
@@ -136,19 +138,16 @@ export const ButtonsHeader = ({
                       </FormItem>
                     )}
                   />
-                  <DialogCards
-                    handleTextareaChange={handleTextareaChange}
-                    localCards={localCards}
-                    setLocalCards={setLocalCards}
-                    setNewCardAdded={setNewCardAdded}
-                    textAreaRefs={textAreaRefs}
-                  />
-                  <Button type="submit" className="mt-4">
-                    Schedule Post
-                  </Button>
-                </div>
-              </form>
-            </Form>
+                </form>
+              </Form>
+              <DialogCards
+                handleTextareaChange={handleTextareaChange}
+                localCards={localCards}
+                setLocalCards={setLocalCards}
+                setNewCardAdded={setNewCardAdded}
+                textAreaRefs={textAreaRefs}
+              />
+            </div>
           </div>
         </DialogContent>
       </Dialog>
@@ -157,7 +156,7 @@ export const ButtonsHeader = ({
         buttonColor={"#1E58E8"}
         buttonText={"Publish"}
         activeButtons={activeButtons}
-        actionButton={() => onPublish()} // Call without scheduled date for immediate publish
+        actionButton={() => onPublish()} // Immediate publish
       />
     </div>
   );
