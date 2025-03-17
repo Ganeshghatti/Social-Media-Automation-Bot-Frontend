@@ -87,7 +87,7 @@ export const ButtonsHeader = ({
   };
 
   return (
-    <div className="w-full px-8 py-3 gap-3 flex justify-end">
+    <div className="w-full px-8 py-3 gap-3 flex justify-center md:justify-end">
       <CustomButtonHeader
         buttonColor={"#FF9900"}
         activeButtons={activeButtons}
@@ -101,7 +101,7 @@ export const ButtonsHeader = ({
             style={{ backgroundColor: activeButtons ? "#079500" : "gray" }}
             className="px-6 rounded-full py-3 flex justify-center items-center"
           >
-            <span className="text-base font-medium text-white">Schedule</span>
+            <span className="text-sm md:text-base font-medium text-white">Schedule</span>
           </Button>
         </DialogTrigger>
 

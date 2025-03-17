@@ -73,7 +73,7 @@ export function RegisterForm({ className, ...props }) {
   return (
     <div
       className={cn(
-        "flex flex-col gap-6 flex-[0.4] mx-auto h-full items-start    justify-center ",
+        "flex flex-col gap-6 p-6 flex-[0.4] mx-auto h-full items-start    justify-center ",
         className
       )}
       {...props}
@@ -99,7 +99,7 @@ export function RegisterForm({ className, ...props }) {
           Enter your credentials to access your account
         </p>
       </div>
-      <Card className="w-[60vh] px-0 bg-transparent border-transparent">
+      <Card className="w-full md:w-[60vh] px-0 bg-transparent border-transparent">
         <CardContent className="px-0">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">

@@ -30,6 +30,8 @@ const WorkspacePage = () => {
   const [activeButtons, setActiveButtons] = useState(false);
   const [isEditingDraft, setIsEditingDraft] = useState(false);
   const [threadIdForEdit, setThreadIdForEdit] = useState("");
+  const [draftPosts, setDraftPosts] = useState([]);
+  const [draftLoading, setDraftLoading] = useState(false);
 
   useEffect(() => {
     if (token) {
@@ -138,9 +140,12 @@ const WorkspacePage = () => {
     // Convert scheduledDateTime to workspace's timezone
     let formattedDateTime = "";
     if (scheduledDateTime) {
+      console.log("Workspace Time zone ", workspaceTimezone);
       formattedDateTime = DateTime.fromJSDate(scheduledDateTime)
         .setZone(workspaceTimezone)
         .toFormat("yyyy-MM-dd HH:mm:ss"); // Format in local timezone
+
+      console.log("Formate Time zone ", formattedDateTime);
     }
 
     const isThread = cards.length > 1 && postType === "thread";
@@ -214,6 +219,7 @@ const WorkspacePage = () => {
           ? "Post scheduled successfully!"
           : "Post published successfully!"
       );
+      setCards([{ id: 0, text: "" }]);
     } catch (error) {
       console.error(
         "Error posting data:",
@@ -326,6 +332,13 @@ const WorkspacePage = () => {
 
       console.log("Final Response:", finalResponse.data);
       toast("Draft Post Has been created");
+      SingleWorkspaceDraftData(
+        workspaceId,
+        token,
+        setDraftLoading,
+        setDraftPosts
+      );
+      setCards([{ id: 0, text: "" }]);
     } catch (error) {
       console.error("Error making draft post:", error);
     }
@@ -369,10 +382,43 @@ const WorkspacePage = () => {
 
       console.log("Final Response:", finalResponse.data);
       toast("Draft Post Has been Edited");
+
+      setCards([{ id: 0, text: "" }]);
+
+      SingleWorkspaceDraftData(
+        workspaceId,
+        token,
+        setDraftLoading,
+        setDraftPosts
+      );
     } catch (error) {
       console.error("Error making draft post:", error);
     }
   };
+
+  const SingleWorkspaceDraftData = useCallback(
+    async (workspaceId, token, setLoading, setDraftPosts) => {
+      try {
+        setDraftLoading(true);
+        const response = await axios.get(
+          `https://api.bot.thesquirrel.site/workspace/draft/get/${workspaceId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setDraftPosts(response.data.data);
+        console.log("draft ", response.data.data);
+      } catch (error) {
+        console.log("Error ", error);
+        setDraftPosts(null);
+      } finally {
+        setDraftLoading(false);
+      }
+    },
+    []
+  );
 
   useEffect(() => {
     if (!loading && singleWorkspace === null) {
@@ -400,11 +446,15 @@ const WorkspacePage = () => {
         cards={cards} // ✅ Ensure cards are passed
         setCards={setCards} // ✅ Set function
         textAreaRefs={textAreaRefs} // ✅ Textarea references
-        setNewCardAdded={setNewCardAdded} // ✅ Track new cards
+        setNewCardAdded={setNewCardAdded}
+        SingleWorkspaceDraftData={SingleWorkspaceDraftData}
       />
 
       <Form>
-        <form className="w-full flex-1 p-4 py-10 mb-8 no-scrollbar overflow-y-auto justify-center items-center">
+        <form
+          className="w-full  flex-1 p-4 py-10 mb-8 no-scrollbar overflow-y-auto
+         justify-center items-center"
+        >
           {cards.map((card, index) => (
             <CreatePostCard
               key={index}
@@ -429,6 +479,11 @@ const WorkspacePage = () => {
         setIsEditingDraft={setIsEditingDraft}
         threadIdForEdit={threadIdForEdit}
         setThreadIdForEdit={setThreadIdForEdit}
+        SingleWorkspaceDraftData={SingleWorkspaceDraftData}
+        draftPosts={draftPosts}
+        setDraftPosts={setDraftPosts}
+        draftLoading={draftLoading}
+        setDraftLoading={setDraftLoading}
       />
     </main>
   );

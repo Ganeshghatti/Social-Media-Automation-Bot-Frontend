@@ -6,15 +6,15 @@ import React from "react";
 
 const Page = () => {
   return (
-    <div className="h-screen w-screen overflow-x-hidden bg-navBg flex items-start justify-start p-2">
+    <div className="h-screen w-screen overflow-x-hidden bg-navBg flex md:flex-row flex-col md:items-start md:justify-start justify-center items-center p-2">
       <LoginForm />
-      <div className="flex relative flex-[0.3] p-0    h-full  ">
+      <div className="md:flex hidden relative flex-[0.3] p-0    h-full  ">
         <Image
           src={"/AuthScreen.png"}
           height={3000}
           width={3000}
           alt="No"
-          className="h-full w-full object-contain p-0 "
+          className="h-full w-full   object-contain p-0 "
         />
         <Image
           src={"/DEALFLOW.png"}

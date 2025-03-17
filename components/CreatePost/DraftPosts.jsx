@@ -15,6 +15,7 @@ import {
   CardTitle,
 } from "@components/ui/card";
 import { Edit, Trash } from "lucide-react";
+import { toast } from "sonner";
 
 export const DraftPosts = ({
   workspaceId,
@@ -27,35 +28,17 @@ export const DraftPosts = ({
   setIsEditingDraft,
   threadIdForEdit,
   setThreadIdForEdit,
+  SingleWorkspaceDraftData,
+  draftLoading,
+  setDraftLoading,
+  setDraftPosts,
+  draftPosts,
 }) => {
-  const [draftPosts, setDraftPosts] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
-
-  const SingleWorkspaceData = useCallback(async (workspaceId, token) => {
-    try {
-      setLoading(true);
-      const response = await axios.get(
-        `https://api.bot.thesquirrel.site/workspace/draft/get/${workspaceId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      setDraftPosts(response.data.data);
-      console.log("draft ", response.data.data);
-    } catch (error) {
-      console.log("Error ", error);
-      setDraftPosts(null);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
 
   const DeleteDraftPost = async (draftType, draftPostId) => {
     try {
-      setLoading(true);
+      setDraftLoading(true);
 
       console.log("Deelete Draft Type ", draftType);
 
@@ -74,13 +57,23 @@ export const DraftPosts = ({
         }
       );
 
-      console.log("Draft deleted:", response.data.data);
-      SingleWorkspaceData(workspaceId, token);
+      SingleWorkspaceDraftData(
+        workspaceId,
+        token,
+        setDraftLoading,
+        setDraftPosts
+      );
+      toast("Draft Post Has been deleted");
     } catch (error) {
       console.error("Error deleting draft:", error);
-      SingleWorkspaceData(workspaceId, token);
+      SingleWorkspaceDraftData(
+        workspaceId,
+        token,
+        setDraftLoading,
+        setDraftPosts
+      );
     } finally {
-      setLoading(false);
+      setDraftLoading(false);
     }
   };
 
@@ -90,9 +83,6 @@ export const DraftPosts = ({
     draft,
     setThreadIdForEdit
   ) => {
-    console.log("Draft ", draft);
-    console.log("cards ", cards);
-
     setIsEditingDraft(true);
     if (draft?.type === "thread") {
       setThreadIdForEdit(draft?.threadId);
@@ -102,17 +92,21 @@ export const DraftPosts = ({
           text: post.content,
         }))
       );
-      
     } else {
       setCards([{ id: draft?._id, text: draft.content }]); // For non-thread drafts
     }
   };
 
   useEffect(() => {
-    SingleWorkspaceData(workspaceId, token);
+    SingleWorkspaceDraftData(
+      workspaceId,
+      token,
+      setDraftLoading,
+      setDraftPosts
+    );
   }, [workspaceId, token]);
 
-  if (!loading) {
+  if (!draftLoading) {
     <main className="flex w-full flex-1 justify-around px-4 py-3">
       <h1 className="text-2xl font-semibold">Loading...</h1>
     </main>;

@@ -57,7 +57,7 @@ const ForgetPassword = () => {
     }
   }
   return (
-    <div className="h-screen w-screen flex items-center justify-center">
+    <div className="h-screen w-screen overflow-x-hidden bg-navBg flex items-center justify-center p-2">
       <div className={"flex flex-col gap-6 "}>
         <Card className="w-[60vh]">
           <CardHeader className="flex items-center justify-center">
