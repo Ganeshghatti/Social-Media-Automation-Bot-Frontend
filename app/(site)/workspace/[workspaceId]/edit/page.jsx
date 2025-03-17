@@ -275,7 +275,7 @@ const EditWorkspace = () => {
                 name="icon"
                 render={({ field }) => (
                   <div className="flex-1 w-full relative">
-                    <input
+                    <Input
                       type="file"
                       id="fileInput"
                       ref={fileInputRef}
