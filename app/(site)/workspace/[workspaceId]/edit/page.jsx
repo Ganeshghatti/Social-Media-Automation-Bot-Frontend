@@ -134,6 +134,8 @@ const EditWorkspace = () => {
       if (!token) return;
       setLoading(true);
 
+      console.log("DATA ", data);
+
       const payload = {
         name: data.name,
         timezone: data.timezone || "IST", // Default to IST if not selected
@@ -169,7 +171,7 @@ const EditWorkspace = () => {
         });
       }
 
-      router.push("/workspaces");
+      // router.push("/workspaces");
     } catch (error) {
       console.error("Error:", error);
     } finally {
@@ -210,12 +212,12 @@ const EditWorkspace = () => {
             className="w-full rounded-xl bg-headerBg
            border-[#ffffff30] px-5 py-6 flex flex-col gap-6"
           >
-            <div className="w-full flex gap-3 items-center justify-between">
+            <div className="w-full flex gap-3 items-center justify-between flex-wrap md:flex-row flex-col">
               <FormField
                 control={form.control}
                 name="name"
                 render={({ field }) => (
-                  <FormItem className="flex-1 bg-navBg text-white py-4 border rounded-[20px] border-[#ffffff30] px-2">
+                  <FormItem className="flex-1 w-full bg-navBg text-white py-4 border rounded-[20px] border-[#ffffff30] px-2">
                     <FormControl>
                       <Input
                         className="bg-transparent border-transparent focus:border-transparent focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-[24px] placeholder:text-[24px]"
@@ -234,7 +236,7 @@ const EditWorkspace = () => {
                 name="timezone"
                 render={({ field }) => (
                   <div
-                    className="flex-1 flex gap-3 bg-navBg text-white py-4
+                    className="flex-1 w-full flex gap-3 bg-navBg text-white py-4
                    border rounded-[20px] justify-center items-center border-[#ffffff30] px-2"
                   >
                     <Select
@@ -272,8 +274,8 @@ const EditWorkspace = () => {
                 control={form.control}
                 name="icon"
                 render={({ field }) => (
-                  <div className="flex-1 relative">
-                    <input
+                  <div className="flex-1 w-full relative">
+                    <Input
                       type="file"
                       id="fileInput"
                       ref={fileInputRef}

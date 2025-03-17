@@ -1,5 +1,5 @@
 "use client";
-import { ChevronsUpDown } from "lucide-react";
+import { ChevronsUpDown, PlusIcon } from "lucide-react";
 import Image from "next/image";
 import React, { useCallback, useEffect, useState } from "react";
 import { Button } from "../ui/button";
@@ -15,11 +15,17 @@ import axios from "axios";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@components/ui/dropdown-menu";
-import useAuthToken from "@hooks/useAuthToken";
 import Link from "next/link";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@components/ui/dialog";
 
 export const Sidebar = ({ workspaceId, token }) => {
   const [singleWorkspace, setSingleWorkspace] = useState(null);
@@ -86,8 +92,34 @@ export const Sidebar = ({ workspaceId, token }) => {
     }
   }, [workspaceId, token, SingleWorkspaceData]);
 
+  if (loading) {
+    return (
+      <div className="flex flex-col items-start justify-between  bg-darkBg px-4 py-6 shadow-sm text-white w-[15%] no-scrollbar h-screen overflow-y-auto sticky top-0">
+        <div className="flex w-full items-center gap-4">
+          <Image
+            src={"/sidebar_logo.png"}
+            height={61}
+            alt="Image"
+            width={52}
+            className="object-contain"
+          />
+          <div className="flex flex-col items-start">
+            <h1 className="text-white font-bold text-2xl">The</h1>
+            <h1 className="text-white font-bold text-2xl">Squirrel</h1>
+          </div>
+        </div>
+
+        <h1 className="text-xl text-white">Loading...</h1>
+      </div>
+    );
+  }
+
+  if (!singleWorkspace) {
+    return null;
+  }
+
   return (
-    <div className="flex flex-col items-start justify-between bg-darkBg px-4 py-6 shadow-sm text-white w-[25%] h-screen overflow-y-auto sticky top-0">
+    <div className="md:flex hidden flex-col items-start justify-between  bg-darkBg px-4 py-6 shadow-sm text-white w-[15%] no-scrollbar h-screen overflow-y-auto sticky top-0">
       <div className="flex flex-col gap-14 items-center w-full">
         <div className="flex w-full items-center gap-4">
           <Image
@@ -107,14 +139,14 @@ export const Sidebar = ({ workspaceId, token }) => {
             imageUrl={"/dashboard_icon.png"}
             text={"Dashboard"}
             onClickFunction={() => {
-              router.push("dashboard");
+              router.push("/dashboard");
             }}
           />
           <Sidebar_Card
             imageUrl={"/Analytics.png"}
-            text={"Anlaytics"}
+            text={"Analytics"}
             onClickFunction={() => {
-              router.push("Analytics");
+              router.push("/analytics");
             }}
           />
           <div className="w-full h-[1px] bg-white opacity-40" />
@@ -134,25 +166,44 @@ export const Sidebar = ({ workspaceId, token }) => {
             }}
           />
 
-          <Sidebar_Card
-            onClickFunction={() => connectTwitter(workspaceId, router, token)}
-            imageUrl={"/twitter.png"}
-            text={"Connect X"}
-          />
-          <Sidebar_Card
-            onClickFunction={() => connectLinkedin(workspaceId, router, token)}
-            imageUrl={"/linkedIn.png"}
-            text={"Connect LinkedIn"}
-          />
+          <Dialog>
+            <DialogTrigger className="py-6 rounded-xl w-full  cursor-pointer px-3 flex items-center justify-start gap-3 bg-navBg  font-semibold">
+              <PlusIcon />
+              Add Account
+            </DialogTrigger>
+            <DialogContent className="w-[40vw] max-w-[40vw] h-[420px]  bg-headerBg flex border-transparent gap-2 items-start px-4 py-9">
+              <DialogHeader>
+                <DialogTitle className="text-white"></DialogTitle>
+              </DialogHeader>
+              <div className="w-full p-4 grid grid-cols-2 items-center gap-5">
+                <Sidebar_Card
+                  onClickFunction={() =>
+                    connectTwitter(workspaceId, router, token)
+                  }
+                  imageUrl={"/twitter.png"}
+                  text={"Connect X"}
+                />
+                <Sidebar_Card
+                  onClickFunction={() =>
+                    connectLinkedin(workspaceId, router, token)
+                  }
+                  imageUrl={"/linkedIn.png"}
+                  text={"Connect LinkedIn"}
+                />
+              </div>
+            </DialogContent>
+          </Dialog>
 
-          {singleWorkspace &&
+          {/* {singleWorkspace &&
             singleWorkspace.connectedAccounts?.map((account, i) => {
               if (account?.type === "twitter") {
                 return (
                   <Sidebar_Card
                     key={i}
                     onClickFunction={() =>
-                      disconnectTwitter(workspaceId, account?.userId, token)
+                      router.push(
+                        `/workspace/${workspaceId}/${account?.type}/${account?.userId}`
+                      )
                     }
                     imageUrl={"/twitter.png"}
                     text={account?.username}
@@ -163,14 +214,16 @@ export const Sidebar = ({ workspaceId, token }) => {
                   <Sidebar_Card
                     key={i}
                     onClickFunction={() =>
-                      disconnectLinkedIn(workspaceId, account?.userId, token)
+                      router.push(
+                        `/workspace/${workspaceId}/${account?.type}/${account?.userId}`
+                      )
                     }
                     imageUrl={"/linkedIn.png"}
                     text={account?.username}
                   />
                 );
               }
-            })}
+            })} */}
         </div>
       </div>
       {loading ? (

@@ -28,7 +28,7 @@ import {
 const page = () => {
   const router = useRouter();
   const { id } = useParams();
-console.log("Id ",id)
+  console.log("Id ", id);
   const formSchema = z
     .object({
       newPassword: z.string().min(8, {
@@ -57,7 +57,7 @@ console.log("Id ",id)
         "https://api.bot.thesquirrel.site/user/reset-password",
         {
           newPassword: values.newPassword,
-          token:id
+          token: id,
         }
       );
 
@@ -71,7 +71,7 @@ console.log("Id ",id)
   }
 
   return (
-    <div className="h-screen w-screen flex items-center justify-center">
+    <div className="h-screen w-screen overflow-x-hidden bg-navBg flex items-center justify-center p-2">
       <div className="flex flex-col gap-6">
         <Card className="w-[60vh]">
           <CardHeader className="flex items-center justify-center">

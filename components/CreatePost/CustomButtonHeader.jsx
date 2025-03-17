@@ -13,7 +13,7 @@ const CustomButtonHeader = ({
       style={{ backgroundColor: activeButtons ? buttonColor : "gray" }}
       className="px-6 rounded-full py-3 flex justify-center items-center"
     >
-      <span className="text-base font-medium text-white">{buttonText}</span>
+      <span className="text-sm md:text-base font-medium text-white">{buttonText}</span>
     </Button>
   );
 };

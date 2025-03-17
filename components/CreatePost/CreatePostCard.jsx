@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import { Card, CardContent, CardFooter, CardTitle } from "../ui/card";
 import Image from "next/image";
@@ -8,20 +9,21 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import { useUserStore } from "@/store/userStore";
 
 export const CreatePostCard = ({
-  threadNumber,
   value,
   onChange,
   setCards,
-  cards,
   textareaRef,
   setNewCardAdded,
-  isFirst, // New prop to indicate if this is the first card
-  isLast, // New prop to indicate if this is the last card
+  width,
 }) => {
+  const { user, setUser } = useUserStore();
   return (
-    <Card className="w-2/4 flex flex-row  gap-4 bg-transparent h-full max-h-[240px] border-transparent mx-auto ">
+    <Card
+      className={`w-full  md:w-1/2 flex flex-row  gap-4 bg-transparent h-full max-h-[240px] border-transparent mx-auto  `}
+    >
       {/* Thread/Line Container */}
 
       <CardTitle className="p-0 justify-between   flex gap-4 h-full items-center">
@@ -29,14 +31,24 @@ export const CreatePostCard = ({
           {" "}
           {/* Added padding for thread */}
           <div className="relative h-full  ">
-            <Image alt="Profile" src="/profile.png" height={50} width={50} />
+            <Image
+              alt="Profile"
+              src={
+                user && user?.profilePicture
+                  ? user?.profilePicture
+                  : "/default-profile.jpg"
+              }
+              height={50}
+              width={50}
+              className="rounded-full"
+            />
             <div className="bg-[#FFFFFF33] absolute left-1/2 h-[90%] w-[1px]" />
           </div>
         </div>
       </CardTitle>
       <div className="flex h-full w-full  flex-col gap-4   justify-between">
         <div className="flex flex-1 w-full items-center justify-between ">
-          <h2 className="font-semibold text-xl text-white">Jatin</h2>
+          <h2 className="font-semibold text-xl text-white">{user?.username}</h2>
 
           <div className="w-8 h-8 bg-headerBg rounded-sm cursor-pointer flex justify-center items-center">
             <Image
