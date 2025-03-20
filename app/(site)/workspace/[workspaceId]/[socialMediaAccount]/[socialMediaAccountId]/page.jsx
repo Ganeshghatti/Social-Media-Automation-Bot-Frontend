@@ -45,7 +45,7 @@ const SocialMediaAccount = () => {
       <div className="flex flex-col gap-6 w-full">
         <div className="flex flex-col gap-6">
           <h1>Published Posts</h1>
-          {published &&
+          {published && 
             published.map((post, i) => {
               return <div key={i}></div>;
             })}
