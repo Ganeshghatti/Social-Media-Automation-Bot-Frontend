@@ -206,7 +206,8 @@ const Page = () => {
                 control={form.control}
                 name="name"
                 render={({ field }) => (
-                  <FormItem className="flex-1 w-full bg-navBg text-white py-4 border rounded-[20px] border-[#ffffff30] px-2">
+                  <FormItem className="flex-1 w-full bg-navBg text-white py-2 border
+                   rounded-[20px] border-[#ffffff30] px-2">
                     <FormControl>
                       <Input
                         className="bg-transparent border-transparent focus:border-transparent focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-[24px] placeholder:text-[24px]"
@@ -224,7 +225,7 @@ const Page = () => {
                 control={form.control}
                 name="timezone"
                 render={({ field }) => (
-                  <div className="flex-1 w-full flex gap-3 bg-navBg text-white py-4 border rounded-[20px] justify-center items-center border-[#ffffff30] px-2">
+                  <div className="flex-1 w-full flex gap-3 bg-navBg text-white py-2 border rounded-[20px] justify-center items-center border-[#ffffff30] px-2">
                     <Select
                       onValueChange={(value) => {
                         field.onChange(value);
@@ -270,7 +271,7 @@ const Page = () => {
                     <div
                       onClick={() => fileInputRef.current.click()}
                       className="flex gap-3 cursor-pointer
-                       bg-navBg text-white py-5 border rounded-[20px] justify-center 
+                       bg-navBg text-white py-3 border rounded-[20px] justify-center 
                        items-center border-[#ffffff30] px-2"
                     >
                       {iconPreview ? (
@@ -307,7 +308,7 @@ const Page = () => {
               render={({ field }) => (
                 <FormItem
                   className="flex-1 bg-navBg
-                 text-white py-4 border rounded-[20px] border-[#ffffff30] px-2"
+                 text-white py-2 border rounded-[20px] border-[#ffffff30] px-2"
                 >
                   <FormControl className="text-2xl">
                     <Textarea
@@ -326,7 +327,7 @@ const Page = () => {
               name="keywords"
               render={({ field }) => (
                 <FormItem
-                  className="flex-1 bg-navBg text-white py-4 border 
+                  className="flex-1 bg-navBg text-white py-2 border 
                 rounded-[20px] border-[#ffffff30] px-2"
                 >
                   <FormControl>
@@ -376,7 +377,7 @@ const Page = () => {
               type="submit"
               disabled={loading}
               className="bg-primary 
-              hover:bg-primary/90 text-white py-6 text-xl rounded-[20px]"
+              hover:bg-primary/90 mx-auto px-6 w-max text-white py-6 text-xl  rounded-full"
             >
               {loading ? "Creating..." : "Create Workspace"}
             </Button>

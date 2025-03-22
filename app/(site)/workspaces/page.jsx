@@ -47,9 +47,9 @@ const WorkspacesPage = () => {
       {loading ? (
         <h1 className="text-2xl font-semibold">Loading...</h1>
       ) : (
-        <div className="md:px-10 py-12 flex flex-col  md:grid md:grid-cols-3 gap-4  ">
+        <div className="md:px-10 py-12 flex flex-col items-center  md:grid md:grid-cols-3 gap-4  ">
           {workspaces.length === 0 ? (
-            <h1 className="text-2xl font-semibold">No Workspaces Found</h1>
+            <h1 className="text-2xl font-semibold text-white">No Workspaces Found</h1>
           ) : (
             workspaces.map((workspace, i) => (
               <Link

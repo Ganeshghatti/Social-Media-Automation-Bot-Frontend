@@ -1,28 +1,33 @@
 "use client";
 
 import { LoginForm } from "@components/login-form";
+import useAuthToken from "@hooks/useAuthToken";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import React from "react";
 
 const Page = () => {
+  const token = useAuthToken();
+  const router = useRouter();
+  if (token) {
+    router.push("/dashboard");
+  }
   return (
-    <div className="h-screen w-screen overflow-x-hidden bg-navBg flex md:flex-row flex-col md:items-start md:justify-start justify-center items-center p-2">
-      <LoginForm />
-      <div className="md:flex hidden relative flex-[0.3] p-0    h-full  ">
+    <div className="grid min-h-svh bg-navBg lg:grid-cols-2">
+      <div className="relative hidden bg-muted lg:block">
         <Image
-          src={"/AuthScreen.png"}
-          height={3000}
-          width={3000}
-          alt="No"
-          className="h-full w-full   object-contain p-0 "
+          layout="fill"
+          src="/placeholder.jpg"
+          alt="Image"
+          className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
         />
-        <Image
-          src={"/DEALFLOW.png"}
-          height={2000}
-          alt="No"
-          width={2000}
-          className="h-full w-full object-fill absolute left-0 top-0 "
-        />
+      </div>
+      <div className="flex flex-col gap-4 p-6 md:p-10">
+        <div className="flex flex-1 items-center justify-center">
+          <div className="w-full max-w-xs">
+            <LoginForm />
+          </div>
+        </div>
       </div>
     </div>
   );
