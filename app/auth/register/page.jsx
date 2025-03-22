@@ -13,26 +13,23 @@ const Page = () => {
     router.push("/dashboard");
   }
   return (
-     <div className="min-h-screen w-full overflow-hidden bg-navBg flex flex-row-reverse
-        md:flex-row items-center justify-center p-3 md:p-6 lg:p-10 space-x-2 ">
-         <RegisterForm />
-         <div className="hidden xl:flex flex-1 relative h-[90vh] w-[60vw] max-w-md lg:max-w-lg xl:max-w-xl">
-           <Image
-             src="/AuthScreen.png"
-             layout="fill"
-             objectFit="contain"
-             alt="Auth Screen"
-             className="absolute"
-           />
-           <Image
-             src="/DEALFLOW.png"
-             layout="fill"
-             objectFit="cover"
-             alt="Dealflow"
-             className="absolute left-0 top-0"
-           />
-         </div>
-       </div>
+    <div className="grid min-h-svh bg-navBg lg:grid-cols-2">
+      <div className="flex flex-col gap-4 p-6 md:p-10">
+        <div className="flex flex-1 items-center justify-center">
+          <div className="w-full max-w-xs">
+            <RegisterForm />
+          </div>
+        </div>
+      </div>
+      <div className="relative hidden bg-muted lg:block">
+        <Image
+          layout="fill"
+          src="/placeholder.jpg"
+          alt="Image"
+          className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+        />
+      </div>
+    </div>
   );
 };
 

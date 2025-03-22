@@ -70,15 +70,9 @@ export function LoginForm({ className, ...props }) {
   }
 
   return (
-    <div
-      className={cn(
-        "flex flex-col gap-6  flex-[0.4] mx-auto h-full items-start    justify-center ",
-        className
-      )}
-      {...props}
-    >
+    <div className={cn("flex flex-col gap-6", className)} {...props}>
       <div className="flex gap-2 items-center  ">
-        <div className="rounded-full bg-white justify-center items-center h-24 w-24 flex ">
+        <div className="rounded-full bg-white justify-center items-center h-24 w-24  flex ">
           <Image
             src={"/sidebar_logo.png"}
             height={50}
@@ -98,81 +92,77 @@ export function LoginForm({ className, ...props }) {
           Enter your credentials to access your account
         </p>
       </div>
-      <Card className="w-full md:w-[60vh] px-0 bg-transparent border-transparent">
-        <CardContent className="px-0">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem
-                    className="flex-1 bg-navBg text-white gap-0 border 
-                           border-transparent "
-                  >
-                    <Label className="text-sm text-white">Email</Label>
-                    <FormControl>
-                      <Input
-                        className="bg-[#1A1D1F] py-6 border-[#ffffff30]  focus:outline-none focus:ring-0   px-4  focus-visible:ring-0 focus-visible:ring-offset-0
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+          className="grid gap-6"
+          >
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem className="grid gap-2">
+                  <Label className="text-sm text-white">Email</Label>
+                  <FormControl>
+                    <Input
+                      className="bg-[#1A1D1F] py-6 border-[#ffffff30]  focus:outline-none focus:ring-0   px-4  focus-visible:ring-0 focus-visible:ring-offset-0
                                     text-[20px] placeholder:text-[20px] placeholder:text-[#ffffff60] overflow-hidden rounded-lg"
-                        placeholder="Enter Your Email"
-                        {...field}
-                        value={field.value ?? ""}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem
-                    className="flex-1 bg-navBg text-white gap-0 border 
-                       border-transparent "
-                  >
-                    <Label className="text-sm text-white">Password</Label>
-                    <FormControl>
-                      <Input
-                        className="bg-[#1A1D1F] py-6 border-[#ffffff30]
+                      placeholder="Enter Your Email"
+                      {...field}
+                      value={field.value ?? ""}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem className="grid gap-2">
+                  <Label className="text-sm text-white">Password</Label>
+                  <FormControl>
+                    <Input
+                      className="bg-[#1A1D1F] py-6 border-[#ffffff30]
                           focus:outline-none focus:ring-0   px-4  focus-visible:ring-0
                            focus-visible:ring-offset-0
                                 text-[20px] placeholder:text-[20px] placeholder:text-[#ffffff60] overflow-hidden rounded-lg"
-                        placeholder="Enter Your Password"
-                        {...field}
-                        value={field.value ?? ""}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <div className="flex flex-col space-y-2">
-                <div className="flex w-full justify-end items-end">
-                  <Link
-                    href={"/auth/forgetPassword"}
-                    className="text-white underline font-medium text-base"
-                  >
-                    Forget Password?
-                  </Link>
-                </div>
-                <Button type="submit" className="w-full text-white">
-                  Submit
-                </Button>
+                      placeholder="Enter Your Password"
+                      {...field}
+                      value={field.value ?? ""}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="flex items-center justify-center flex-col space-y-2">
+              <div className="flex w-full justify-end items-end">
+                <Link
+                  href={"/auth/forgetPassword"}
+                  className="text-white underline font-medium text-base"
+                >
+                  Forget Password?
+                </Link>
               </div>
-            </form>
-          </Form>
-        </CardContent>
-        <CardFooter className="p-0 justify-center items-center">
+              <Button type="submit" className="w-full text-white">
+                Submit
+              </Button>
+            </div>
+          </form>
+        </Form>
+        <div className="p-0 justify-center items-center">
           <p className="text-white text-base ">
             Don't Have an Account?{" "}
-            <Link className="text-white text-base underline" href={"/auth/register"}>
+            <Link
+              className="text-white text-base underline"
+              href={"/auth/register"}
+            >
               Register
             </Link>
           </p>
-        </CardFooter>
-      </Card>
+      </div>
     </div>
   );
 }
