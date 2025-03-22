@@ -1,9 +1,11 @@
 "use client";
+import { useUserStore } from "@/store/userStore";
 import useAuthToken from "@hooks/useAuthToken";
 import axios from "axios";
 import { PlusIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 const WorkspacesPage = () => {
@@ -11,6 +13,15 @@ const WorkspacesPage = () => {
   const [workspaces, setWorkspaces] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  const { user } = useUserStore();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (user === null) return; // Wait for user to load
+    if (!user?.onboarding) {
+      router.replace("/onboarding");
+    }
+  }, [user, router]);
   const GetAllWorkspaces = async (token) => {
     try {
       setLoading(true);
@@ -49,7 +60,9 @@ const WorkspacesPage = () => {
       ) : (
         <div className="md:px-10 py-12 flex flex-col items-center  md:grid md:grid-cols-3 gap-4  ">
           {workspaces.length === 0 ? (
-            <h1 className="text-2xl font-semibold text-white">No Workspaces Found</h1>
+            <h1 className="text-2xl font-semibold text-white">
+              No Workspaces Found
+            </h1>
           ) : (
             workspaces.map((workspace, i) => (
               <Link

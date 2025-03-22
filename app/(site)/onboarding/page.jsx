@@ -28,7 +28,7 @@ const formSchema = z.object({
   keywords: z.string(),
 });
 
-const Page = ({ className, ...props }) => {
+const Page = ({ className }) => {
   const token = useAuthToken();
   const [keywords, setKeywords] = useState([]);
   const { user } = useUserStore();
@@ -79,6 +79,8 @@ const Page = ({ className, ...props }) => {
         }
       );
 
+      form.setValue("description","")
+
       router.push("/dashboard");
     } catch (error) {
       console.error("Error:", error.response?.data || error.message);
@@ -88,16 +90,14 @@ const Page = ({ className, ...props }) => {
   return (
     <div
       className={cn(
-        "flex flex-col gap-6  flex-[0.4] mx-auto h-full items-start    justify-center ",
+        "flex flex-col gap-6  flex-[0.4] mx-auto h-full items-start bg-navBg    justify-center ",
         className
       )}
-      {...props}
     >
       <div className="flex flex-col gap-3">
         <h1 className="text-2xl text-white font-normal">Onboarding Page</h1>
       </div>
       <Card className="w-full md:w-[60vh] px-0 bg-transparent border-transparent">
-        
         <CardContent className="px-0">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -106,9 +106,13 @@ const Page = ({ className, ...props }) => {
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Description</FormLabel>
+                    <FormLabel className="text-white">Description</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter description" {...field} />
+                      <Input
+                        className="text-black"
+                        placeholder="Enter description"
+                        {...field}
+                      />
                     </FormControl>
                   </FormItem>
                 )}
@@ -118,10 +122,11 @@ const Page = ({ className, ...props }) => {
                 name="keywords"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Keywords</FormLabel>
+                    <FormLabel className="text-white">Keywords</FormLabel>
                     <FormControl>
                       <div className="flex gap-2">
                         <Input
+                          className="text-black"
                           placeholder="Add keyword"
                           onKeyDown={(e) => {
                             if (e.key === "Enter") {
@@ -146,13 +151,13 @@ const Page = ({ className, ...props }) => {
                 {keywords.map((keyword, index) => (
                   <div
                     key={index}
-                    className="flex items-center gap-1 bg-secondary px-3 py-1 rounded-full"
+                    className="flex items-center text-black gap-1 bg-secondary px-3 py-1 rounded-full"
                   >
                     {keyword}
                     <button
                       type="button"
                       onClick={() => removeKeyword(keyword)}
-                      className="text-muted-foreground hover:text-foreground"
+                      className="text-muted-foreground text-black hover:text-foreground"
                     >
                       <X size={14} />
                     </button>

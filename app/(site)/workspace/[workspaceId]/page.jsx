@@ -40,6 +40,8 @@ const WorkspacePage = () => {
   }, [token, fetchUser]);
 
   useEffect(() => {
+    if (user === null) return; // Wait for user to load
+
     if (user) {
       if (!user.onboarding) {
         router.replace("/onboarding");
@@ -140,7 +142,6 @@ const WorkspacePage = () => {
     // Convert scheduledDateTime to workspace's timezone
     let formattedDateTime = "";
     if (scheduledDateTime) {
-      console.log("Workspace Time zone ", workspaceTimezone);
       formattedDateTime = DateTime.fromJSDate(scheduledDateTime)
         .setZone(workspaceTimezone)
         .toFormat("yyyy-MM-dd HH:mm:ss"); // Format in local timezone
@@ -183,8 +184,6 @@ const WorkspacePage = () => {
             },
       ],
     };
-
-    console.log("FormData being sent:", JSON.stringify(formData, null, 2));
 
     try {
       const token = localStorage.getItem("token");
@@ -443,9 +442,9 @@ const WorkspacePage = () => {
         createDraftPosts={createDraftPosts}
         EditDraftPosts={EditDraftPosts}
         singleWorkspace={singleWorkspace}
-        cards={cards} // ✅ Ensure cards are passed
-        setCards={setCards} // ✅ Set function
-        textAreaRefs={textAreaRefs} // ✅ Textarea references
+        cards={cards}
+        setCards={setCards} 
+        textAreaRefs={textAreaRefs} 
         setNewCardAdded={setNewCardAdded}
         SingleWorkspaceDraftData={SingleWorkspaceDraftData}
       />

@@ -32,6 +32,7 @@ import { TIMEZONES } from "@constants/create-workspace/index";
 import Image from "next/image";
 import { Sidebar_Card } from "@components/single-workspace/Sidebar_Card";
 import { disconnectLinkedIn, disconnectTwitter } from "@functions/social";
+import { useUserStore } from "@/store/userStore";
 const EditWorkspace = () => {
   const [loading, setLoading] = useState(false);
   const [singleWorkspace, setSingleWorkspace] = useState(null);
@@ -39,10 +40,18 @@ const EditWorkspace = () => {
   const [iconPreview, setIconPreview] = useState(null);
   const [selectedTimezone, setSelectedTimezone] = useState("");
   const fileInputRef = useRef(null);
-  const router = useRouter();
   const token = useAuthToken() || "";
   const params = useParams();
   const { workspaceId } = params;
+
+  const { user } = useUserStore();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!user?.onboarding) {
+      router.replace("/onboarding");
+    }
+  }, [user, router]);
 
   const formSchema = z.object({
     name: z.string().min(1, "Name is required"),

@@ -1,6 +1,21 @@
+'use client'
+import { useUserStore } from "@/store/userStore";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 const Page = () => {
+  const { user } = useUserStore();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (user === null) return; // Wait for user to load
+
+    if (!user?.onboarding) {
+      router.replace("/onboarding");
+    }
+  }, [user, router]);
+
   return (
     <main className="flex-1 flex flex-col space-y-3  items-center justify-center h-screen overflow-y-auto">
       <Image

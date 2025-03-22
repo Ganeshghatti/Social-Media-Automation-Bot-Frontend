@@ -93,21 +93,24 @@ export const ButtonsHeader = ({
         activeButtons={activeButtons}
         actionButton={isEditingDraft ? EditDraftPosts : createDraftPosts}
         buttonText={isEditingDraft ? "Edit the Draft" : "Save as Draft"}
+        isDisabled={activeButtons}
       />
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogTrigger asChild>
           <Button
+            disabled={!activeButtons}
             style={{ backgroundColor: activeButtons ? "#079500" : "gray" }}
             className="px-6 rounded-full py-3 flex justify-center items-center"
           >
-            <span className="text-sm md:text-base font-medium text-white">Schedule</span>
+            <span className="text-sm md:text-base font-medium text-white">
+              Schedule
+            </span>
           </Button>
         </DialogTrigger>
 
         <DialogContent className="w-[60vw] max-w-[60vw] h-[720px] p-0 bg-navBg flex border-transparent gap-2 items-start">
           <DialogTitle></DialogTitle>
-
           <div className="flex relative flex-row gap-3 h-full w-full">
             <DialogSidebar
               workspaceData={workspaceData}
@@ -157,6 +160,7 @@ export const ButtonsHeader = ({
         buttonText={"Publish"}
         activeButtons={activeButtons}
         actionButton={() => onPublish()} // Immediate publish
+        isDisabled={activeButtons}
       />
     </div>
   );

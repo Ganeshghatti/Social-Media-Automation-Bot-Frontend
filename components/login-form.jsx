@@ -63,7 +63,7 @@ export function LoginForm({ className, ...props }) {
         localStorage.setItem("token", token);
       }
 
-      router.push("/dashboard");
+      router.push("/onboarding");
     } catch (error) {
       console.error("Signup failed:", error);
     }
