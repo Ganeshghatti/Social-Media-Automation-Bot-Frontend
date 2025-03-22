@@ -1,27 +1,35 @@
 "use client";
 
 import { LoginForm } from "@components/login-form";
+import useAuthToken from "@hooks/useAuthToken";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import React from "react";
 
 const Page = () => {
+  const token=useAuthToken()
+  const router=useRouter()
+  if (token) {
+    router.push('/dashboard')
+  }
   return (
-    <div className="h-screen w-screen overflow-x-hidden bg-navBg flex md:flex-row flex-col md:items-start md:justify-start justify-center items-center p-2">
+    <div className="min-h-screen w-full overflow-hidden bg-navBg flex flex-col-reverse
+     md:flex-row items-center justify-center p-3 md:p-6 lg:p-10 space-x-2">
       <LoginForm />
-      <div className="md:flex hidden relative flex-[0.3] p-0    h-full  ">
+      <div className="hidden xl:flex flex-1 relative h-[90vh] w-[60vw] max-w-md lg:max-w-lg xl:max-w-xl">
         <Image
-          src={"/AuthScreen.png"}
-          height={3000}
-          width={3000}
-          alt="No"
-          className="h-full w-full   object-contain p-0 "
+          src="/AuthScreen.png"
+          layout="fill"
+          objectFit="contain"
+          alt="Auth Screen"
+          className="absolute"
         />
         <Image
-          src={"/DEALFLOW.png"}
-          height={2000}
-          alt="No"
-          width={2000}
-          className="h-full w-full object-fill absolute left-0 top-0 "
+          src="/DEALFLOW.png"
+          layout="fill"
+          objectFit="cover"
+          alt="Dealflow"
+          className="absolute left-0 top-0"
         />
       </div>
     </div>

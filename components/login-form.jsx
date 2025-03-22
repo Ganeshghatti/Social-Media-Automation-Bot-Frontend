@@ -6,6 +6,7 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@components/ui/card";
@@ -71,7 +72,7 @@ export function LoginForm({ className, ...props }) {
   return (
     <div
       className={cn(
-        "flex flex-col gap-6 p-6 flex-[0.4] mx-auto h-full items-start    justify-center ",
+        "flex flex-col gap-6  flex-[0.4] mx-auto h-full items-start    justify-center ",
         className
       )}
       {...props}
@@ -147,19 +148,30 @@ export function LoginForm({ className, ...props }) {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full text-white">
-                Submit
-              </Button>
+              <div className="flex flex-col space-y-2">
+                <div className="flex w-full justify-end items-end">
+                  <Link
+                    href={"/auth/forgetPassword"}
+                    className="text-white underline font-medium text-base"
+                  >
+                    Forget Password?
+                  </Link>
+                </div>
+                <Button type="submit" className="w-full text-white">
+                  Submit
+                </Button>
+              </div>
             </form>
           </Form>
-
-          <Link
-            href={"/forget-password"}
-            className="text-lg font-semibold underline mt-12"
-          >
-            Forget Password?
-          </Link>
         </CardContent>
+        <CardFooter className="p-0 justify-center items-center">
+          <p className="text-white text-base ">
+            Don't Have an Account?{" "}
+            <Link className="text-white text-base underline" href={"/auth/register"}>
+              Register
+            </Link>
+          </p>
+        </CardFooter>
       </Card>
     </div>
   );

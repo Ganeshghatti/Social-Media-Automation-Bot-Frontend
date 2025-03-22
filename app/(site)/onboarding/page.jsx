@@ -21,13 +21,14 @@ import axios from "axios";
 import useAuthToken from "@hooks/useAuthToken";
 import { useUserStore } from "@/store/userStore";
 import { useRouter } from "next/navigation";
+import { cn } from "@lib/utils";
 
 const formSchema = z.object({
   description: z.string().min(10, "Description must be at least 10 characters"),
   keywords: z.string(),
 });
 
-const Page = () => {
+const Page = ({ className, ...props }) => {
   const token = useAuthToken();
   const [keywords, setKeywords] = useState([]);
   const { user } = useUserStore();
@@ -85,78 +86,87 @@ const Page = () => {
   };
 
   return (
-    <Card className="w-full max-w-lg">
-      <CardHeader>
-        <CardTitle>Onboarding</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter description" {...field} />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="keywords"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Keywords</FormLabel>
-                  <FormControl>
-                    <div className="flex gap-2">
-                      <Input
-                        placeholder="Add keyword"
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            e.preventDefault();
-                            addKeyword(field.value);
-                          }
-                        }}
-                        {...field}
-                      />
-                      <Button
-                        type="button"
-                        onClick={() => addKeyword(field.value)}
-                      >
-                        Add
-                      </Button>
-                    </div>
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            <div className="flex flex-wrap gap-2">
-              {keywords.map((keyword, index) => (
-                <div
-                  key={index}
-                  className="flex items-center gap-1 bg-secondary px-3 py-1 rounded-full"
-                >
-                  {keyword}
-                  <button
-                    type="button"
-                    onClick={() => removeKeyword(keyword)}
-                    className="text-muted-foreground hover:text-foreground"
+    <div
+      className={cn(
+        "flex flex-col gap-6  flex-[0.4] mx-auto h-full items-start    justify-center ",
+        className
+      )}
+      {...props}
+    >
+      <div className="flex flex-col gap-3">
+        <h1 className="text-2xl text-white font-normal">Onboarding Page</h1>
+      </div>
+      <Card className="w-full md:w-[60vh] px-0 bg-transparent border-transparent">
+        
+        <CardContent className="px-0">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter description" {...field} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="keywords"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Keywords</FormLabel>
+                    <FormControl>
+                      <div className="flex gap-2">
+                        <Input
+                          placeholder="Add keyword"
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              addKeyword(field.value);
+                            }
+                          }}
+                          {...field}
+                        />
+                        <Button
+                          type="button"
+                          onClick={() => addKeyword(field.value)}
+                        >
+                          Add
+                        </Button>
+                      </div>
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <div className="flex flex-wrap gap-2">
+                {keywords.map((keyword, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center gap-1 bg-secondary px-3 py-1 rounded-full"
                   >
-                    <X size={14} />
-                  </button>
-                </div>
-              ))}
-            </div>
-            <Button type="submit" className="w-full">
-              Submit
-            </Button>
-          </form>
-        </Form>
-      </CardContent>
-    </Card>
+                    {keyword}
+                    <button
+                      type="button"
+                      onClick={() => removeKeyword(keyword)}
+                      className="text-muted-foreground hover:text-foreground"
+                    >
+                      <X size={14} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <Button type="submit" className="w-full">
+                Submit
+              </Button>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 
