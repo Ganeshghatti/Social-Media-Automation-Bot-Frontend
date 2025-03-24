@@ -433,7 +433,7 @@ const WorkspacePage = () => {
     );
 
   return (
-    <main className="flex-1 flex flex-col h-screen overflow-y-auto">
+    <main className="flex-1 flex flex-col space-y-3  items-center justify-center  overflow-y-auto w-full ">
       <CreatePostHeader />
       <ButtonsHeader
         isEditingDraft={isEditingDraft}

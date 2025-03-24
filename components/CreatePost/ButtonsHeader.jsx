@@ -15,6 +15,7 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DateTimePicker } from "@components/global/DateTimePicker";
+import { SidebarTrigger } from "@components/ui/sidebar";
 
 export const ButtonsHeader = ({
   isEditingDraft,
@@ -88,6 +89,7 @@ export const ButtonsHeader = ({
 
   return (
     <div className="w-full px-8 py-3 gap-3 flex justify-center md:justify-end">
+      <SidebarTrigger className="text-white" />
       <CustomButtonHeader
         buttonColor={"#FF9900"}
         activeButtons={activeButtons}

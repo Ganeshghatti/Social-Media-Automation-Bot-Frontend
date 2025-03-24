@@ -54,7 +54,7 @@ const WorkspacesPage = () => {
   }, [token]);
 
   return (
-    <div className="h-screen flex flex-1 w-full items-center bg-navBg justify-center ">
+    <div className=" flex flex-1 w-full items-center bg-navBg justify-center ">
       {loading ? (
         <h1 className="text-2xl font-semibold">Loading...</h1>
       ) : (

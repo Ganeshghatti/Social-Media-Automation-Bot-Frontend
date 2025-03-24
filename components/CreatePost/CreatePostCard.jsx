@@ -22,8 +22,8 @@ export const CreatePostCard = ({
   const { user, setUser } = useUserStore();
   return (
     <Card
-      className={`w-full  md:w-1/2 flex flex-row  gap-4 bg-transparent h-full max-h-[240px] border-transparent mx-auto  `}
-    >
+    className="w-full sm:w-[120vw] md:w-[60vw] lg:w-[70vw] xl:w-[55vw] flex flex-row gap-4 bg-transparent h-full max-h-[240px] border-transparent mx-auto min-w-[300px] max-w-[1440px]"
+  >
       {/* Thread/Line Container */}
 
       <CardTitle className="p-0 justify-between   flex gap-4 h-full items-center">

@@ -3,13 +3,14 @@ import React from "react";
 import { Sidebar_Card } from "../single-workspace/Sidebar_Card";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { Sidebar, SidebarContent, SidebarHeader } from "@components/ui/sidebar";
 
 const SidebarDashboard = () => {
   const router = useRouter();
 
   return (
-    <div className=" md:flex hidden flex-col items-start justify-between  bg-darkBg px-4 py-6 shadow-sm text-white w-[15%] no-scrollbar h-screen overflow-y-auto sticky top-0">
-      <div className="flex flex-col gap-14 items-center w-full">
+    <Sidebar className=" px-4 py-6 bg-darkBg  flex flex-row ">
+      <SidebarHeader className="flex  bg-darkBg  flex-col gap-14 items-center w-full">
         <div className="flex w-full items-center gap-4">
           <Image
             src={"/sidebar_logo.png"}
@@ -18,11 +19,13 @@ const SidebarDashboard = () => {
             width={52}
             className="object-contain"
           />
-          <div className="flex flex-col items-start">
-            <h1 className="text-white font-bold text-2xl">The</h1>
-            <h1 className="text-white font-bold text-2xl">Squirrel</h1>
+          <div className="flex flex-col items-start text-white">
+            <h1 className=" font-bold text-2xl">The</h1>
+            <h1 className=" font-bold text-2xl">Squirrel</h1>
           </div>
         </div>
+      </SidebarHeader>
+      <SidebarContent className=" bg-darkBg">
         <div className="flex flex-col w-full gap-3">
           <Sidebar_Card
             imageUrl={"/dashboard_icon.png"}
@@ -40,8 +43,8 @@ const SidebarDashboard = () => {
           />
           <div className="w-full h-[1px] bg-white opacity-40" />
         </div>
-      </div>
-    </div>
+      </SidebarContent>
+    </Sidebar>
   );
 };
 

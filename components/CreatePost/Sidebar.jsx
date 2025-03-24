@@ -26,6 +26,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@components/ui/dialog";
+import { SidebarContent, SidebarFooter, SidebarHeader } from "../ui/sidebar";
 
 export const Sidebar = ({ workspaceId, token }) => {
   const [singleWorkspace, setSingleWorkspace] = useState(null);
@@ -119,82 +120,81 @@ export const Sidebar = ({ workspaceId, token }) => {
   }
 
   return (
-    <div className="md:flex hidden flex-col items-start justify-between  bg-darkBg px-4 py-6 shadow-sm text-white w-[15%] no-scrollbar h-screen overflow-y-auto sticky top-0">
-      <div className="flex flex-col gap-14 items-center w-full">
-        <div className="flex w-full items-center gap-4">
-          <Image
-            src={"/sidebar_logo.png"}
-            height={61}
-            alt="Image"
-            width={52}
-            className="object-contain"
-          />
-          <div className="flex flex-col items-start">
-            <h1 className="text-white font-bold text-2xl">The</h1>
-            <h1 className="text-white font-bold text-2xl">Squirrel</h1>
-          </div>
+    <Sidebar className=" px-4 py-6 bg-darkBg  flex flex-row ">
+      <SidebarHeader className="flex w-full items-center gap-4">
+        <Image
+          src={"/sidebar_logo.png"}
+          height={61}
+          alt="Image"
+          width={52}
+          className="object-contain"
+        />
+        <div className="flex flex-col items-start">
+          <h1 className="text-white font-bold text-2xl">The</h1>
+          <h1 className="text-white font-bold text-2xl">Squirrel</h1>
         </div>
-        <div className="flex flex-col w-full gap-3">
-          <Sidebar_Card
-            imageUrl={"/dashboard_icon.png"}
-            text={"Dashboard"}
-            onClickFunction={() => {
-              router.push("/dashboard");
-            }}
-          />
-          <Sidebar_Card
-            imageUrl={"/Analytics.png"}
-            text={"Analytics"}
-            onClickFunction={() => {
-              router.push("/analytics");
-            }}
-          />
-          <div className="w-full h-[1px] bg-white opacity-40" />
-          <Sidebar_Card
-            imageUrl={"/Create-Post.png"}
-            text={"Create post"}
-            onClickFunction={() => {
-              router.push(`/workspace/${workspaceId}`);
-            }}
-          />
+      </SidebarHeader>
+      <SidebarContent className="flex flex-col w-full gap-3">
+        <Sidebar_Card
+          imageUrl={"/dashboard_icon.png"}
+          text={"Dashboard"}
+          onClickFunction={() => {
+            router.push("/dashboard");
+          }}
+        />
+        <Sidebar_Card
+          imageUrl={"/Analytics.png"}
+          text={"Analytics"}
+          onClickFunction={() => {
+            router.push("/analytics");
+          }}
+        />
+        <div className="w-full h-[1px] bg-white opacity-40" />
+        <Sidebar_Card
+          imageUrl={"/Create-Post.png"}
+          text={"Create post"}
+          onClickFunction={() => {
+            router.push(`/workspace/${workspaceId}`);
+          }}
+        />
 
-          <Sidebar_Card
-            imageUrl={"/edit.png"}
-            text={"Edit Workspace"}
-            onClickFunction={() => {
-              router.push(`/workspace/${workspaceId}/edit`);
-            }}
-          />
+        <Sidebar_Card
+          imageUrl={"/edit.png"}
+          text={"Edit Workspace"}
+          onClickFunction={() => {
+            router.push(`/workspace/${workspaceId}/edit`);
+          }}
+        />
 
-          <Dialog>
-            <DialogTrigger className="py-6 rounded-xl w-full  cursor-pointer px-3 flex items-center justify-start gap-3 bg-navBg  font-semibold">
-              <PlusIcon />
-              Add Account
-            </DialogTrigger>
-            <DialogContent className="w-[40vw] max-w-[40vw] h-[420px]  bg-headerBg flex border-transparent gap-2 items-start px-4 py-9">
-              <DialogHeader>
-                <DialogTitle className="text-white"></DialogTitle>
-              </DialogHeader>
-              <div className="w-full p-4 grid grid-cols-2 items-center gap-5">
-                <Sidebar_Card
-                  onClickFunction={() =>
-                    connectTwitter(workspaceId, router, token)
-                  }
-                  imageUrl={"/twitter.png"}
-                  text={"Connect X"}
-                />
-                <Sidebar_Card
-                  onClickFunction={() =>
-                    connectLinkedin(workspaceId, router, token)
-                  }
-                  imageUrl={"/linkedIn.png"}
-                  text={"Connect LinkedIn"}
-                />
-              </div>
-            </DialogContent>
-          </Dialog>
+        <Dialog>
+          <DialogTrigger className="py-6 rounded-xl w-full  cursor-pointer px-3 flex items-center justify-start gap-3 bg-navBg  font-semibold">
+            <PlusIcon />
+            Add Account
+          </DialogTrigger>
+          <DialogContent className="w-[40vw] max-w-[40vw] h-[420px]  bg-headerBg flex border-transparent gap-2 items-start px-4 py-9">
+            <DialogHeader>
+              <DialogTitle className="text-white"></DialogTitle>
+            </DialogHeader>
+            <div className="w-full p-4 grid grid-cols-2 items-center gap-5">
+              <Sidebar_Card
+                onClickFunction={() =>
+                  connectTwitter(workspaceId, router, token)
+                }
+                imageUrl={"/twitter.png"}
+                text={"Connect X"}
+              />
+              <Sidebar_Card
+                onClickFunction={() =>
+                  connectLinkedin(workspaceId, router, token)
+                }
+                imageUrl={"/linkedIn.png"}
+                text={"Connect LinkedIn"}
+              />
+            </div>
+          </DialogContent>
+        </Dialog>
 
-          {/* {singleWorkspace &&
+        {/* {singleWorkspace &&
             singleWorkspace.connectedAccounts?.map((account, i) => {
               if (account?.type === "twitter") {
                 return (
@@ -224,51 +224,52 @@ export const Sidebar = ({ workspaceId, token }) => {
                 );
               }
             })} */}
-        </div>
-      </div>
-      {loading ? (
-        <h1 className="text-2xl font-semibold">Loading...</h1>
-      ) : (
-        <DropdownMenu className="w-full mt-6">
-          <DropdownMenuTrigger asChild>
-            <Button className="bg-primary rounded-2xl w-full py-8 px-4 flex items-center gap-2 mt-auto">
-              {singleWorkspace?.icon && (
-                <Image
-                  alt="Paw image"
-                  src={singleWorkspace?.icon}
-                  width={30}
-                  className="object-contain"
-                  height={30}
-                />
-              )}
+      </SidebarContent>
+      <SidebarFooter>
+        {loading ? (
+          <h1 className="text-2xl font-semibold">Loading...</h1>
+        ) : (
+          <DropdownMenu className="w-full mt-6">
+            <DropdownMenuTrigger asChild>
+              <Button className="bg-primary rounded-2xl w-full py-8 px-4 flex items-center gap-2 mt-auto">
+                {singleWorkspace?.icon && (
+                  <Image
+                    alt="Paw image"
+                    src={singleWorkspace?.icon}
+                    width={30}
+                    className="object-contain"
+                    height={30}
+                  />
+                )}
 
-              <span className="text-base text-white font-semibold">
-                {singleWorkspace?.name}
-              </span>
-              <ChevronsUpDown className="h-6 w-6 object-contain" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-[300px] flex flex-col gap-4 items-center bg-headerBg">
-            {workspaces?.length !== 0 &&
-              workspaces?.map((workspace, i) => (
-                <Link
-                  href={`/workspace/${workspace._id}`}
-                  key={i}
-                  className="text-white  border-0  rounded-sm px-6 py-4 "
-                >
-                  {workspace.name}
-                </Link>
-              ))}
+                <span className="text-base text-white font-semibold">
+                  {singleWorkspace?.name}
+                </span>
+                <ChevronsUpDown className="h-6 w-6 object-contain" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-[300px] flex flex-col gap-4 items-center bg-headerBg">
+              {workspaces?.length !== 0 &&
+                workspaces?.map((workspace, i) => (
+                  <Link
+                    href={`/workspace/${workspace._id}`}
+                    key={i}
+                    className="text-white  border-0  rounded-sm px-6 py-4 "
+                  >
+                    {workspace.name}
+                  </Link>
+                ))}
 
-            <Link
-              href={`/workspaces`}
-              className="text-white  border-0  rounded-sm px-6 py-4 "
-            >
-              Manage Workspcaes
-            </Link>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )}
-    </div>
+              <Link
+                href={`/workspaces`}
+                className="text-white  border-0  rounded-sm px-6 py-4 "
+              >
+                Manage Workspcaes
+              </Link>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+      </SidebarFooter>
+    </Sidebar>
   );
 };
