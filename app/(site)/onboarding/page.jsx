@@ -28,7 +28,7 @@ const formSchema = z.object({
   keywords: z.string(),
 });
 
-const Page = ({ className }) => {
+const Page = ({ className="" }) => {
   const token = useAuthToken();
   const [keywords, setKeywords] = useState([]);
   const { user } = useUserStore();
@@ -45,9 +45,10 @@ const Page = ({ className }) => {
   const addKeyword = (value) => {
     if (value && !keywords.includes(value)) {
       setKeywords([...keywords, value]);
-      form.setValue("keyword", "");
+      form.setValue("keywords", ""); // Correct field name
     }
   };
+  
 
   useEffect(() => {
     if (user?.onboarding) {
@@ -66,27 +67,27 @@ const Page = ({ className }) => {
       </div>
     );
 
-  const onSubmit = async (data) => {
-    try {
-      const response = await axios.post(
-        "https://api.bot.thesquirrel.site/user/welcome",
-        { ...data, keywords },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      form.setValue("description","")
-
-      router.push("/dashboard");
-    } catch (error) {
-      console.error("Error:", error.response?.data || error.message);
-    }
-  };
-
+    const onSubmit = async (data) => {
+      try {
+        await axios.post(
+          "https://api.bot.thesquirrel.site/user/welcome",
+          { description: data.description, keywords }, // Ensure correct structure
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+    
+        form.reset(); // Reset form after success
+        setKeywords([]); // Clear keywords array
+        router.push("/dashboard");
+      } catch (error) {
+        console.error("Error:", error.response?.data || error.message);
+      }
+    };
+    
   return (
     <div
       className={cn(
