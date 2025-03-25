@@ -192,8 +192,8 @@ const Page = () => {
     <div className="flex items-start gap-4 justify-start bg-navBg min-h-screen w-full flex-col px-4 md:px-8">
       <CreatePostHeader />
 
-      <div className="flex gap-6 flex-col w-full max-w-[40%] md:max-w-[80%]  mx-auto py-3">
-      <h1 className="text-3xl md:text-4xl font-semibold text-white text-center md:text-left">
+      <div className="flex gap-6 flex-col w-full mx-auto py-3 md:max-w-[90%] lg:max-w-[90%] xl:max-w-[60%]">
+        <h1 className="text-3xl md:text-4xl font-semibold text-white text-center md:text-left">
           Create Workspace
         </h1>
 
@@ -203,7 +203,7 @@ const Page = () => {
             className="w-full rounded-xl bg-headerBg border-[#ffffff30] px-4 md:px-6 py-6 flex flex-col gap-6"
           >
             {/* First Row */}
-            <div className="w-full flex flex-col flex-wrap md:flex-row gap-4">
+            <div className="w-full flex flex-col lg:flex-row flex-wrap gap-4 flex-1">
               {/* Workspace Name Input */}
               <FormField
                 control={form.control}

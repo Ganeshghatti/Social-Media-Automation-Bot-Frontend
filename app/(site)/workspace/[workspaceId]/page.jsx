@@ -96,14 +96,11 @@ const WorkspacePage = () => {
       setSingleWorkspace(response.data.data);
       if (response.data.data.connectedAccounts?.length > 0) {
         setAccountId(response.data.data.connectedAccounts[0].userId);
-        console.log(
-          "Set accountId:",
-          response.data.data.connectedAccounts[0].userId
-        );
       } else {
         console.log("No connected accounts found");
       }
     } catch (error) {
+      toast.error("Failed to get Single Workspace");
       console.error("Error fetching workspace:", error);
       setSingleWorkspace(null);
     } finally {
@@ -339,6 +336,8 @@ const WorkspacePage = () => {
       );
       setCards([{ id: 0, text: "" }]);
     } catch (error) {
+      toast.error("Failed to make draft post");
+
       console.error("Error making draft post:", error);
     }
   };
@@ -391,6 +390,8 @@ const WorkspacePage = () => {
         setDraftPosts
       );
     } catch (error) {
+      toast.error("Failed to make draft post");
+
       console.error("Error making draft post:", error);
     }
   };
@@ -410,6 +411,7 @@ const WorkspacePage = () => {
         setDraftPosts(response.data.data);
         console.log("draft ", response.data.data);
       } catch (error) {
+        toast.error("Failed to get single workspace data");
         console.log("Error ", error);
         setDraftPosts(null);
       } finally {
@@ -433,7 +435,7 @@ const WorkspacePage = () => {
     );
 
   return (
-    <main className="flex-1 flex flex-col space-y-3  items-center justify-center  overflow-y-auto w-full ">
+    <main className="h-screen flex  flex-col space-y-3 items-center justify-center overflow-y-auto w-full">
       <CreatePostHeader />
       <ButtonsHeader
         isEditingDraft={isEditingDraft}
@@ -443,17 +445,14 @@ const WorkspacePage = () => {
         EditDraftPosts={EditDraftPosts}
         singleWorkspace={singleWorkspace}
         cards={cards}
-        setCards={setCards} 
-        textAreaRefs={textAreaRefs} 
+        setCards={setCards}
+        textAreaRefs={textAreaRefs}
         setNewCardAdded={setNewCardAdded}
         SingleWorkspaceDraftData={SingleWorkspaceDraftData}
       />
 
       <Form>
-        <form
-          className="w-full  flex-1 p-4 py-10 mb-8 no-scrollbar overflow-y-auto
-         justify-center items-center"
-        >
+        <form className="w-full flex-1 flex flex-col p-4 py-10 mb-8 no-scrollbar overflow-y-auto items-center ">
           {cards.map((card, index) => (
             <CreatePostCard
               key={index}

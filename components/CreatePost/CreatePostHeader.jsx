@@ -13,7 +13,7 @@ import React from "react";
 
 export const CreatePostHeader = () => {
   return (
-    <div className="w-full px-8 py-3 gap-3 flex justify-end bg-[#1A1D1F] sticky top-0 z-10">
+    <div className="w-full px-8 py-3 gap-3 flex justify-end bg-[#1A1D1F] z-10">
       <Dialog>
         <DialogTrigger asChild>
           <Button className="px-6 bg-primary rounded-full py-3 flex justify-center items-center">
@@ -28,7 +28,7 @@ export const CreatePostHeader = () => {
             </span>
           </Button>
         </DialogTrigger>
-        <DialogContent className="w-[40vw] max-w-[40vw] h-[420px]  bg-headerBg  border-transparent gap-2 px-4 py-5 justify-center items-center flex flex-col space-y-6">
+        <DialogContent className="w-[80%]  bg-headerBg  border-transparent gap-2 px-4 py-5 justify-center items-center flex flex-col space-y-6">
           <DialogHeader className="flex justify-start items-center flex-col space-y-1">
             <DialogTitle className="text-white text-3xl ">
               Upgrade to Premium

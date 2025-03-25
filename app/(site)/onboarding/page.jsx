@@ -22,13 +22,14 @@ import useAuthToken from "@hooks/useAuthToken";
 import { useUserStore } from "@/store/userStore";
 import { useRouter } from "next/navigation";
 import { cn } from "@lib/utils";
+import { toast } from "sonner";
 
 const formSchema = z.object({
   description: z.string().min(10, "Description must be at least 10 characters"),
   keywords: z.string(),
 });
 
-const Page = ({ className="" }) => {
+const Page = ({ className = "" }) => {
   const token = useAuthToken();
   const [keywords, setKeywords] = useState([]);
   const { user } = useUserStore();
@@ -48,7 +49,6 @@ const Page = ({ className="" }) => {
       form.setValue("keywords", ""); // Correct field name
     }
   };
-  
 
   useEffect(() => {
     if (user?.onboarding) {
@@ -67,27 +67,28 @@ const Page = ({ className="" }) => {
       </div>
     );
 
-    const onSubmit = async (data) => {
-      try {
-        await axios.post(
-          "https://api.bot.thesquirrel.site/user/welcome",
-          { description: data.description, keywords }, // Ensure correct structure
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-    
-        form.reset(); // Reset form after success
-        setKeywords([]); // Clear keywords array
-        router.push("/dashboard");
-      } catch (error) {
-        console.error("Error:", error.response?.data || error.message);
-      }
-    };
-    
+  const onSubmit = async (data) => {
+    try {
+      await axios.post(
+        "https://api.bot.thesquirrel.site/user/welcome",
+        { description: data.description, keywords }, // Ensure correct structure
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      form.reset(); // Reset form after success
+      setKeywords([]); // Clear keywords array
+      router.push("/dashboard");
+    } catch (error) {
+      toast.error("Error on the Onboarding Page");
+      console.error("Error:", error.response?.data || error.message);
+    }
+  };
+
   return (
     <div
       className={cn(

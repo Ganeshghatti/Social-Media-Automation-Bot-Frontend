@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@components/ui/avatar";
 import { Button } from "@components/ui/button";
@@ -12,11 +12,9 @@ import useAuthToken from "@hooks/useAuthToken";
 const Page = () => {
   const token = useAuthToken();
 
+  const [userData, setUserData] = useState(null);
 
-  const [userData, setUserData] = React.useState(null);
-
-
-  React.useEffect(() => {
+  useEffect(() => {
     const fetchProfile = async () => {
       try {
         const response = await axios.get(

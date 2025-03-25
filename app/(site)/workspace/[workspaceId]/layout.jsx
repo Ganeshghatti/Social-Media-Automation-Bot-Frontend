@@ -9,9 +9,9 @@ const WorkspaceLayout = ({ children }) => {
   const { workspaceId } = useParams();
   const token = useAuthToken();
   return (
-    <div className="flex  bg-navBg w-full">
+    <div className="flex  min-h-screen bg-navBg w-full">
       <Sidebar workspaceId={workspaceId} token={token} />
-      {children}
+      <div className="flex-1  h-screen">{children}</div>
     </div>
   );
 };

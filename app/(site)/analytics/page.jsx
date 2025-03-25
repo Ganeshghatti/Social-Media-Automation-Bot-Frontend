@@ -2,6 +2,7 @@
 import { useUserStore } from "@/store/userStore";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 const Page = () => {
   const { user } = useUserStore();

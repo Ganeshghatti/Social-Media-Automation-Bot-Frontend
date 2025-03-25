@@ -39,6 +39,7 @@ const SocialMediaAccount = () => {
         }
       }
     } catch (error) {
+      toast.error("Failed to get all twitter posts");
       console.log("Error ", error);
       setError(error);
     } finally {
