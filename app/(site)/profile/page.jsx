@@ -8,11 +8,13 @@ import { Label } from "@components/ui/label";
 
 import axios from "axios";
 import useAuthToken from "@hooks/useAuthToken";
+import { CustomLoader } from "@/components/global/CustomLoader";
 
 const Page = () => {
   const token = useAuthToken();
 
   const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -29,6 +31,8 @@ const Page = () => {
         console.log(response.data.data);
       } catch (error) {
         console.error("Error fetching profile:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -37,15 +41,17 @@ const Page = () => {
     }
   }, [token]);
 
-  if (!userData) {
-    return <div>Loading...</div>;
+
+
+if (loading || !userData) {
+    return <CustomLoader />;
   }
 
   return (
-    <div className="min-h-screen flex items-center p-8 bg-gray-50">
-      <Card className="max-w-2xl mx-auto">
-        <CardHeader className="text-center">
-          <CardTitle>Profile</CardTitle>
+    <div className="min-h-screen flex items-center p-8 bg-navBg">
+      <Card className="max-w-2xl mx-auto bg-headerBg">
+        <CardHeader className="text-center text-white">
+          <CardTitle >Profile</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col items-center space-y-6">
@@ -56,29 +62,29 @@ const Page = () => {
             </Avatar>
 
             <div className="space-y-2 text-center">
-              <h2 className="text-2xl font-bold">{userData?.username}</h2>
-              <p className="text-gray-500">{userData?.email}</p>
+              <h2 className="text-2xl text-white font-bold">{userData?.username}</h2>
+              <p className="text-white">{userData?.email}</p>
             </div>
 
             <div className="w-full space-y-4">
               <div>
-                <Label>Bio</Label>
-                <p className="text-gray-600">
+                <Label className="text-white/80">Bio</Label>
+                <p className="text-white">
                   A passionate developer who loves to code.
                 </p>
               </div>
               <div>
-                <Label>Phone</Label>
-                <p className="text-gray-600 capitalize">{userData.phone}</p>
+                <Label  className="text-white/80">Phone</Label>
+                <p className="text-white">{userData.phone}</p>
               </div>
               <div>
-                <Label>Role</Label>
-                <p className="text-gray-600 capitalize">{userData.role}</p>
+                <Label className="text-white/80">Role</Label>
+                <p className="text-white">{userData.role}</p>
               </div>
 
               <div>
-                <Label>Subscription</Label>
-                <p className="text-gray-600 capitalize">
+                <Label className="text-white/80">Subscription</Label>
+                <p className="text-white">
                   {userData.subscription}
                 </p>
               </div>

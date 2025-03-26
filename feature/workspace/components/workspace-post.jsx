@@ -27,6 +27,7 @@ import { Switch } from "@/components/ui/switch";
 
 import axios from "axios";
 import useAuthToken from "@/hooks/useAuthToken";
+import { toast } from "sonner";
 
 const WorkSpacePost = ({ accountId, workSpaceId }) => {
   const [postId, setPostId] = useState();
@@ -103,6 +104,8 @@ const WorkSpacePost = ({ accountId, workSpaceId }) => {
 
             console.log(`File ${i + 1} upload status:`, uploadResult.status);
           } catch (uploadError) {
+                  toast.error("Error in uploading file");
+            
             console.error(`Error uploading file ${i + 1}:`, uploadError);
             throw uploadError;
           }
@@ -144,6 +147,8 @@ const WorkSpacePost = ({ accountId, workSpaceId }) => {
         );
       }
     } catch (error) {
+      toast.error("Error in creating post");
+
       console.error("Detailed error:", {
         message: error.message,
         response: error.response?.data,

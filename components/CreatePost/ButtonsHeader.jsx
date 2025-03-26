@@ -16,6 +16,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DateTimePicker } from "@components/global/DateTimePicker";
 import { SidebarTrigger } from "@components/ui/sidebar";
+import { toast } from "sonner";
 
 export const ButtonsHeader = ({
   isEditingDraft,
@@ -83,13 +84,13 @@ export const ButtonsHeader = ({
 
       setIsDialogOpen(false);
     } catch (error) {
+      toast.error("Submission Failed");
       console.error("Submission error:", error);
     }
   };
 
   return (
     <div className="w-full px-8 py-3 gap-3 flex justify-center md:justify-end">
-      <SidebarTrigger className="text-white" />
       <CustomButtonHeader
         buttonColor={"#FF9900"}
         activeButtons={activeButtons}

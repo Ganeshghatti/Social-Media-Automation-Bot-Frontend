@@ -1,4 +1,5 @@
 "use client";
+import { CustomLoader } from "@/components/global/CustomLoader";
 import useAuthToken from "@hooks/useAuthToken";
 import axios from "axios";
 import { useParams } from "next/navigation";
@@ -50,6 +51,10 @@ const SocialMediaAccount = () => {
   useEffect(() => {
     getAllPostsTwitter();
   }, [socialMediaAccount, workspaceId, socialMediaAccountId, token]);
+
+    if (loading) {
+      return <CustomLoader />;
+    }
 
   return (
     <main

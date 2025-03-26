@@ -1,4 +1,5 @@
 import axios from "axios";
+import { toast } from "sonner";
 
 export const connectTwitter = async (workspaceId, router, token) => {
     try {
@@ -13,6 +14,7 @@ export const connectTwitter = async (workspaceId, router, token) => {
         );
         router.push(response.data.data);
     } catch (error) {
+        toast.error("Error in connecting twitter");
         console.error("Error connecting Twitter:", error);
     }
 };
@@ -29,6 +31,8 @@ export const disconnectTwitter = async (workspaceId, userId, token) => {
             }
         );
     } catch (error) {
+        toast.error("Error in disconnecting twitter");
+
         console.error("Error disconnecting Twitter:", error);
     }
 };
@@ -46,6 +50,8 @@ export const connectLinkedin = async (workspaceId, router, token) => {
         );
         router.push(response.data.data);
     } catch (error) {
+        toast.error("Error in connecting linkedin");
+
         console.error("Error connecting linked in: ", error);
     }
 };
@@ -62,6 +68,8 @@ export const disconnectLinkedIn = async (workspaceId, userId, token) => {
             }
         );
     } catch (error) {
+        toast.error("Error in disconnecting Linkedin");
+
         console.error("Error disconnecting Linkedin:", error);
     }
 };

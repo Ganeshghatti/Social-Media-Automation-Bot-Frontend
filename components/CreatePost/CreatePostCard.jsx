@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { useUserStore } from "@/store/userStore";
+import { Ellipsis, Images, Plus, Search, Sparkles, Upload } from "lucide-react";
 
 export const CreatePostCard = ({
   value,
@@ -21,9 +22,7 @@ export const CreatePostCard = ({
 }) => {
   const { user, setUser } = useUserStore();
   return (
-    <Card
-    className="w-full sm:w-full md:w-[60vw] lg:w-[70vw] xl:w-[55vw] flex flex-row gap-4 bg-transparent h-full max-h-[240px] border-transparent mx-auto min-w-[240px] max-w-[1440px]"
-  >
+    <Card className="w-full sm:w-full md:w-[60vw] lg:w-[70vw] xl:w-[55vw] flex flex-row gap-4 bg-transparent h-full max-h-[240px] border-transparent mx-auto min-w-[240px] max-w-[1440px]">
       {/* Thread/Line Container */}
 
       <CardTitle className="p-0 justify-between   flex gap-4 h-full items-center">
@@ -38,9 +37,9 @@ export const CreatePostCard = ({
                   ? user?.profilePicture
                   : "/default-profile.jpg"
               }
-              height={50}
-              width={50}
-              className="rounded-full"
+              height={40}
+              width={40}
+              className="rounded-full object-contain"
             />
             <div className="bg-[#FFFFFF33] absolute left-1/2 h-[90%] w-[1px]" />
           </div>
@@ -51,13 +50,7 @@ export const CreatePostCard = ({
           <h2 className="font-semibold text-xl text-white">{user?.username}</h2>
 
           <div className="w-8 h-8 bg-headerBg rounded-sm cursor-pointer flex justify-center items-center">
-            <Image
-              src="/ThreeDots.png"
-              alt="More"
-              width={20}
-              height={20}
-              className="h-5 w-5 object-contain"
-            />
+            <Ellipsis className="h-5 w-5 object-contain text-white" />
           </div>
         </div>
         <CardContent className="w-full p-0 justify-start items-start flex  ">
@@ -72,64 +65,31 @@ export const CreatePostCard = ({
             }}
             className="w-8 h-8 rounded-sm flex bg-headerBg justify-center items-center cursor-pointer"
           >
-            <Image
-              src={"/AddSquirrel.png"}
-              alt="AddSquirrel "
-              height={200}
-              width={200}
-              className="object-contain h-5 w-5"
-            />
+            <Plus className="object-contain h-5 w-5 text-white" />
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger>
               <div className="w-8 h-8 flex bg-headerBg rounded-sm justify-center items-center cursor-pointer">
-                <Image
-                  src={"/SquireelGallery.png"}
-                  alt="SquireelGallery"
-                  height={200}
-                  width={200}
-                  className="object-contain h-5 w-5"
-                />
+                <Images className="object-contain h-5 w-5 text-white" />
               </div>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="rounded-lg px-2 py-2 min-w-[140px] flex flex-col gap-2 bg-headerBg border-[0.5px] border-[#ffffff32]">
               <div className="flex gap-3 bg-[#2C3032] rounded-md hover:bg-[#2C3032] hover:opacity-100 px-2 justify-between py-1 items-center cursor-pointer">
                 <span className="text-white text-sm">User Upload</span>
                 <div className="flex items-center justify-center bg-headerBg px-1 py-1 rounded-md">
-                  <Image
-                    alt="Image"
-                    src={"/Upload.png"}
-                    height={20}
-                    quality={100}
-                    width={20}
-                    className="object-contain h-5 w-5"
-                  />
+                  <Upload className="object-contain h-5 w-5 text-white" />
                 </div>
               </div>
               <div className="flex gap-3 bg-[#2C3032] rounded-md hover:bg-[#2C3032] hover:opacity-100 px-2 justify-between py-1 items-center cursor-pointer">
                 <span className="text-white text-sm">Ai Generated</span>
                 <div className="flex items-center justify-center bg-headerBg px-1 py-1 rounded-md">
-                  {/* <Image
-                  alt="Image"
-                  src={"/Gemini.png"}
-                  height={20}
-                  quality={100}
-                  width={20}
-                  className="object-contain h-5 w-5"
-                /> */}
+                  <Sparkles className="object-contain text-purple-900 h-5 w-5" />
                 </div>
               </div>
               <div className="flex gap-3 bg-[#2C3032] rounded-md hover:bg-[#2C3032] hover:opacity-100 px-2 justify-between py-1 items-center cursor-pointer">
                 <span className="text-white text-sm">Google Search</span>
                 <div className="flex items-center justify-center bg-headerBg px-1 py-1 rounded-md">
-                  {/* <Image
-                  alt="Image"
-                  src={"/Search.png"}
-                  height={20}
-                  quality={100}
-                  width={20}
-                  className="object-contain h-5 w-5"
-                /> */}
+                  <Search className="object-contain h-5 w-5 text-white" />
                 </div>
               </div>
             </DropdownMenuContent>

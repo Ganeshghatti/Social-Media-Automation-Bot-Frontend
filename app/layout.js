@@ -29,11 +29,9 @@ export default function RootLayout({ children }) {
             gtag('config', 'G-TNSWCQXZTN');
           `}
         </Script>
-        <SidebarProvider>
-          <div className="flex flex-col w-screen">
-            {children}
-          </div>
-        </SidebarProvider>
+        <div className="flex flex-col w-screen">
+          {children}
+        </div>
         <Toaster />
 
       </body>

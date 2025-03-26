@@ -15,6 +15,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import axios from "axios";
+import { useState } from "react";
+import { EyeIcon, EyeOffIcon } from "lucide-react";
+import Link from "next/link";
 
 export function RegisterForm({ className, ...props }) {
   const formSchema = z.object({
@@ -57,11 +60,13 @@ export function RegisterForm({ className, ...props }) {
     }
   }
 
+  const [showPassword, setShowPassword] = useState(false);
+
   return (
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className={cn("flex flex-col gap-6", className)}
+        className={cn("flex flex-col gap-10", className)}
       >
         <div className="flex flex-col items-center gap-2 text-center">
           <h1 className="text-2xl font-bold text-white">Create your account</h1>
@@ -84,8 +89,7 @@ export function RegisterForm({ className, ...props }) {
                     placeholder="Enter Your Username"
                     {...field}
                     value={field.value ?? ""}
-                    required
-                    className="bg-[#1A1D1F] border-[0.5px] border-[#D8DADC]/50 rounded-[10px]"
+                    className="bg-[#1A1D1F] border-[0.5px] border-[#D8DADC]/50 rounded-[10px] text-white"
                   />
                 </FormControl>
                 <FormMessage />
@@ -105,10 +109,9 @@ export function RegisterForm({ className, ...props }) {
                     id="email"
                     type="email"
                     placeholder="Enter Your Email"
-                    className="bg-[#1A1D1F] border-[0.5px] border-[#D8DADC]/50 rounded-[10px]"
+                    className="bg-[#1A1D1F] border-[0.5px] border-[#D8DADC]/50 rounded-[10px] text-white"
                     {...field}
                     value={field.value ?? ""}
-                    required
                   />
                 </FormControl>
                 <FormMessage />
@@ -129,8 +132,7 @@ export function RegisterForm({ className, ...props }) {
                     placeholder="Enter Your Phone"
                     {...field}
                     value={field.value ?? ""}
-                    required
-                    className="bg-[#1A1D1F] border-[0.5px] border-[#D8DADC]/50 rounded-[10px]"
+                    className="bg-[#1A1D1F] border-[0.5px] border-[#D8DADC]/50 rounded-[10px] text-white"
                   />
                 </FormControl>
                 <FormMessage />
@@ -146,15 +148,27 @@ export function RegisterForm({ className, ...props }) {
                   Password
                 </Label>
                 <FormControl>
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="Enter Your Password"
-                    {...field}
-                    value={field.value ?? ""}
-                    required
-                    className="bg-[#1A1D1F] border-[0.5px] border-[#D8DADC]/50 rounded-[10px]"
-                  />
+                  <div className="relative">
+                    <Input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Enter Your Password"
+                      {...field}
+                      value={field.value ?? ""}
+                      className="bg-[#1A1D1F] border-[0.5px] border-[#D8DADC]/50 rounded-[10px] text-white"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
+                    >
+                      {showPassword ? (
+                        <EyeOffIcon className="text-primary" size={18} />
+                      ) : (
+                        <EyeIcon className="text-white" size={18} />
+                      )}
+                    </button>
+                  </div>
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -165,13 +179,13 @@ export function RegisterForm({ className, ...props }) {
           </Button>
         </div>
         <div className="text-center text-sm text-white/50">
-          Already have an account?{" "}
-          <a
-            href="/login"
-            className="underline underline-offset-4 text-primary"
+          Already have an account?{"  "}
+          <Link
+            href="/auth/login"
+            className="underline underline-offset-4 pl-1 text-primary"
           >
             Login
-          </a>
+          </Link>
         </div>
       </form>
     </Form>

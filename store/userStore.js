@@ -1,4 +1,5 @@
 import axios from "axios";
+import { toast } from "sonner";
 import { create } from "zustand";
 
 export const useUserStore = create((set) => ({
@@ -15,8 +16,15 @@ export const useUserStore = create((set) => ({
             });
             set({ user: response.data.data });
         } catch (error) {
+            toast.error("Error in fetch user");
+
             console.error("Failed to fetch user:", error);
             set({ user: null }); // Reset user if error
         }
+    },
+    
+    logout: () => {
+        localStorage.removeItem("token"); // Remove token from storage
+        set({ user: null }); // Clear user state
     },
 }));

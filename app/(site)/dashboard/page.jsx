@@ -1,20 +1,28 @@
-'use client'
+"use client";
 import { useUserStore } from "@/store/userStore";
+import { CustomLoader } from "@components/global/CustomLoader";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const Page = () => {
   const { user } = useUserStore();
   const router = useRouter();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (user === null) return; // Wait for user to load
 
     if (!user?.onboarding) {
       router.replace("/onboarding");
+    } else {
+      setLoading(false);
     }
   }, [user, router]);
+
+  // // Ensure the spinner only shows while user is null or being processed
+  // if (loading || user === null) {
+  //   return <CustomLoader />;
+  // }
 
   return (
     <main className="flex-1 flex flex-col space-y-3  items-center justify-center h-screen overflow-y-auto">

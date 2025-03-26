@@ -14,6 +14,7 @@ import { notFound, useParams, useRouter } from "next/navigation";
 import { Form } from "@components/ui/form";
 import axios from "axios";
 import { DateTime } from "luxon"; // Install: npm install luxon
+import { CustomLoader } from "@/components/global/CustomLoader";
 
 const WorkspacePage = () => {
   const { workspaceId } = useParams();
@@ -390,7 +391,7 @@ const WorkspacePage = () => {
         setDraftPosts
       );
     } catch (error) {
-      toast.error("Failed to make draft post");
+      toast.error("Failed to edit draft post");
 
       console.error("Error making draft post:", error);
     }
@@ -427,15 +428,13 @@ const WorkspacePage = () => {
     }
   }, [loading, singleWorkspace]);
 
-  if (loading)
-    return (
-      <main className="flex-1 flex flex-col h-screen overflow-y-auto">
-        <h1 className="text-2xl">Loading...</h1>
-      </main>
-    );
+  if (loading) {
+    return <CustomLoader />;
+  }
 
   return (
-    <main className="h-screen flex  flex-col space-y-3 items-center justify-center overflow-y-auto w-full">
+    <main className="h-screen flex  flex-col space-y-3 items-center
+     justify-center overflow-y-auto w-full">
       <CreatePostHeader />
       <ButtonsHeader
         isEditingDraft={isEditingDraft}

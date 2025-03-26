@@ -65,6 +65,7 @@ export const DraftPosts = ({
       );
       toast("Draft Post Has been deleted");
     } catch (error) {
+      toast.error("Failed to delete draft post")
       console.error("Error deleting draft:", error);
       SingleWorkspaceDraftData(
         workspaceId,

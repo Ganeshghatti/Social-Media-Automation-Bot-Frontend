@@ -1,3 +1,4 @@
+import { useUserStore } from "@/store/userStore";
 import { Button } from "@components/ui/button";
 import {
   Dialog,
@@ -6,12 +7,19 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@components/ui/dropdown-menu";
+import useAuthToken from "@hooks/useAuthToken";
 import { DialogDescription } from "@radix-ui/react-dialog";
-import { Diamond, LucideDiamond } from "lucide-react";
+import { Bell, Diamond, LucideDiamond, Settings } from "lucide-react";
 import Image from "next/image";
 import React from "react";
 
 export const CreatePostHeader = () => {
+  const { logout } = useUserStore();
   return (
     <div className="w-full px-8 py-3 gap-3 flex justify-end bg-[#1A1D1F] z-10">
       <Dialog>
@@ -50,30 +58,29 @@ export const CreatePostHeader = () => {
       </Dialog>
 
       <div className="flex items-center p-2 h-11 w-11 rounded-full cursor-pointer bg-[#111315] justify-center">
-        <Image
-          alt="Setting "
-          src={"/settings.png"}
-          height={22}
-          width={22}
-          className="object-contain h-full w-full"
-        />
+        <DropdownMenu>
+          <DropdownMenuTrigger>
+            <Image
+              alt="Profile"
+              src={"/default-profile.jpg"}
+              height={48}
+              width={48}
+              className="object-contain"
+            />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="bg-transparent p-0 border-transparent">
+            <div
+              onClick={() => {
+                logout();
+                window.location.href = "/auth/login"; // Redirect to login page
+              }}
+              className="flex gap-3 bg-[#2C3032] p-3 rounded-md hover:bg-[#2C3032] px-2 justify-between py-1 items-center cursor-pointer"
+            >
+              <span className="text-white text-sm">Logout</span>
+            </div>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
-      <div className="flex items-center p-2 h-11 w-11 rounded-full cursor-pointer bg-[#111315] justify-center">
-        <Image
-          alt="Notification"
-          src={"/Notification.png"}
-          height={22}
-          width={22}
-          className="object-contain h-full w-full"
-        />
-      </div>
-      <Image
-        alt="Profile"
-        src={"/profile.png"}
-        height={48}
-        width={48}
-        className="object-contain"
-      />
     </div>
   );
 };

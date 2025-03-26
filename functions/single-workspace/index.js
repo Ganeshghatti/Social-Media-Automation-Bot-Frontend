@@ -1,5 +1,6 @@
+import { toast } from "sonner";
 
-export const deleteWorkspace = async (workspaceId,router,token) => {
+export const deleteWorkspace = async (workspaceId, router, token) => {
     if (!token) return;
 
     try {
@@ -17,6 +18,8 @@ export const deleteWorkspace = async (workspaceId,router,token) => {
             router.push("/workspaces");
         }
     } catch (error) {
+        toast.error("Error in deleting wprkspace");
+
         console.error("Error deleting workspace:", error);
     }
 };

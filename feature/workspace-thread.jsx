@@ -19,6 +19,7 @@ import axios from "axios";
 import { Switch } from "@components/ui/switch"; // Assuming you have a Switch component
 import { workSpaceThreadSchema } from "@/schema/index";
 import useAuthToken from "@hooks/useAuthToken";
+import { toast } from "sonner";
 
 const WorkSpaceThread = ({ accountId, workSpaceId }) => {
   const token = useAuthToken();
@@ -125,6 +126,7 @@ const WorkSpaceThread = ({ accountId, workSpaceId }) => {
 
                   console.log(`File upload status:`, uploadResult.status);
                 } catch (uploadError) {
+                  toast.error("Error in uploading File")
                   console.error(`Error uploading file:`, uploadError);
                   throw uploadError;
                 }
@@ -152,6 +154,8 @@ const WorkSpaceThread = ({ accountId, workSpaceId }) => {
 
       console.log("Post created successfully:", finalResponse.data);
     } catch (error) {
+      toast.error("Error in posting data")
+
       console.error("Error posting data", error);
     }
   };

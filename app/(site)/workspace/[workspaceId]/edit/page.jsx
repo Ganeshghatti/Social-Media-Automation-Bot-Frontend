@@ -13,7 +13,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { X } from "lucide-react";
+import { Upload, X } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -33,6 +33,7 @@ import Image from "next/image";
 import { Sidebar_Card } from "@components/single-workspace/Sidebar_Card";
 import { disconnectLinkedIn, disconnectTwitter } from "@functions/social";
 import { useUserStore } from "@/store/userStore";
+import { CustomLoader } from "@components/global/CustomLoader";
 const EditWorkspace = () => {
   const [loading, setLoading] = useState(false);
   const [singleWorkspace, setSingleWorkspace] = useState(null);
@@ -53,6 +54,8 @@ const EditWorkspace = () => {
     }
     if (!user?.onboarding) {
       router.replace("/onboarding");
+    }else{
+      setLoading(false)
     }
   }, [user, router]);
 
@@ -78,14 +81,12 @@ const EditWorkspace = () => {
   const keywords = form.watch("keywords");
 
   const handleFileChange = (e) => {
-    console.log("File input changed"); // Debugging
     const file = e.target.files[0];
     if (!file) {
       console.log("No file selected");
       return;
     }
 
-    console.log("File selected:", file.name);
 
     if (!file.type.startsWith("image/")) {
       alert("Please upload an image file");
@@ -187,6 +188,7 @@ const EditWorkspace = () => {
 
       // router.push("/workspaces");
     } catch (error) {
+      toast.error(`Failed to edit workspace`);
       console.error("Error:", error);
     } finally {
       setLoading(false);
@@ -211,13 +213,18 @@ const EditWorkspace = () => {
     );
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) {
+    return <CustomLoader />;
+  }
 
   return (
-    <div className="flex items-start  gap-4 justify-start min-h-screen w-full flex-col ">
+    <div className="flex items-start  gap-4 justify-start min-h-screen bg-navBg w-full flex-col ">
       <CreatePostHeader />
 
-      <div className="flex gap-6 flex-col w-full mx-auto py-3 max-w-[80%] xl:max-w-[70%]">
+      <div
+        className="flex gap-6 flex-col w-full
+       mx-auto py-3 max-w-[90%] sm:max-w-[90%] md:max-w-[80%] lg:max-w-[80%] xl:max-w-[60%] 2xl:max-w-[40%]"
+      >
         <h1 className="text-2xl md:text-4xl font-semibold text-white text-center md:text-left">
           Edit Workspace
         </h1>
@@ -225,8 +232,7 @@ const EditWorkspace = () => {
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="w-full rounded-xl bg-headerBg 
-            border-[#ffffff30] px-4 md:px-6 py-6 flex flex-col gap-6"
+            className="w-full rounded-xl  border-[#ffffff30] bg-headerBg px-4 md:px-6 py-6 flex flex-col gap-6"
           >
             <div className="w-full flex flex-col lg:flex-row flex-wrap gap-4 flex-1">
               <FormField
@@ -236,7 +242,7 @@ const EditWorkspace = () => {
                   <FormItem className="flex-1 w-full bg-navBg text-white py-2 border rounded-[20px] border-[#ffffff30] px-3">
                     <FormControl>
                       <Input
-                        className="bg-transparent border-transparent focus:border-transparent focus:outline-none focus:ring-0 text-lg md:text-xl placeholder:text-lg"
+                        className="bg-transparent border-transparent focus:border-transparent focus:outline-none focus:ring-0 text-base md:text-base placeholder:text-base"
                         placeholder="Workspace name"
                         {...field}
                         value={field.value ?? ""}
@@ -259,7 +265,7 @@ const EditWorkspace = () => {
                       }}
                       value={field.value}
                     >
-                      <SelectTrigger className="bg-transparent border-transparent focus:outline-none focus:ring-0 flex-1 text-lg md:text-xl text-[#ffffff60]">
+                      <SelectTrigger className="bg-transparent border-transparent focus:outline-none focus:ring-0 flex-1 text-base md:text-xl text-[#ffffff60]">
                         <SelectValue
                           placeholder="Timezone = (08:00)"
                           className="bg-transparent"
@@ -269,7 +275,8 @@ const EditWorkspace = () => {
                         {TIMEZONES.map((time_zone, i) => (
                           <SelectItem
                             key={i}
-                            className="cursor-pointer bg-navBg hover:bg-opacity-90 focus:bg-navBg focus:text-white"
+                            className="cursor-pointer bg-navBg hover:bg-opacity-90
+                           focus:bg-navBg focus:text-white text-base"
                             value={time_zone.name}
                           >
                             {time_zone.name} ({time_zone.offset})
@@ -307,15 +314,16 @@ const EditWorkspace = () => {
                           />
                         </div>
                       ) : (
-                        <Image
-                          src="/Upload-Workspace.png"
-                          alt="Upload Image"
-                          height={24}
-                          width={24}
-                          className="h-6 w-6 object-contain"
-                        />
+                        // <Image
+                        //   src="/Upload-Workspace.png"
+                        //   alt="Upload Image"
+                        //   height={24}
+                        //   width={24}
+                        //   className="h-6 w-6 object-contain"
+                        // />
+                        <Upload className="h-6 w-6 object-contain text-white" />
                       )}
-                      <span className="text-lg md:text-xl text-white opacity-50">
+                      <span className="text-base md:text-base text-white opacity-50">
                         {iconPreview ? "Change Image" : "Upload Image"}
                       </span>
                     </div>
@@ -328,10 +336,15 @@ const EditWorkspace = () => {
               control={form.control}
               name="description"
               render={({ field }) => (
-                <FormItem className="flex-1 bg-navBg text-white py-2 border rounded-[20px] border-[#ffffff30] px-3">
+                <FormItem
+                  className="flex-1 bg-navBg text-white py-2
+                border rounded-[20px] border-[#ffffff30] px-3"
+                >
                   <FormControl>
                     <Textarea
-                      className="bg-navBg text-white border-transparent focus:border-transparent focus:outline-none focus:ring-0 text-lg md:text-xl placeholder:text-lg rounded-xl py-4"
+                      className="bg-navBg text-white border-transparent
+                      focus:border-transparent focus:outline-none focus:ring-0 text-base
+                       md:text-base placeholder:text-base rounded-xl py-2"
                       rows={6}
                       placeholder="Enter Description"
                       {...field}
@@ -344,12 +357,17 @@ const EditWorkspace = () => {
               control={form.control}
               name="keywords"
               render={({ field }) => (
-                <FormItem className="flex-1 bg-navBg text-white py-2 border rounded-[20px] border-[#ffffff30] px-3">
+                <FormItem
+                  className="flex-1 bg-navBg text-white py-2 border
+                 rounded-[20px] border-[#ffffff30] px-3"
+                >
                   <FormControl>
                     <Input
                       placeholder="Add keyword"
                       value={keywordInput}
-                      className="bg-navBg text-white border-transparent focus:border-transparent focus:outline-none text-lg md:text-xl placeholder:text-lg rounded-xl py-2"
+                      className="bg-navBg text-white border-transparent
+                     focus:border-transparent focus:outline-none text-base 
+                     md:text-base placeholder:text-base rounded-xl py-2"
                       onChange={(e) => setKeywordInput(e.target.value)}
                       onKeyDown={(e) => {
                         if (e.key === "Enter") {

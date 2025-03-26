@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -30,17 +30,23 @@ import useAuthToken from "@hooks/useAuthToken";
 import { CreatePostHeader } from "@components/CreatePost/CreatePostHeader";
 import { TIMEZONES } from "@constants/create-workspace/index";
 import Image from "next/image";
+import { toast } from "sonner";
+import { CustomLoader } from "@/components/global/CustomLoader";
 const Page = () => {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true); // Set to true initially
   const [keywordInput, setKeywordInput] = useState("");
   const [iconPreview, setIconPreview] = useState(null);
   const [selectedTimezone, setSelectedTimezone] = useState("");
   const router = useRouter();
   const token = useAuthToken() || "";
   const fileInputRef = useRef(null);
-  const handleDivClick = () => {
-    fileInputRef.current?.click(); // Trigger the hidden input
-  };
+
+  useEffect(() => {
+    // Simulate API or initial setup delay
+    setTimeout(() => {
+      setLoading(false);
+    }, 1000); // Adjust time as needed
+  }, []);
 
   const formSchema = z.object({
     name: z.string().min(1, "Name is required"),
@@ -156,11 +162,7 @@ const Page = () => {
       router.push("/workspaces");
     } catch (error) {
       console.error("Error details:", error.response?.data || error.message);
-      alert(
-        `Error creating workspace: ${
-          error.response?.data?.message || error.message
-        }`
-      );
+      toast.error(`Error creating workspace`);
     } finally {
       setLoading(false);
     }
@@ -185,14 +187,14 @@ const Page = () => {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <CustomLoader />;
   }
 
   return (
     <div className="flex items-start gap-4 justify-start bg-navBg min-h-screen w-full flex-col px-4 md:px-8">
       <CreatePostHeader />
 
-      <div className="flex gap-6 flex-col w-full mx-auto py-3 md:max-w-[90%] lg:max-w-[90%] xl:max-w-[60%]">
+      <div className="flex gap-6 flex-col w-full mx-auto py-3 max-w-[90%] sm:max-w-[90%] md:max-w-[80%] lg:max-w-[80%] xl:max-w-[60%] 2xl:max-w-[40%]">
         <h1 className="text-3xl md:text-4xl font-semibold text-white text-center md:text-left">
           Create Workspace
         </h1>
@@ -202,17 +204,16 @@ const Page = () => {
             onSubmit={form.handleSubmit(onSubmit)}
             className="w-full rounded-xl bg-headerBg border-[#ffffff30] px-4 md:px-6 py-6 flex flex-col gap-6"
           >
-            {/* First Row */}
             <div className="w-full flex flex-col lg:flex-row flex-wrap gap-4 flex-1">
               {/* Workspace Name Input */}
               <FormField
                 control={form.control}
                 name="name"
                 render={({ field }) => (
-                  <FormItem className="flex-1 w-full bg-navBg text-white py-2 border rounded-[20px] border-[#ffffff30] px-3">
+                  <FormItem className="flex-1 w-full min-h-[48px] bg-navBg text-white border rounded-[20px] border-[#ffffff30] px-3">
                     <FormControl>
                       <Input
-                        className="bg-transparent border-transparent focus:border-transparent focus:outline-none focus:ring-0 text-lg md:text-xl placeholder:text-lg"
+                        className="bg-transparent border-transparent focus:border-transparent focus:outline-none focus:ring-0 text-base md:text-base placeholder:text-base h-full py-2"
                         placeholder="Workspace name"
                         {...field}
                         value={field.value ?? ""}
@@ -228,7 +229,7 @@ const Page = () => {
                 control={form.control}
                 name="timezone"
                 render={({ field }) => (
-                  <div className="flex-1 w-full flex items-center justify-center bg-navBg text-white py-2 border rounded-[20px] border-[#ffffff30] px-3">
+                  <div className="flex-1 w-full flex items-center justify-center bg-navBg text-white border rounded-[20px] border-[#ffffff30] px-3 min-h-[48px]">
                     <Select
                       onValueChange={(value) => {
                         field.onChange(value);
@@ -236,17 +237,14 @@ const Page = () => {
                       }}
                       value={field.value}
                     >
-                      <SelectTrigger className="bg-transparent border-transparent focus:outline-none focus:ring-0 flex-1 text-lg md:text-xl text-[#ffffff60]">
-                        <SelectValue
-                          placeholder="Timezone = (08:00)"
-                          className="bg-transparent"
-                        />
+                      <SelectTrigger className="bg-transparent border-transparent focus:outline-none focus:ring-0 flex-1 text-base md:text-xl text-[#ffffff60] min-h-[48px]">
+                        <SelectValue placeholder="Timezone = (08:00)" />
                       </SelectTrigger>
                       <SelectContent className="bg-navBg text-white">
                         {TIMEZONES.map((time_zone, i) => (
                           <SelectItem
                             key={i}
-                            className="cursor-pointer bg-navBg hover:bg-opacity-90 focus:bg-navBg focus:text-white"
+                            className="cursor-pointer bg-navBg hover:bg-opacity-90 focus:bg-navBg focus:text-white text-base"
                             value={time_zone.name}
                           >
                             {time_zone.name} ({time_zone.offset})
@@ -257,6 +255,8 @@ const Page = () => {
                   </div>
                 )}
               />
+
+              {/* Image Upload */}
               <FormField
                 control={form.control}
                 name="icon"
@@ -264,7 +264,7 @@ const Page = () => {
                   <div className="flex-1 justify-center">
                     <div
                       onClick={() => fileInputRef.current.click()}
-                      className="flex items-center gap-3 cursor-pointer bg-navBg text-white py-3 border rounded-[20px] border-[#ffffff30] px-4 w-full md:w-auto"
+                      className="flex items-center gap-3 cursor-pointer bg-navBg text-white border rounded-[20px] border-[#ffffff30] px-4 w-full md:w-auto min-h-[48px] py-2"
                     >
                       <Input
                         type="file"
@@ -292,7 +292,7 @@ const Page = () => {
                           className="h-6 w-6 object-contain"
                         />
                       )}
-                      <span className="text-lg md:text-xl text-white opacity-50">
+                      <span className="text-base md:text-base text-white opacity-50">
                         {iconPreview ? "Change Image" : "Upload Image"}
                       </span>
                     </div>
@@ -308,10 +308,15 @@ const Page = () => {
               control={form.control}
               name="description"
               render={({ field }) => (
-                <FormItem className="flex-1 bg-navBg text-white py-2 border rounded-[20px] border-[#ffffff30] px-3">
+                <FormItem
+                  className="flex-1 bg-navBg text-white py-2
+                 border rounded-[20px] border-[#ffffff30] px-3"
+                >
                   <FormControl>
                     <Textarea
-                      className="bg-navBg text-white border-transparent focus:border-transparent focus:outline-none focus:ring-0 text-lg md:text-xl placeholder:text-lg rounded-xl py-4"
+                      className="bg-navBg text-white border-transparent
+                       focus:border-transparent focus:outline-none focus:ring-0 text-base
+                        md:text-base placeholder:text-base rounded-xl py-2"
                       rows={6}
                       placeholder="Enter Description"
                       {...field}
@@ -326,12 +331,14 @@ const Page = () => {
               control={form.control}
               name="keywords"
               render={({ field }) => (
-                <FormItem className="flex-1 bg-navBg text-white py-2 border rounded-[20px] border-[#ffffff30] px-3">
+                <FormItem className="flex-1 bg-navBg text-white border rounded-[20px] border-[#ffffff30] px-3 min-h-[48px]">
                   <FormControl>
                     <Input
                       placeholder="Add keyword"
                       value={keywordInput}
-                      className="bg-navBg text-white border-transparent focus:border-transparent focus:outline-none text-lg md:text-xl placeholder:text-lg rounded-xl py-2"
+                      className="bg-navBg text-white border-transparent 
+          focus:border-transparent focus:outline-none text-base 
+          md:text-base placeholder:text-base rounded-[20px] py-2 min-h-[48px]"
                       onChange={(e) => setKeywordInput(e.target.value)}
                       onKeyDown={(e) => {
                         if (e.key === "Enter") {

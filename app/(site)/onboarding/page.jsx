@@ -23,6 +23,7 @@ import { useUserStore } from "@/store/userStore";
 import { useRouter } from "next/navigation";
 import { cn } from "@lib/utils";
 import { toast } from "sonner";
+import { CustomLoader } from "@components/global/CustomLoader";
 
 const formSchema = z.object({
   description: z.string().min(10, "Description must be at least 10 characters"),
@@ -34,6 +35,7 @@ const Page = ({ className = "" }) => {
   const [keywords, setKeywords] = useState([]);
   const { user } = useUserStore();
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -53,6 +55,8 @@ const Page = ({ className = "" }) => {
   useEffect(() => {
     if (user?.onboarding) {
       router.replace("/dashboard");
+    } else {
+      setLoading(false);
     }
   }, [user, router]);
 
@@ -88,6 +92,10 @@ const Page = ({ className = "" }) => {
       console.error("Error:", error.response?.data || error.message);
     }
   };
+
+  if (loading) {
+    return <CustomLoader />;
+  }
 
   return (
     <div
