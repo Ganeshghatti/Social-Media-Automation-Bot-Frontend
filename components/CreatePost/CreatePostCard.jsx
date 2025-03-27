@@ -10,7 +10,15 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { useUserStore } from "@/store/userStore";
-import { Ellipsis, Images, Plus, Search, Sparkles, Upload } from "lucide-react";
+import {
+  Ellipsis,
+  Images,
+  Plus,
+  Search,
+  Sparkles,
+  Trash,
+  Upload,
+} from "lucide-react";
 
 export const CreatePostCard = ({
   value,
@@ -18,7 +26,8 @@ export const CreatePostCard = ({
   setCards,
   textareaRef,
   setNewCardAdded,
-  width,
+  cards,
+  setPostType,
 }) => {
   const { user, setUser } = useUserStore();
   return (
@@ -39,7 +48,7 @@ export const CreatePostCard = ({
               }
               height={40}
               width={40}
-              className="rounded-full object-contain"
+              className="rounded-full object-cover"
             />
             <div className="bg-[#FFFFFF33] absolute left-1/2 h-[90%] w-[1px]" />
           </div>
@@ -49,9 +58,27 @@ export const CreatePostCard = ({
         <div className="flex flex-1 w-full items-center justify-between ">
           <h2 className="font-semibold text-xl text-white">{user?.username}</h2>
 
-          <div className="w-8 h-8 bg-headerBg rounded-sm cursor-pointer flex justify-center items-center">
-            <Ellipsis className="h-5 w-5 object-contain text-white" />
-          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger>
+              <div className="w-8 h-8 bg-headerBg rounded-sm cursor-pointer flex justify-center items-center">
+                <Ellipsis className="h-5 w-5 object-contain text-white" />
+              </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="rounded-lg p-0 min-w-[140px] flex flex-col gap-2 bg-headerBg border-[0.5px] border-transparent">
+              <div
+                onClick={() => {
+                  setCards((prev) =>
+                    prev.length > 1 ? prev.slice(0, -1) : prev
+                  );
+                  if (cards.length <= 1) setPostType("post");
+                }}
+                className="flex gap-3  bg-[#2C3032] rounded-md hover:bg-[#2C3032] hover:opacity-100 px-4 justify-between py-3 items-center cursor-pointer"
+              >
+                <span className="text-white text-base">Delete</span>
+                <Trash className="object-contain h-5 w-5 text-red-600" />
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
         <CardContent className="w-full p-0 justify-start items-start flex  ">
           <CustomTextarea value={value} onChange={onChange} ref={textareaRef} />

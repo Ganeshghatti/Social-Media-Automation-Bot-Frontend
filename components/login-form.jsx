@@ -27,6 +27,7 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import { Label } from "./ui/label";
+import { toast } from "sonner";
 
 export function LoginForm({ className, ...props }) {
   const router = useRouter();
@@ -50,6 +51,10 @@ export function LoginForm({ className, ...props }) {
 
   async function onSubmit(values) {
     try {
+      // const lowerCaseValues = {
+      //   email: values.email.toLowerCase(),
+      //   password: values.password.toLowerCase(),
+      // };
       const response = await axios.post(
         "https://api.bot.thesquirrel.site/user/login",
         values
@@ -62,6 +67,8 @@ export function LoginForm({ className, ...props }) {
 
       router.push("/dashboard");
     } catch (error) {
+      toast.error("Sigup Failed");
+
       console.error("Signup failed:", error);
     }
   }
@@ -140,7 +147,7 @@ export function LoginForm({ className, ...props }) {
           </Button>
         </div>
         <div className="text-center text-sm text-white/50">
-          Don't have an Account{"  "}
+          Don't have an Account?{"  "}
           <Link
             href="/auth/register"
             className="underline underline-offset-4 pl-1 text-primary"

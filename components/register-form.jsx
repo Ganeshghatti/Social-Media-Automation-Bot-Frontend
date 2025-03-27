@@ -18,6 +18,7 @@ import axios from "axios";
 import { useState } from "react";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import Link from "next/link";
+import { toast } from "sonner";
 
 export function RegisterForm({ className, ...props }) {
   const formSchema = z.object({
@@ -47,14 +48,23 @@ export function RegisterForm({ className, ...props }) {
 
   async function onSubmit(values) {
     try {
+      const lowerCaseValues = {
+        username: values.username.toLowerCase(),
+        email: values.email.toLowerCase(),
+        password: values.password.toLowerCase(),
+        phone: values.phone.toLowerCase(),
+      };
+
       const response = await axios.post(
         "https://api.bot.thesquirrel.site/user/signup",
-        values
+        lowerCaseValues
       );
+
       if (response.data) {
         window.location.href = "/auth/verify";
       }
     } catch (error) {
+      toast.error("Sigup Failed");
       console.error("Signup failed:", error);
       // You might want to show an error message to the user here
     }

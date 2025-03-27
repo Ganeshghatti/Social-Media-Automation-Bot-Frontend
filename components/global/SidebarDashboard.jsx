@@ -38,6 +38,13 @@ const SidebarDashboard = () => {
               router.push("analytics");
             }}
           />
+          <Sidebar_Card
+            imageUrl={"/dashboard_icon.png"}
+            text={"Workspaces"}
+            onClickFunction={() => {
+              router.push("workspaces");
+            }}
+          />
           <div className="w-full h-[1px] mt- bg-white opacity-40" />
         </div>
       </div>

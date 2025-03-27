@@ -9,12 +9,16 @@ import { Label } from "@components/ui/label";
 import axios from "axios";
 import useAuthToken from "@hooks/useAuthToken";
 import { CustomLoader } from "@/components/global/CustomLoader";
+import { useUserStore } from "@/store/userStore";
+import { useRouter } from "next/navigation";
 
 const Page = () => {
   const token = useAuthToken();
 
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(false);
+  const { logout } = useUserStore();
+  const router = useRouter();
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -28,7 +32,6 @@ const Page = () => {
           }
         );
         setUserData(response.data.data);
-        console.log(response.data.data);
       } catch (error) {
         console.error("Error fetching profile:", error);
       } finally {
@@ -41,17 +44,15 @@ const Page = () => {
     }
   }, [token]);
 
-
-
-if (loading || !userData) {
+  if (loading || !userData) {
     return <CustomLoader />;
   }
 
   return (
-    <div className="min-h-screen flex items-center p-8 bg-navBg">
-      <Card className="max-w-2xl mx-auto bg-headerBg">
+    <div className="min-h-screen w-full flex items-center p-4 md:p-8 bg-navBg overflow-x-hidden">
+      <Card className="w-full max-w-lg mx-auto bg-headerBg">
         <CardHeader className="text-center text-white">
-          <CardTitle >Profile</CardTitle>
+          <CardTitle>Profile</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col items-center space-y-6">
@@ -62,7 +63,9 @@ if (loading || !userData) {
             </Avatar>
 
             <div className="space-y-2 text-center">
-              <h2 className="text-2xl text-white font-bold">{userData?.username}</h2>
+              <h2 className="text-2xl text-white font-bold">
+                {userData?.username}
+              </h2>
               <p className="text-white">{userData?.email}</p>
             </div>
 
@@ -74,7 +77,7 @@ if (loading || !userData) {
                 </p>
               </div>
               <div>
-                <Label  className="text-white/80">Phone</Label>
+                <Label className="text-white/80">Phone</Label>
                 <p className="text-white">{userData.phone}</p>
               </div>
               <div>
@@ -84,12 +87,21 @@ if (loading || !userData) {
 
               <div>
                 <Label className="text-white/80">Subscription</Label>
-                <p className="text-white">
-                  {userData.subscription}
-                </p>
+                <p className="text-white">{userData.subscription}</p>
               </div>
 
-              <Button className="w-full capitalize">Edit Profile</Button>
+              <Button className="w-full capitalize text-white">
+                Edit Profile
+              </Button>
+              <Button
+                onClick={() => {
+                  logout();
+                  router.replace("/auth/login");
+                }}
+                className="w-full capitalize hover:bg-red-700 bg-red-600 text-white"
+              >
+                Logout
+              </Button>
             </div>
           </div>
         </CardContent>

@@ -64,13 +64,6 @@ const Page = ({ className = "" }) => {
     setKeywords(keywords.filter((keyword) => keyword !== keywordToRemove));
   };
 
-  if (user === null)
-    return (
-      <div className="flex flex-col">
-        <h1 className="text-2xl">Loading...</h1>
-      </div>
-    );
-
   const onSubmit = async (data) => {
     try {
       await axios.post(
@@ -93,14 +86,17 @@ const Page = ({ className = "" }) => {
     }
   };
 
-  if (loading) {
+  
+  if (loading || !user) {
     return <CustomLoader />;
   }
+
+
 
   return (
     <div
       className={cn(
-        "flex flex-col gap-6  flex-[0.4] mx-auto h-full items-start bg-navBg    justify-center ",
+        "flex flex-col gap-6  flex-[0.4] mx-auto h-full items-center bg-navBg    justify-center ",
         className
       )}
     >
@@ -119,7 +115,7 @@ const Page = ({ className = "" }) => {
                     <FormLabel className="text-white">Description</FormLabel>
                     <FormControl>
                       <Input
-                        className="text-black"
+                               className="bg-[#1A1D1F] border-[0.5px] border-[#D8DADC]/50 rounded-[10px] text-white"
                         placeholder="Enter description"
                         {...field}
                       />
@@ -136,7 +132,7 @@ const Page = ({ className = "" }) => {
                     <FormControl>
                       <div className="flex gap-2">
                         <Input
-                          className="text-black"
+                                  className="bg-[#1A1D1F] border-[0.5px] border-[#D8DADC]/50 rounded-[10px] text-white"
                           placeholder="Add keyword"
                           onKeyDown={(e) => {
                             if (e.key === "Enter") {
@@ -148,6 +144,7 @@ const Page = ({ className = "" }) => {
                         />
                         <Button
                           type="button"
+                          className="text-white"
                           onClick={() => addKeyword(field.value)}
                         >
                           Add
@@ -161,7 +158,7 @@ const Page = ({ className = "" }) => {
                 {keywords.map((keyword, index) => (
                   <div
                     key={index}
-                    className="flex items-center text-black gap-1 bg-secondary px-3 py-1 rounded-full"
+                    className="flex items-center text-black gap-2 bg-secondary px-3 py-1 rounded-full"
                   >
                     {keyword}
                     <button
@@ -174,7 +171,7 @@ const Page = ({ className = "" }) => {
                   </div>
                 ))}
               </div>
-              <Button type="submit" className="w-full">
+              <Button type="submit" className="w-full text-white">
                 Submit
               </Button>
             </form>

@@ -54,8 +54,8 @@ const EditWorkspace = () => {
     }
     if (!user?.onboarding) {
       router.replace("/onboarding");
-    }else{
-      setLoading(false)
+    } else {
+      setLoading(false);
     }
   }, [user, router]);
 
@@ -86,7 +86,6 @@ const EditWorkspace = () => {
       console.log("No file selected");
       return;
     }
-
 
     if (!file.type.startsWith("image/")) {
       alert("Please upload an image file");
@@ -120,6 +119,7 @@ const EditWorkspace = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
+      console.log("Response data ", response.data.data);
       setSingleWorkspace(response.data.data);
       if (response.data.data) {
         setIconPreview(response.data.data.icon);
@@ -453,7 +453,7 @@ const EditWorkspace = () => {
                         }}
                         key={i}
                         imageUrl={"/twitter.png"}
-                        text={"Disconnect Twitter"}
+                        text={"Disconnect "+account?.username}
                       />
                     );
                   }

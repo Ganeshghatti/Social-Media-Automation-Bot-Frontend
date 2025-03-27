@@ -124,7 +124,7 @@ export const Sidebar = ({ workspaceId, token }) => {
   }
 
   return (
-    <div className="md:flex hidden flex-col items-start justify-between  bg-darkBg px-4 py-6 shadow-sm text-white w-72 no-scrollbar h-screen overflow-y-auto sticky top-0">
+    <div className="md:flex hidden flex-col  items-start justify-between  bg-darkBg px-4 py-6 shadow-sm text-white w-72 no-scrollbar  min-h-screen overflow-y-auto sticky top-0">
       <div className="flex flex-col gap-14 items-center w-full">
         <div className="flex w-full items-center gap-4">
           <Image
@@ -154,6 +154,13 @@ export const Sidebar = ({ workspaceId, token }) => {
               router.push("/analytics");
             }}
           />
+          <Sidebar_Card
+            imageUrl={"/Analytics.png"}
+            text={"Scheduled"}
+            onClickFunction={() => {
+              router.push(`/workspace/${workspaceId}/scheduledPosts`);
+            }}
+          />
           <div className="w-full h-[1px] bg-white opacity-40" />
           <Sidebar_Card
             imageUrl={"/Create-Post.png"}
@@ -176,11 +183,11 @@ export const Sidebar = ({ workspaceId, token }) => {
               <PlusIcon />
               Add Account
             </DialogTrigger>
-            <DialogContent className="w-[40vw] max-w-[40vw] h-[420px]  bg-headerBg flex border-transparent gap-2 items-start px-4 py-9">
+            <DialogContent className=":w-[60vw] max-w-[60vw]  bg-headerBg flex border-transparent gap-2 items-start px-4 py-3 md:py-9">
               <DialogHeader>
                 <DialogTitle className="text-white"></DialogTitle>
               </DialogHeader>
-              <div className="w-full p-4 grid grid-cols-2 items-center gap-5">
+              <div className="w-full p-4 grid grid-cols-1 lg:grid-cols-2 items-center gap-5">
                 <Sidebar_Card
                   onClickFunction={() =>
                     connectTwitter(workspaceId, router, token)

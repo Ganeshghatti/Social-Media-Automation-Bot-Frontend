@@ -1,17 +1,12 @@
 "use client";
 import useAuthToken from "@hooks/useAuthToken";
 import { useParams } from "next/navigation";
-import {
-  Accordion,
-  AccordionItem,
-  AccordionTrigger,
-  AccordionContent,
-} from "@components/ui/accordion";
+
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import axios from "axios";
 import { CustomLoader } from "@components/global/CustomLoader";
-
+import { ScheduledCard } from "@components/scheduledPosts/ScheduledCard";
 const Page = () => {
   const { workspaceId, socialMediaAccountId } = useParams();
   const [scheduledPosts, setScheduledPosts] = useState({});
@@ -37,7 +32,7 @@ const Page = () => {
         throw new Error("Failed to retrieve scheduled posts.");
       }
     } catch (error) {
-      toast.error("Failed to get all scheduled posts");
+      // toast.error("Failed to get all scheduled posts");
       console.error("Error:", error);
       setError("Failed to load scheduled posts.");
     } finally {
@@ -54,30 +49,32 @@ const Page = () => {
   }
 
   return (
-    <main className="h-screen flex bg-navBg text-white items-center flex-col justify-center gap-5 py-12 px-8 w-full">
+    <main
+      className="h-screen flex bg-navBg text-white items-center
+     flex-col justify-start gap-7 py-16  px-8 flex-1 "
+    >
       <h1 className="text-3xl font-medium">All Scheduled Posts</h1>
 
-      <div className="w-full max-w-3xl">
+      <div className="w-full max-w-5xl">
         {error ? (
           <p className="text-red-500">{error}</p>
         ) : Object.keys(scheduledPosts).length > 0 ? (
-          <Accordion type="single" collapsible>
-            {Object.entries(scheduledPosts).map(([date, posts]) => (
-              <AccordionItem key={date} value={date}>
-                <AccordionTrigger>{date}</AccordionTrigger>
-                <AccordionContent>
-                  <div className="flex flex-col gap-4">
-                    {posts.map((post, index) => (
-                      <div key={post._id || index} className="p-4 bg-gray-800 rounded-lg">
-                        <p className="text-gray-300">{post.content}</p>
-                        <span className="text-sm text-gray-500">Platform: {post.platform}</span>
-                      </div>
-                    ))}
+          <div className=" py-4 px-5 flex items-start space-y-4 flex-col w-full  ">
+            {Object.entries(scheduledPosts).map(([date, posts]) => {
+              return (
+                <div key={date} className="flex flex-col items-start space-y-2">
+                  <h2 className="text-lg text-white ">{date}</h2>
+                  <div className="flex flex-col gap-4 items-center flex-wrap w-full">
+                    {posts &&
+                      posts.length > 0 &&
+                      posts?.map((post, i) => (
+                        <ScheduledCard key={i} post={post} />
+                      ))}
                   </div>
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
+                </div>
+              );
+            })}
+          </div>
         ) : (
           <p className="text-gray-400">No scheduled posts available.</p>
         )}

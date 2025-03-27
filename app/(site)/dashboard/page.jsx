@@ -6,26 +6,37 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const Page = () => {
-  const { user } = useUserStore();
+  const { user, fetchUser } = useUserStore(); // Add fetchUser from the store
   const router = useRouter();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const token = localStorage.getItem("token"); // Get token from localStorage
 
-    if (!user?.onboarding) {
+    if (user === null && token) {
+      // Fetch user if not loaded and token exists
+      fetchUser(token).then(() => {
+        setLoading(false); // Resolve loading after fetch completes
+      });
+    } else if (user === null && !token) {
+      // No token, assume logged out, stop loading
+      setLoading(false);
+    } else if (user && !user?.onboarding) {
+      // User exists but needs onboarding
       router.replace("/onboarding");
+      setLoading(false);
     } else {
+      // User exists and onboarding is done
       setLoading(false);
     }
-  }, [user, router]);
+  }, [user, router, fetchUser]); // Add fetchUser to dependencies
 
-  // // Ensure the spinner only shows while user is null or being processed
-  // if (loading || user === null) {
-  //   return <CustomLoader />;
-  // }
+  if (loading || user === null) {
+    return <CustomLoader />;
+  }
 
   return (
-    <main className="flex-1 flex flex-col space-y-3  items-center justify-center h-screen overflow-y-auto">
+    <main className="flex-1 flex flex-col space-y-3 items-center justify-center h-screen overflow-y-auto">
       <Image
         src={"/coming-soon.avif"}
         alt="no image"

@@ -460,6 +460,8 @@ const WorkspacePage = () => {
               setCards={setCards}
               textareaRef={(el) => (textAreaRefs.current[index] = el)}
               setNewCardAdded={setNewCardAdded}
+              cards={cards}
+              setPostType={setPostType}
             />
           ))}
         </form>
