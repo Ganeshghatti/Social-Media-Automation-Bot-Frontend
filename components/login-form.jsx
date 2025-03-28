@@ -28,9 +28,12 @@ import Link from "next/link";
 import Image from "next/image";
 import { Label } from "./ui/label";
 import { toast } from "sonner";
+import { useUserStore } from "@/store/userStore";
 
 export function LoginForm({ className, ...props }) {
   const router = useRouter();
+  const { fetchUser } = useUserStore();
+  const [loading, setLoading] = useState(false);
 
   const formSchema = z.object({
     email: z.string().email({
@@ -51,25 +54,32 @@ export function LoginForm({ className, ...props }) {
 
   async function onSubmit(values) {
     try {
-      // const lowerCaseValues = {
-      //   email: values.email.toLowerCase(),
-      //   password: values.password.toLowerCase(),
-      // };
+      setLoading(true);
       const response = await axios.post(
         "https://api.bot.thesquirrel.site/user/login",
         values
       );
 
       const token = response.data.data.token;
+
       if (typeof window !== "undefined") {
         localStorage.setItem("token", token);
       }
 
-      router.push("/dashboard");
-    } catch (error) {
-      toast.error("Sigup Failed");
+      if (token) {
+        await fetchUser(token);
 
-      console.error("Signup failed:", error);
+        if (useUserStore.getState().user?.onboarding) {
+          router.replace("/dashboard");
+        } else {
+          router.replace("/onboarding");
+        }
+      }
+    } catch (error) {
+      toast.error("Login Failed");
+      console.error("Login failed:", error);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -142,7 +152,7 @@ export function LoginForm({ className, ...props }) {
               Forget Password?
             </Link>
           </div>
-          <Button type="submit" className="w-full text-white">
+          <Button default={loading} type="submit" className="w-full text-white">
             Submit
           </Button>
         </div>

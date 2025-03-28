@@ -15,9 +15,8 @@ const WorkspacesPage = () => {
   const [workspaces, setWorkspaces] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const { user,fetchUser } = useUserStore();
+  const { user, fetchUser } = useUserStore();
   const router = useRouter();
-
 
   useEffect(() => {
     if (user === null && token) {
@@ -84,11 +83,11 @@ const WorkspacesPage = () => {
   }
 
   return (
-    <div className="flex flex-1 w-full items-center bg-navBg justify-center">
-      <div className="md:px-10 py-12 flex flex-col justify-center items-center md:grid md:grid-cols-3 gap-4">
+    <>
+      <div className="md:px-10 py-12 w-full flex-1 flex justify-center items-center">
         {workspaces.length === 0 ? (
-          // Show message and button if no workspaces
-          <div className="flex flex-col items-center space-y-4">
+          // No workspaces case: Fully centered
+          <div className="flex flex-col items-center justify-center h-full w-full space-y-4">
             <h1 className="text-2xl font-semibold text-white">
               No Workspaces Found
             </h1>
@@ -101,39 +100,38 @@ const WorkspacesPage = () => {
             </Link>
           </div>
         ) : (
-          // Show workspaces if they exist
-          workspaces.map((workspace, i) => (
+          // Workspaces exist case: Display them in the center
+          <div className="flex flex-wrap justify-center gap-6">
+            {workspaces.map((workspace, i) => (
+              <Link
+                href={`/workspace/${workspace._id}`}
+                key={i}
+                className="border-white text-white flex items-center space-x-2 border-2 rounded-sm px-12 py-4 gap-3"
+              >
+                {workspace?.icon && (
+                  <Image
+                    src={workspace.icon}
+                    alt="Workspace Icon"
+                    height={60}
+                    width={60}
+                    className="h-10 w-10 object-contain"
+                  />
+                )}
+                {workspace.name}
+              </Link>
+            ))}
+            {/* Always show Add Workspace button */}
             <Link
-              href={`/workspace/${workspace._id}`}
-              key={i}
-              className="border-white text-white flex items-center space-x-2 border-2 rounded-sm px-3 py-4 gap-3"
+              href={`/workspace/create`}
+              className="border-white text-white flex items-center space-x-2 border-2 rounded-sm px-6 py-4"
             >
-              {workspace?.icon && (
-                <Image
-                  src={workspace.icon}
-                  alt="dummy"
-                  height={60}
-                  width={60}
-                  className="h-10 w-10 object-contain"
-                />
-              )}
-              {workspace.name}
+              <PlusIcon className="h-10 w-10" />
+              Add Workspace
             </Link>
-          ))
-        )}
-
-        {/* Always show Add Workspace button if workspaces exist */}
-        {workspaces.length > 0 && (
-          <Link
-            href={`/workspace/create`}
-            className="border-white text-white flex items-center space-x-2 border-2 rounded-sm px-6 py-4"
-          >
-            <PlusIcon className="h-10 w-10" />
-            Add Workspace
-          </Link>
+          </div>
         )}
       </div>
-    </div>
+    </>
   );
 };
 

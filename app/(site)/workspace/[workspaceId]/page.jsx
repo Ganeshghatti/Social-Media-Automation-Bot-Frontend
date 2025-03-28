@@ -40,23 +40,7 @@ const WorkspacePage = () => {
     }
   }, [token, fetchUser]);
 
-  useEffect(() => {
-    if (user === null) return; // Wait for user to load
 
-    if (user) {
-      if (!user.onboarding) {
-        router.replace("/onboarding");
-      }
-    }
-  }, [user, router]);
-
-  const focusLastTextarea = () => {
-    setTimeout(() => {
-      const lastTextarea =
-        textAreaRefs.current[textAreaRefs.current.length - 1];
-      if (lastTextarea) lastTextarea.focus();
-    }, 0); // Ensure DOM is updated
-  };
 
   useEffect(() => {
     const handleKeyPress = (e) => {
@@ -433,9 +417,7 @@ const WorkspacePage = () => {
   }
 
   return (
-    <main className="h-screen flex  flex-col space-y-3 items-center
-     justify-center overflow-y-auto w-full">
-      <CreatePostHeader />
+    <>
       <ButtonsHeader
         isEditingDraft={isEditingDraft}
         onPublish={onPublish}
@@ -462,6 +444,7 @@ const WorkspacePage = () => {
               setNewCardAdded={setNewCardAdded}
               cards={cards}
               setPostType={setPostType}
+              cardId={card.id}
             />
           ))}
         </form>
@@ -484,7 +467,7 @@ const WorkspacePage = () => {
         draftLoading={draftLoading}
         setDraftLoading={setDraftLoading}
       />
-    </main>
+    </>
   );
 };
 

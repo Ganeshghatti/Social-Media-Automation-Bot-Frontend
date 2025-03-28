@@ -45,6 +45,13 @@ const SidebarDashboard = () => {
               router.push("workspaces");
             }}
           />
+          <Sidebar_Card
+            imageUrl={"/Analytics.png"}
+            text={"Scheduled"}
+            onClickFunction={() => {
+              router.push(`scheduledPosts`);
+            }}
+          />
           <div className="w-full h-[1px] mt- bg-white opacity-40" />
         </div>
       </div>

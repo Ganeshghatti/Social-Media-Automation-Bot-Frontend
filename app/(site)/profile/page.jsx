@@ -82,12 +82,12 @@ const Page = () => {
               </div>
               <div>
                 <Label className="text-white/80">Role</Label>
-                <p className="text-white">{userData.role}</p>
+                <p className="text-white capitalize">{userData.role}</p>
               </div>
 
               <div>
                 <Label className="text-white/80">Subscription</Label>
-                <p className="text-white">{userData.subscription}</p>
+                <p className="text-white capitalize">{userData.subscription}</p>
               </div>
 
               <Button className="w-full capitalize text-white">

@@ -154,13 +154,7 @@ export const Sidebar = ({ workspaceId, token }) => {
               router.push("/analytics");
             }}
           />
-          <Sidebar_Card
-            imageUrl={"/Analytics.png"}
-            text={"Scheduled"}
-            onClickFunction={() => {
-              router.push(`/workspace/${workspaceId}/scheduledPosts`);
-            }}
-          />
+        
           <div className="w-full h-[1px] bg-white opacity-40" />
           <Sidebar_Card
             imageUrl={"/Create-Post.png"}

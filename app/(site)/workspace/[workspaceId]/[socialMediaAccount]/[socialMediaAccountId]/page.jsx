@@ -52,9 +52,9 @@ const SocialMediaAccount = () => {
     getAllPostsTwitter();
   }, [socialMediaAccount, workspaceId, socialMediaAccountId, token]);
 
-    if (loading) {
-      return <CustomLoader />;
-    }
+  if (loading) {
+    return <CustomLoader />;
+  }
 
   return (
     <main

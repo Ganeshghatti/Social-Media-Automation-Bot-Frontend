@@ -53,7 +53,7 @@ const Page = ({ className = "" }) => {
   };
 
   useEffect(() => {
-    if (user?.onboarding) {
+    if (user && user?.onboarding) {
       router.replace("/dashboard");
     } else {
       setLoading(false);
@@ -86,12 +86,9 @@ const Page = ({ className = "" }) => {
     }
   };
 
-  
   if (loading || !user) {
     return <CustomLoader />;
   }
-
-
 
   return (
     <div
@@ -115,7 +112,7 @@ const Page = ({ className = "" }) => {
                     <FormLabel className="text-white">Description</FormLabel>
                     <FormControl>
                       <Input
-                               className="bg-[#1A1D1F] border-[0.5px] border-[#D8DADC]/50 rounded-[10px] text-white"
+                        className="bg-[#1A1D1F] border-[0.5px] border-[#D8DADC]/50 rounded-[10px] text-white"
                         placeholder="Enter description"
                         {...field}
                       />
@@ -132,7 +129,7 @@ const Page = ({ className = "" }) => {
                     <FormControl>
                       <div className="flex gap-2">
                         <Input
-                                  className="bg-[#1A1D1F] border-[0.5px] border-[#D8DADC]/50 rounded-[10px] text-white"
+                          className="bg-[#1A1D1F] border-[0.5px] border-[#D8DADC]/50 rounded-[10px] text-white"
                           placeholder="Add keyword"
                           onKeyDown={(e) => {
                             if (e.key === "Enter") {

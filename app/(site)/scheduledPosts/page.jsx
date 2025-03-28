@@ -1,14 +1,12 @@
 "use client";
 import useAuthToken from "@hooks/useAuthToken";
-import { useParams } from "next/navigation";
 
 import React, { useEffect, useState } from "react";
-import { toast } from "sonner";
 import axios from "axios";
 import { CustomLoader } from "@components/global/CustomLoader";
 import { ScheduledCard } from "@components/scheduledPosts/ScheduledCard";
+import { toast } from "sonner";
 const Page = () => {
-  const { workspaceId, socialMediaAccountId } = useParams();
   const [scheduledPosts, setScheduledPosts] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -29,10 +27,12 @@ const Page = () => {
       if (response.status === 200 && response.data.success) {
         setScheduledPosts(response.data.data.groupedPosts || {});
       } else {
+        toast.error("Failed to retrieve scheduled posts.");
         throw new Error("Failed to retrieve scheduled posts.");
       }
     } catch (error) {
-      // toast.error("Failed to get all scheduled posts");
+      toast.error("Failed to retrieve scheduled posts.");
+
       console.error("Error:", error);
       setError("Failed to load scheduled posts.");
     } finally {
@@ -42,17 +42,14 @@ const Page = () => {
 
   useEffect(() => {
     getAllSchedulesPosts();
-  }, [workspaceId, socialMediaAccountId, token]);
+  }, [token]);
 
   if (loading) {
     return <CustomLoader />;
   }
 
   return (
-    <main
-      className="h-screen flex bg-navBg text-white items-center
-     flex-col justify-start gap-7 py-16  px-8 flex-1 "
-    >
+    <>
       <h1 className="text-3xl font-medium">All Scheduled Posts</h1>
 
       <div className="w-full max-w-5xl">
@@ -79,7 +76,7 @@ const Page = () => {
           <p className="text-gray-400">No scheduled posts available.</p>
         )}
       </div>
-    </main>
+    </>
   );
 };
 

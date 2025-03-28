@@ -7,32 +7,17 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const Page = () => {
-  const { user, fetchUser } = useUserStore(); // Add fetchUser from the store
-  const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const token=useAuthToken()
 
   useEffect(() => {
-    if (user === null && token) {
-      fetchUser(token).then(() => {
-        setLoading(false); // Resolve loading after fetch completes
-      });
-    } else if (user === null && !token) {
-      setLoading(false);
-    } else if (user && !user?.onboarding) {
-      router.replace("/onboarding");
-      setLoading(false);
-    } else {
-      setLoading(false);
-    }
-  }, [user, router, fetchUser,token]); 
+    setLoading(false);
+  }, []);
 
-  if (loading || user === null) {
+  if (loading) {
     return <CustomLoader />;
   }
-
   return (
-    <main className="flex-1 flex flex-col space-y-3 items-center justify-center h-screen overflow-y-auto">
+    <>
       <Image
         src={"/coming-soon.avif"}
         alt="no image"
@@ -41,7 +26,7 @@ const Page = () => {
         width={400}
       />
       <h2 className="text-2xl text-white ">Coming Soon...</h2>
-    </main>
+    </>
   );
 };
 

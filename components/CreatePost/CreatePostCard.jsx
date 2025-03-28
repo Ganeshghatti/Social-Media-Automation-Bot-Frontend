@@ -28,16 +28,13 @@ export const CreatePostCard = ({
   setNewCardAdded,
   cards,
   setPostType,
+  cardId,
 }) => {
   const { user, setUser } = useUserStore();
   return (
     <Card className="w-full sm:w-full md:w-[60vw] lg:w-[70vw] xl:w-[55vw] flex flex-row gap-4 bg-transparent h-full max-h-[240px] border-transparent mx-auto min-w-[240px] max-w-[1440px]">
-      {/* Thread/Line Container */}
-
       <CardTitle className="p-0 justify-between   flex gap-4 h-full items-center">
         <div className="flex gap-4 items-center justify-center  h-full ">
-          {" "}
-          {/* Added padding for thread */}
           <div className="relative h-full  ">
             <Image
               alt="Profile"
@@ -67,9 +64,7 @@ export const CreatePostCard = ({
             <DropdownMenuContent className="rounded-lg p-0 min-w-[140px] flex flex-col gap-2 bg-headerBg border-[0.5px] border-transparent">
               <div
                 onClick={() => {
-                  setCards((prev) =>
-                    prev.length > 1 ? prev.slice(0, -1) : prev
-                  );
+                  setCards(cards.filter((card) => card.id !== cardId));
                   if (cards.length <= 1) setPostType("post");
                 }}
                 className="flex gap-3  bg-[#2C3032] rounded-md hover:bg-[#2C3032] hover:opacity-100 px-4 justify-between py-3 items-center cursor-pointer"

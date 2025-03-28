@@ -7,8 +7,8 @@ export const useUserStore = create((set) => ({
     setUser: (userData) => set({ user: userData }),
     clearUser: () => set({ user: null }),
 
-    fetchUser: async (token) => {  // Accept token as parameter
-        if (!token) return; // Avoid making a request if no token
+    fetchUser: async (token) => { 
+        if (!token) return; 
 
         try {
             const response = await axios.get("https://api.bot.thesquirrel.site/user/profile", {
