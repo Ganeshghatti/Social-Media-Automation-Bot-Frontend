@@ -39,7 +39,7 @@ export const Sidebar = ({ workspaceId, token }) => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `https://api.bot.thesquirrel.site/workspace/get`,
+        `https://api.bot.thesquirrel.tech/workspace/get`,
         {
           headers: {
             Authorization: "Bearer " + token,
@@ -74,7 +74,7 @@ export const Sidebar = ({ workspaceId, token }) => {
   const SingleWorkspaceData = useCallback(async (workspaceId, token) => {
     try {
       const response = await axios.get(
-        `https://api.bot.thesquirrel.site/workspace/get/${workspaceId}`,
+        `https://api.bot.thesquirrel.tech/workspace/get/${workspaceId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -154,7 +154,7 @@ export const Sidebar = ({ workspaceId, token }) => {
               router.push("/analytics");
             }}
           />
-        
+
           <div className="w-full h-[1px] bg-white opacity-40" />
           <Sidebar_Card
             imageUrl={"/Create-Post.png"}
@@ -237,7 +237,7 @@ export const Sidebar = ({ workspaceId, token }) => {
       ) : (
         <DropdownMenu className="w-full mt-6">
           <DropdownMenuTrigger asChild>
-            <Button className="bg-primary rounded-2xl w-full py-8 px-4 flex items-center gap-2 mt-auto">
+            <Button className="bg-primary rounded-2xl w-full py-8  flex items-center gap-2 mt-auto">
               {singleWorkspace?.icon && (
                 <Image
                   alt="Paw image"
@@ -254,13 +254,13 @@ export const Sidebar = ({ workspaceId, token }) => {
               <ChevronsUpDown className="h-6 w-6 object-contain" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-[300px] flex flex-col gap-4 items-center bg-headerBg">
+          <DropdownMenuContent className="bg-white/5 flex justify-center rounded-2xl my-2 w-[16rem] text-center border-orange-600  items-center gap-2 mt-auto">
             {workspaces?.length !== 0 &&
               workspaces?.map((workspace, i) => (
                 <Link
                   href={`/workspace/${workspace._id}`}
                   key={i}
-                  className="text-white  border-0  rounded-sm px-6 py-4 "
+                  className="text-white  text-center border-0  rounded-sm   "
                 >
                   {workspace.name}
                 </Link>
@@ -268,9 +268,9 @@ export const Sidebar = ({ workspaceId, token }) => {
 
             <Link
               href={`/workspaces`}
-              className="text-white  border-0  rounded-sm px-6 py-4 "
+              className="text-white border-none rounded-sm px-6 py-4 "
             >
-              Manage Workspcaes
+              More Workspaces
             </Link>
           </DropdownMenuContent>
         </DropdownMenu>

@@ -17,7 +17,7 @@ const Page = ({ params }) => {
     const verifyToken = async () => {
       try {
         const response = await axios.post(
-          `https://api.bot.thesquirrel.site/user/verification/${token}`
+          `https://api.bot.thesquirrel.tech/user/verification/${token}`
         );
         setMessage("Email verified successfully!");
         setDescription(

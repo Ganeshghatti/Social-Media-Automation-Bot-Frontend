@@ -88,7 +88,7 @@ const WorkspaceCreate = ({ isOpen, setIsOpen }) => {
       console.log(values);
 
       const response = await axios.post(
-        "https://api.bot.thesquirrel.site/workspace/create",
+        "https://api.bot.thesquirrel.tech/workspace/create",
         values,
         {
           headers: {

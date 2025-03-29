@@ -131,7 +131,7 @@ const Page = () => {
       console.log("Sending request with payload:", payload);
 
       const response = await axios.post(
-        `https://api.bot.thesquirrel.site/workspace/create`,
+        `https://api.bot.thesquirrel.tech/workspace/create`,
         payload,
         {
           headers: {

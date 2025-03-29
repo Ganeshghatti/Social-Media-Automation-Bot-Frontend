@@ -24,7 +24,7 @@ const Page = () => {
     const fetchProfile = async () => {
       try {
         const response = await axios.get(
-          "https://api.bot.thesquirrel.site/user/profile",
+          "https://api.bot.thesquirrel.tech/user/profile",
           {
             headers: {
               Authorization: `Bearer ${token}`,

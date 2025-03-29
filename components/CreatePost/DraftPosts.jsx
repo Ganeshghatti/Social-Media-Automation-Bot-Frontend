@@ -43,7 +43,7 @@ export const DraftPosts = ({
       console.log("Deelete Draft Type ", draftType);
 
       const response = await axios.delete(
-        `https://api.bot.thesquirrel.site/workspace/draft/delete/${workspaceId}`, // Correct API endpoint
+        `https://api.bot.thesquirrel.tech/workspace/draft/delete/${workspaceId}`, // Correct API endpoint
         {
           data: {
             type: draftType,
@@ -65,7 +65,7 @@ export const DraftPosts = ({
       );
       toast("Draft Post Has been deleted");
     } catch (error) {
-      toast.error("Failed to delete draft post")
+      toast.error("Failed to delete draft post");
       console.error("Error deleting draft:", error);
       SingleWorkspaceDraftData(
         workspaceId,

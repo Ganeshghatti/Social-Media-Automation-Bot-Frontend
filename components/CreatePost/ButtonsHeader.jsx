@@ -111,9 +111,9 @@ export const ButtonsHeader = ({
             </span>
           </Button>
         </DialogTrigger>
-
         <DialogContent className="w-[60vw] max-w-[60vw] h-[720px] p-0 bg-navBg flex border-transparent gap-2 items-start">
           <DialogTitle></DialogTitle>
+
           <div className="flex relative flex-row gap-3 h-full w-full">
             <DialogSidebar
               workspaceData={workspaceData}
