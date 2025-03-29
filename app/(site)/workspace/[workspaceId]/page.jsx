@@ -14,6 +14,7 @@ import { notFound, useParams, useRouter } from "next/navigation";
 import { Form } from "@components/ui/form";
 import axios from "axios";
 import { DateTime } from "luxon"; // Install: npm install luxon
+import { CustomLoader } from "@/components/global/CustomLoader";
 
 const WorkspacePage = () => {
   const { workspaceId } = useParams();
@@ -38,22 +39,6 @@ const WorkspacePage = () => {
       fetchUser(token); // Pass token as parameter
     }
   }, [token, fetchUser]);
-
-  useEffect(() => {
-    if (user) {
-      if (!user.onboarding) {
-        router.replace("/onboarding");
-      }
-    }
-  }, [user, router]);
-
-  const focusLastTextarea = () => {
-    setTimeout(() => {
-      const lastTextarea =
-        textAreaRefs.current[textAreaRefs.current.length - 1];
-      if (lastTextarea) lastTextarea.focus();
-    }, 0); // Ensure DOM is updated
-  };
 
   useEffect(() => {
     const handleKeyPress = (e) => {
@@ -87,21 +72,18 @@ const WorkspacePage = () => {
   const SingleWorkspaceData = useCallback(async (workspaceId, token) => {
     try {
       const response = await axios.get(
-        `https://api.bot.thesquirrel.site/workspace/get/${workspaceId}`,
+        `https://api.bot.thesquirrel.tech/workspace/get/${workspaceId}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       console.log("Workspace Data:", response.data.data);
       setSingleWorkspace(response.data.data);
       if (response.data.data.connectedAccounts?.length > 0) {
         setAccountId(response.data.data.connectedAccounts[0].userId);
-        console.log(
-          "Set accountId:",
-          response.data.data.connectedAccounts[0].userId
-        );
       } else {
         console.log("No connected accounts found");
       }
     } catch (error) {
+      toast.error("Failed to get Single Workspace");
       console.error("Error fetching workspace:", error);
       setSingleWorkspace(null);
     } finally {
@@ -140,7 +122,6 @@ const WorkspacePage = () => {
     // Convert scheduledDateTime to workspace's timezone
     let formattedDateTime = "";
     if (scheduledDateTime) {
-      console.log("Workspace Time zone ", workspaceTimezone);
       formattedDateTime = DateTime.fromJSDate(scheduledDateTime)
         .setZone(workspaceTimezone)
         .toFormat("yyyy-MM-dd HH:mm:ss"); // Format in local timezone
@@ -184,14 +165,12 @@ const WorkspacePage = () => {
       ],
     };
 
-    console.log("FormData being sent:", JSON.stringify(formData, null, 2));
-
     try {
       const token = localStorage.getItem("token");
 
       console.log("Fetching presigned URL...");
       const presignedResponse = await axios.post(
-        `https://api.bot.thesquirrel.site/workspace/posts/create/presigned-url/${workspaceId}`,
+        `https://api.bot.thesquirrel.tech/workspace/posts/create/presigned-url/${workspaceId}`,
         formData,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -206,7 +185,7 @@ const WorkspacePage = () => {
       console.log("Final Data being sent:", JSON.stringify(finalData, null, 2));
 
       const finalResponse = await axios.post(
-        `https://api.bot.thesquirrel.site/workspace/posts/create/${workspaceId}`,
+        `https://api.bot.thesquirrel.tech/workspace/posts/create/${workspaceId}`,
         finalData,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -288,7 +267,7 @@ const WorkspacePage = () => {
 
       // Step 1: Get presigned URL response
       const presignedResponse = await axios.post(
-        `https://api.bot.thesquirrel.site/workspace/posts/create/presigned-url/${workspaceId}`,
+        `https://api.bot.thesquirrel.tech/workspace/posts/create/presigned-url/${workspaceId}`,
         formData,
         {
           headers: {
@@ -321,7 +300,7 @@ const WorkspacePage = () => {
 
       // Step 3: Send final request to draft API
       const finalResponse = await axios.post(
-        `https://api.bot.thesquirrel.site/workspace/draft/create/${workspaceId}`,
+        `https://api.bot.thesquirrel.tech/workspace/draft/create/${workspaceId}`,
         postData,
         {
           headers: {
@@ -340,6 +319,8 @@ const WorkspacePage = () => {
       );
       setCards([{ id: 0, text: "" }]);
     } catch (error) {
+      toast.error("Failed to make draft post");
+
       console.error("Error making draft post:", error);
     }
   };
@@ -375,7 +356,7 @@ const WorkspacePage = () => {
       const token = localStorage.getItem("token");
 
       const finalResponse = await axios.put(
-        `https://api.bot.thesquirrel.site/workspace/draft/edit/${workspaceId}`,
+        `https://api.bot.thesquirrel.tech/workspace/draft/edit/${workspaceId}`,
         formData,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -392,6 +373,8 @@ const WorkspacePage = () => {
         setDraftPosts
       );
     } catch (error) {
+      toast.error("Failed to edit draft post");
+
       console.error("Error making draft post:", error);
     }
   };
@@ -401,7 +384,7 @@ const WorkspacePage = () => {
       try {
         setDraftLoading(true);
         const response = await axios.get(
-          `https://api.bot.thesquirrel.site/workspace/draft/get/${workspaceId}`,
+          `https://api.bot.thesquirrel.tech/workspace/draft/get/${workspaceId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -411,6 +394,7 @@ const WorkspacePage = () => {
         setDraftPosts(response.data.data);
         console.log("draft ", response.data.data);
       } catch (error) {
+        toast.error("Failed to get single workspace data");
         console.log("Error ", error);
         setDraftPosts(null);
       } finally {
@@ -426,16 +410,12 @@ const WorkspacePage = () => {
     }
   }, [loading, singleWorkspace]);
 
-  if (loading)
-    return (
-      <main className="flex-1 flex flex-col h-screen overflow-y-auto">
-        <h1 className="text-2xl">Loading...</h1>
-      </main>
-    );
+  if (loading) {
+    return <CustomLoader />;
+  }
 
   return (
-    <main className="flex-1 flex flex-col h-screen overflow-y-auto">
-      <CreatePostHeader />
+    <>
       <ButtonsHeader
         isEditingDraft={isEditingDraft}
         onPublish={onPublish}
@@ -443,18 +423,15 @@ const WorkspacePage = () => {
         createDraftPosts={createDraftPosts}
         EditDraftPosts={EditDraftPosts}
         singleWorkspace={singleWorkspace}
-        cards={cards} // ✅ Ensure cards are passed
-        setCards={setCards} // ✅ Set function
-        textAreaRefs={textAreaRefs} // ✅ Textarea references
+        cards={cards}
+        setCards={setCards}
+        textAreaRefs={textAreaRefs}
         setNewCardAdded={setNewCardAdded}
         SingleWorkspaceDraftData={SingleWorkspaceDraftData}
       />
 
       <Form>
-        <form
-          className="w-full  flex-1 p-4 py-10 mb-8 no-scrollbar overflow-y-auto
-         justify-center items-center"
-        >
+        <form className="w-full flex-1 flex flex-col p-4 py-10  no-scrollbar overflow-y-auto items-center ">
           {cards.map((card, index) => (
             <CreatePostCard
               key={index}
@@ -463,6 +440,9 @@ const WorkspacePage = () => {
               setCards={setCards}
               textareaRef={(el) => (textAreaRefs.current[index] = el)}
               setNewCardAdded={setNewCardAdded}
+              cards={cards}
+              setPostType={setPostType}
+              cardId={card.id}
             />
           ))}
         </form>
@@ -485,7 +465,7 @@ const WorkspacePage = () => {
         draftLoading={draftLoading}
         setDraftLoading={setDraftLoading}
       />
-    </main>
+    </>
   );
 };
 

@@ -9,7 +9,7 @@ export const Sidebar_Card = ({ text, imageUrl, onClickFunction }) => {
           onClickFunction();
         }
       }}
-      className="py-6 rounded-xl w-full  cursor-pointer px-3 flex items-center justify-start gap-3 bg-navBg "
+      className="py-6 rounded-2xl w-full cursor-pointer px-5 flex items-center justify-start gap-3 bg-navBg "
     >
       <Image
         src={imageUrl}
@@ -19,6 +19,7 @@ export const Sidebar_Card = ({ text, imageUrl, onClickFunction }) => {
         className="object-contain "
       />
       <span className="font-semibold text-base text-white">{text}</span>
+        
     </div>
   );
 };

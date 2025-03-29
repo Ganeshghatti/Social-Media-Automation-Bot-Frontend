@@ -26,6 +26,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@components/ui/dialog";
+import { SidebarContent, SidebarFooter, SidebarHeader } from "../ui/sidebar";
+import { toast } from "sonner";
 
 export const Sidebar = ({ workspaceId, token }) => {
   const [singleWorkspace, setSingleWorkspace] = useState(null);
@@ -37,7 +39,7 @@ export const Sidebar = ({ workspaceId, token }) => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `https://api.bot.thesquirrel.site/workspace/get`,
+        `https://api.bot.thesquirrel.tech/workspace/get`,
         {
           headers: {
             Authorization: "Bearer " + token,
@@ -54,6 +56,7 @@ export const Sidebar = ({ workspaceId, token }) => {
         setWorkspaces([]);
       }
     } catch (error) {
+      toast.error("Error in getting workspaces");
       console.log("Error in getting workspaces ", error);
       setWorkspaces([]);
     } finally {
@@ -71,7 +74,7 @@ export const Sidebar = ({ workspaceId, token }) => {
   const SingleWorkspaceData = useCallback(async (workspaceId, token) => {
     try {
       const response = await axios.get(
-        `https://api.bot.thesquirrel.site/workspace/get/${workspaceId}`,
+        `https://api.bot.thesquirrel.tech/workspace/get/${workspaceId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -81,6 +84,8 @@ export const Sidebar = ({ workspaceId, token }) => {
 
       setSingleWorkspace(response.data.data);
     } catch (error) {
+      toast.error("Error in getting single workspace");
+
       console.log("Error ", error);
       setSingleWorkspace(null);
     }
@@ -92,10 +97,14 @@ export const Sidebar = ({ workspaceId, token }) => {
     }
   }, [workspaceId, token, SingleWorkspaceData]);
 
+  if (!singleWorkspace) {
+    return null;
+  }
+
   if (loading) {
     return (
-      <div className="flex flex-col items-start justify-between  bg-darkBg px-4 py-6 shadow-sm text-white w-[15%] no-scrollbar h-screen overflow-y-auto sticky top-0">
-        <div className="flex w-full items-center gap-4">
+      <Sidebar className="flex-[0.2] px-4 py-6 bg-darkBg   ">
+        <SidebarHeader className="flex w-full items-center gap-4">
           <Image
             src={"/sidebar_logo.png"}
             height={61}
@@ -107,19 +116,15 @@ export const Sidebar = ({ workspaceId, token }) => {
             <h1 className="text-white font-bold text-2xl">The</h1>
             <h1 className="text-white font-bold text-2xl">Squirrel</h1>
           </div>
-        </div>
+        </SidebarHeader>
 
         <h1 className="text-xl text-white">Loading...</h1>
-      </div>
+      </Sidebar>
     );
   }
 
-  if (!singleWorkspace) {
-    return null;
-  }
-
   return (
-    <div className="md:flex hidden flex-col items-start justify-between  bg-darkBg px-4 py-6 shadow-sm text-white w-[15%] no-scrollbar h-screen overflow-y-auto sticky top-0">
+    <div className="md:flex hidden flex-col  items-start justify-between  bg-darkBg px-4 py-6 shadow-sm text-white w-72 no-scrollbar  min-h-screen overflow-y-auto sticky top-0">
       <div className="flex flex-col gap-14 items-center w-full">
         <div className="flex w-full items-center gap-4">
           <Image
@@ -149,6 +154,7 @@ export const Sidebar = ({ workspaceId, token }) => {
               router.push("/analytics");
             }}
           />
+
           <div className="w-full h-[1px] bg-white opacity-40" />
           <Sidebar_Card
             imageUrl={"/Create-Post.png"}
@@ -171,11 +177,11 @@ export const Sidebar = ({ workspaceId, token }) => {
               <PlusIcon />
               Add Account
             </DialogTrigger>
-            <DialogContent className="w-[40vw] max-w-[40vw] h-[420px]  bg-headerBg flex border-transparent gap-2 items-start px-4 py-9">
+            <DialogContent className=":w-[60vw] max-w-[60vw]  bg-headerBg flex border-transparent gap-2 items-start px-4 py-3 md:py-9">
               <DialogHeader>
                 <DialogTitle className="text-white"></DialogTitle>
               </DialogHeader>
-              <div className="w-full p-4 grid grid-cols-2 items-center gap-5">
+              <div className="w-full p-4 grid grid-cols-1 lg:grid-cols-2 items-center gap-5">
                 <Sidebar_Card
                   onClickFunction={() =>
                     connectTwitter(workspaceId, router, token)
@@ -231,7 +237,7 @@ export const Sidebar = ({ workspaceId, token }) => {
       ) : (
         <DropdownMenu className="w-full mt-6">
           <DropdownMenuTrigger asChild>
-            <Button className="bg-primary rounded-2xl w-full py-8 px-4 flex items-center gap-2 mt-auto">
+            <Button className="bg-primary rounded-2xl w-full py-8  flex items-center gap-2 mt-auto">
               {singleWorkspace?.icon && (
                 <Image
                   alt="Paw image"
@@ -248,13 +254,13 @@ export const Sidebar = ({ workspaceId, token }) => {
               <ChevronsUpDown className="h-6 w-6 object-contain" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-[300px] flex flex-col gap-4 items-center bg-headerBg">
+          <DropdownMenuContent className="bg-white/5 flex justify-center rounded-2xl my-2 w-[16rem] text-center border-orange-600  items-center gap-2 mt-auto">
             {workspaces?.length !== 0 &&
               workspaces?.map((workspace, i) => (
                 <Link
                   href={`/workspace/${workspace._id}`}
                   key={i}
-                  className="text-white  border-0  rounded-sm px-6 py-4 "
+                  className="text-white  text-center border-0  rounded-sm   "
                 >
                   {workspace.name}
                 </Link>
@@ -262,9 +268,9 @@ export const Sidebar = ({ workspaceId, token }) => {
 
             <Link
               href={`/workspaces`}
-              className="text-white  border-0  rounded-sm px-6 py-4 "
+              className="text-white border-none rounded-sm px-6 py-4 "
             >
-              Manage Workspcaes
+              More Workspaces
             </Link>
           </DropdownMenuContent>
         </DropdownMenu>

@@ -1,8 +1,23 @@
+"use client";
+import { useUserStore } from "@/store/userStore";
+import { CustomLoader } from "@components/global/CustomLoader";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const Page = () => {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setLoading(false);
+  }, []);
+
+  if (loading ) {
+    return <CustomLoader />;
+  }
+
   return (
-    <main className="flex-1 flex flex-col space-y-3  items-center justify-center h-screen overflow-y-auto">
+    <>
       <Image
         src={"/coming-soon.avif"}
         alt="no image"
@@ -11,7 +26,7 @@ const Page = () => {
         width={400}
       />
       <h2 className="text-2xl text-white ">Coming Soon...</h2>
-    </main>
+    </>
   );
 };
 

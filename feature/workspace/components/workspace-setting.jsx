@@ -8,7 +8,6 @@ import {
   DialogTitle,
 } from "@components/ui/dialog";
 
-import Image from "next/image";
 
 const WorkspaceSettings = ({ isOpen, setIsOpen, workSpaceData }) => {
   return (

@@ -14,7 +14,7 @@ const LayoutOnboadingPage = ({ children }) => {
   }, [token]); // Run effect when token is available
 
   return (
-    <div className="flex items-center justify-center min-h-screen p-4">
+    <div className="flex bg-navBg items-center justify-center min-h-screen p-4">
       {children}
     </div>
   );

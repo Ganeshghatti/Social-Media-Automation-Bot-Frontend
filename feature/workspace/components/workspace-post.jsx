@@ -27,6 +27,7 @@ import { Switch } from "@/components/ui/switch";
 
 import axios from "axios";
 import useAuthToken from "@/hooks/useAuthToken";
+import { toast } from "sonner";
 
 const WorkSpacePost = ({ accountId, workSpaceId }) => {
   const [postId, setPostId] = useState();
@@ -45,7 +46,6 @@ const WorkSpacePost = ({ accountId, workSpaceId }) => {
 
   const onSubmit = async (data) => {
     try {
-
       const formData = {
         posts: [
           {
@@ -61,7 +61,7 @@ const WorkSpacePost = ({ accountId, workSpaceId }) => {
 
       // Step 1: Get presigned URLs
       const presignedResponse = await axios.post(
-        `https://api.bot.thesquirrel.site/workspace/posts/create/presigned-url/${workSpaceId}`,
+        `https://api.bot.thesquirrel.tech/workspace/posts/create/presigned-url/${workSpaceId}`,
         formData,
         {
           headers: {
@@ -103,6 +103,8 @@ const WorkSpacePost = ({ accountId, workSpaceId }) => {
 
             console.log(`File ${i + 1} upload status:`, uploadResult.status);
           } catch (uploadError) {
+            toast.error("Error in uploading file");
+
             console.error(`Error uploading file ${i + 1}:`, uploadError);
             throw uploadError;
           }
@@ -112,7 +114,7 @@ const WorkSpacePost = ({ accountId, workSpaceId }) => {
 
         // Step 3: Create final post with all media
         const finalResponse = await axios.post(
-          `https://api.bot.thesquirrel.site/workspace/posts/create/${workSpaceId}`,
+          `https://api.bot.thesquirrel.tech/workspace/posts/create/${workSpaceId}`,
           {
             posts: presignedResponse.data.data,
           },
@@ -127,7 +129,7 @@ const WorkSpacePost = ({ accountId, workSpaceId }) => {
       } else {
         // Handle post without media
         const finalResponse = await axios.post(
-          `https://api.bot.thesquirrel.site/workspace/posts/create/${workSpaceId}`,
+          `https://api.bot.thesquirrel.tech/workspace/posts/create/${workSpaceId}`,
           {
             posts: presignedResponse.data.data,
           },
@@ -144,6 +146,8 @@ const WorkSpacePost = ({ accountId, workSpaceId }) => {
         );
       }
     } catch (error) {
+      toast.error("Error in creating post");
+
       console.error("Detailed error:", {
         message: error.message,
         response: error.response?.data,
