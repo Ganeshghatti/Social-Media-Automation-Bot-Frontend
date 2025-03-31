@@ -24,6 +24,7 @@ import { useRouter } from "next/navigation";
 import { cn } from "@lib/utils";
 import { toast } from "sonner";
 import { CustomLoader } from "@components/global/CustomLoader";
+import { handleApiError } from "@lib/ErrorResponse";
 
 const formSchema = z.object({
   description: z.string().min(10, "Description must be at least 10 characters"),
@@ -66,7 +67,7 @@ const Page = ({ className = "" }) => {
 
   const onSubmit = async (data) => {
     try {
-      await axios.post(
+      const response = await axios.post(
         "https://api.bot.thesquirrel.tech/user/welcome",
         { description: data.description, keywords }, // Ensure correct structure
         {
@@ -77,12 +78,18 @@ const Page = ({ className = "" }) => {
         }
       );
 
-      form.reset(); // Reset form after success
-      setKeywords([]); // Clear keywords array
-      router.push("/dashboard");
+      if (response.data.success) {
+        form.reset(); // Reset form after success
+        setKeywords([]); // Clear keywords array
+        router.push("/dashboard");
+      } else {
+        throw new Error(response.data.error?.message || "Onboarding failed");
+      }
     } catch (error) {
-      toast.error("Error on the Onboarding Page");
-      console.error("Error:", error.response?.data || error.message);
+      const errorMessage = handleApiError(
+        error,
+        "Onboarding failed. Please try again."
+      );
     }
   };
 

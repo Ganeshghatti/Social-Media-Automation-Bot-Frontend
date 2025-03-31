@@ -6,6 +6,7 @@ import axios from "axios";
 import { CustomLoader } from "@components/global/CustomLoader";
 import { ScheduledCard } from "@components/scheduledPosts/ScheduledCard";
 import { toast } from "sonner";
+import { handleApiError } from "@/lib/ErrorResponse";
 const Page = () => {
   const [scheduledPosts, setScheduledPosts] = useState({});
   const [loading, setLoading] = useState(false);
@@ -27,14 +28,15 @@ const Page = () => {
       if (response.status === 200 && response.data.success) {
         setScheduledPosts(response.data.data.groupedPosts || {});
       } else {
-        toast.error("Failed to retrieve scheduled posts.");
-        throw new Error("Failed to retrieve scheduled posts.");
+        throw new Error(
+          response.data.error?.message || "Failed to fetch Scheduled Posts Data"
+        );
       }
     } catch (error) {
-      toast.error("Failed to retrieve scheduled posts.");
-
-      console.error("Error:", error);
-      setError("Failed to load scheduled posts.");
+      const errorMessage = handleApiError(
+        error,
+        "Error Fetching Scheduled Posts. Please try again."
+      );
     } finally {
       setLoading(false);
     }

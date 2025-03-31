@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useState, useEffect } from "react";
-
+import { handleApiError } from "@lib/ErrorResponse";
 import axios from "axios";
 
 const Page = ({ params }) => {
@@ -19,15 +19,24 @@ const Page = ({ params }) => {
         const response = await axios.post(
           `https://api.bot.thesquirrel.tech/user/verification/${token}`
         );
-        setMessage("Email verified successfully!");
-        setDescription(
-          "You can now close this window and login to your account"
-        );
-        console.log(response.data);
+
+        if (response.data.success) {
+          setMessage("Email verified successfully!");
+          setDescription(
+            "You can now close this window and login to your account"
+          );
+        } else {
+          throw new Error(
+            response.data.error?.message || "Verification failed"
+          );
+        }
       } catch (error) {
-        setMessage("Verification failed. Please try again.");
-        setDescription("Please try again later or contact support");
-        console.log(error);
+        const errorMessage = handleApiError(
+          error,
+          "Verification failed. Please try again."
+        );
+        setMessage(errorMessage);
+        setDescription("Please try again later or contact support.");
       } finally {
         setIsLoading(false);
       }
@@ -37,10 +46,10 @@ const Page = ({ params }) => {
   }, [token]);
 
   return (
-    <div className="h-screen w-screen flex justify-center items-center flex-col gap-10">
+    <div className="h-screen w-screen flex justify-center bg-navBg items-center flex-col gap-10">
       {" "}
-      <h1 className="text-5xl font-bold">{message}</h1>
-      <p className="text-muted-foregorund text-lg">{description}</p>
+      <h1 className="text-5xl text-white font-bold">{message}</h1>
+      <p className="text-white text-lg">{description}</p>
     </div>
   );
 };

@@ -1,4 +1,5 @@
 "use client";
+import { handleApiError } from "@/lib/ErrorResponse";
 import { useUserStore } from "@/store/userStore";
 import { CustomLoader } from "@components/global/CustomLoader";
 import useAuthToken from "@hooks/useAuthToken";
@@ -53,15 +54,16 @@ const WorkspacesPage = () => {
           },
         }
       );
+      console.log("workspace ", response);
       if (response.data.success) {
         setWorkspaces(response.data.data);
       } else {
-        setWorkspaces([]);
+        throw new Error(
+          response.data.error?.message || "Failed to Fetch Workspaces "
+        );
       }
     } catch (error) {
-      console.log("Error in getting workspaces ", error);
-      toast.error(`Error in getting workspaces`);
-      setWorkspaces([]);
+      const errorMessage = handleApiError(error, "Failed to fetch workspaces");
     } finally {
       setLoading(false);
     }
