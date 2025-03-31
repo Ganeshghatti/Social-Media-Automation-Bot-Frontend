@@ -50,7 +50,7 @@ const ForgetPassword = ({ className, ...props }) => {
       //   email: values.email.toLowerCase(),
       // };
       const response = await axios.post(
-        "https://api.bot.thesquirrel.site/user/forgot-password",
+        "https://api.bot.thesquirrel.tech/user/forgot-password",
         values
       );
       if (response.status === 200) {

@@ -18,7 +18,7 @@ const Page = () => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `https://api.bot.thesquirrel.site/scheduled/posts/`,
+        `https://api.bot.thesquirrel.tech/scheduled/posts/`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }

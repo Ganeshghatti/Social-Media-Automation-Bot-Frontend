@@ -46,7 +46,7 @@ const WorkspacesPage = () => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `https://api.bot.thesquirrel.site/workspace/get`,
+        `https://api.bot.thesquirrel.tech/workspace/get`,
         {
           headers: {
             Authorization: "Bearer " + token,

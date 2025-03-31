@@ -41,7 +41,7 @@ export const CreatePostCard = ({
               src={
                 user && user?.profilePicture
                   ? user?.profilePicture
-                  : "/default-profile.jpg"
+                  : "/logo.jpg"
               }
               height={40}
               width={40}
@@ -53,12 +53,18 @@ export const CreatePostCard = ({
       </CardTitle>
       <div className="flex h-full w-full  flex-col gap-4   justify-between">
         <div className="flex flex-1 w-full items-center justify-between ">
-          <h2 className="font-semibold text-xl text-white">{user?.username}</h2>
+          <h2 className="font-medium text-lg text-white">{user?.username}</h2>
 
           <DropdownMenu>
             <DropdownMenuTrigger>
-              <div className="w-8 h-8 bg-headerBg rounded-sm cursor-pointer flex justify-center items-center">
-                <Ellipsis className="h-5 w-5 object-contain text-white" />
+              <div className="w-8 h-8 hover:bg-headerBg rounded-sm cursor-pointer flex justify-center items-center">
+                <Image
+                  src="/ThreeDots.svg"
+                  alt="More"
+                  width={20}
+                  height={20}
+                  className="h-5 w-5 object-contain"
+                />
               </div>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="rounded-lg p-0 min-w-[140px] flex flex-col gap-2 bg-headerBg border-[0.5px] border-transparent">
@@ -69,8 +75,8 @@ export const CreatePostCard = ({
                 }}
                 className="flex gap-3  bg-[#2C3032] rounded-md hover:bg-[#2C3032] hover:opacity-100 px-4 justify-between py-3 items-center cursor-pointer"
               >
-                <span className="text-white text-base">Delete</span>
-                <Trash className="object-contain h-5 w-5 text-red-600" />
+                <span className="text-white text-xs">Delete</span>
+                <Trash className="object-contain h-4 w-4 text-red-600" />
               </div>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -85,14 +91,26 @@ export const CreatePostCard = ({
               setCards((prev) => [...prev, { id: prev.length, text: "" }]);
               setNewCardAdded(true);
             }}
-            className="w-8 h-8 rounded-sm flex bg-headerBg justify-center items-center cursor-pointer"
+            className="w-8 h-8 rounded-sm flex hover:bg-headerBg  justify-center items-center cursor-pointer"
           >
-            <Plus className="object-contain h-5 w-5 text-white" />
+            <Image
+              src={"/AddSquirrel.svg"}
+              alt="AddSquirrel "
+              height={20}
+              width={20}
+              className="object-contain h-4 w-4"
+            />
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger>
-              <div className="w-8 h-8 flex bg-headerBg rounded-sm justify-center items-center cursor-pointer">
-                <Images className="object-contain h-5 w-5 text-white" />
+              <div className="w-8 h-8 flex  rounded-sm  hover:bg-headerBg justify-center items-center cursor-pointer">
+                <Image
+                  src={"/SquireelGallery.svg"}
+                  alt="SquireelGallery"
+                  height={200}
+                  width={200}
+                  className="object-contain h-5 w-5"
+                />
               </div>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="rounded-lg px-2 py-2 min-w-[140px] flex flex-col gap-2 bg-headerBg border-[0.5px] border-[#ffffff32]">

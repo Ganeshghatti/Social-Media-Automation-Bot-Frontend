@@ -21,7 +21,7 @@ const SocialMediaAccount = () => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `https://api.bot.thesquirrel.site/workspace/posts/get/${workspaceId}/${socialMediaAccountId}?page=1`,
+        `https://api.bot.thesquirrel.tech/workspace/posts/get/${workspaceId}/${socialMediaAccountId}?page=1`,
         {
           headers: {
             Authorization: "Bearer " + token,

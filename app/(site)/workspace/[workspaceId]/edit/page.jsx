@@ -124,7 +124,7 @@ const EditWorkspace = () => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `https://api.bot.thesquirrel.site/workspace/get/${workspaceId}`,
+        `https://api.bot.thesquirrel.tech/workspace/get/${workspaceId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -158,7 +158,6 @@ const EditWorkspace = () => {
     try {
       if (!token) return;
 
-
       const payload = {
         name: data.name,
         timezone: data.timezone || "IST", // Default to IST if not selected
@@ -177,7 +176,7 @@ const EditWorkspace = () => {
       }
 
       const response = await axios.put(
-        `https://api.bot.thesquirrel.site/workspace/edit/${workspaceId}`,
+        `https://api.bot.thesquirrel.tech/workspace/edit/${workspaceId}`,
         payload,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -206,7 +205,7 @@ const EditWorkspace = () => {
       if (!token) return;
 
       const response = await axios.delete(
-        `https://api.bot.thesquirrel.site/workspace/delete/${workspaceId}`,
+        `https://api.bot.thesquirrel.tech/workspace/delete/${workspaceId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -219,7 +218,7 @@ const EditWorkspace = () => {
     } catch (error) {
       toast.error(`Failed to delete workspace`);
       console.error("Error:", error);
-    } 
+    }
   };
 
   const addKeyword = (value) => {

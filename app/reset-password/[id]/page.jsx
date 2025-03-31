@@ -55,7 +55,7 @@ const page = ({ className, ...props }) => {
   async function onSubmit(values) {
     try {
       const response = await axios.post(
-        "https://api.bot.thesquirrel.site/user/reset-password",
+        "https://api.bot.thesquirrel.tech/user/reset-password",
         {
           newPassword: values.newPassword,
           token: id,
@@ -83,7 +83,6 @@ const page = ({ className, ...props }) => {
               <h1 className="text-2xl font-bold text-white">
                 Reset Your Password
               </h1>
-          
             </div>
             <div className="grid gap-6">
               <FormField
@@ -91,7 +90,7 @@ const page = ({ className, ...props }) => {
                 name="newPassword"
                 render={({ field }) => (
                   <FormItem>
-                   <Label className="text-white">New Password</Label>
+                    <Label className="text-white">New Password</Label>
                     <FormControl>
                       <Input
                         placeholder="Enter your password"
@@ -110,7 +109,7 @@ const page = ({ className, ...props }) => {
                 name="confirmPassword"
                 render={({ field }) => (
                   <FormItem>
-                        <Label className="text-white">Confirm Password</Label>
+                    <Label className="text-white">Confirm Password</Label>
                     <FormControl>
                       <Input
                         placeholder="Confirm your password"

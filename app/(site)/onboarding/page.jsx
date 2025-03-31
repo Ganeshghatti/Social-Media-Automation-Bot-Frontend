@@ -67,7 +67,7 @@ const Page = ({ className = "" }) => {
   const onSubmit = async (data) => {
     try {
       await axios.post(
-        "https://api.bot.thesquirrel.site/user/welcome",
+        "https://api.bot.thesquirrel.tech/user/welcome",
         { description: data.description, keywords }, // Ensure correct structure
         {
           headers: {

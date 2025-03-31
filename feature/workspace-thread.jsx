@@ -67,7 +67,7 @@ const WorkSpaceThread = ({ accountId, workSpaceId }) => {
       console.log("Step 1: Sending initial data:", formData);
 
       const presignedResponse = await axios.post(
-        `https://api.bot.thesquirrel.site/workspace/posts/create/presigned-url/${workSpaceId}`,
+        `https://api.bot.thesquirrel.tech/workspace/posts/create/presigned-url/${workSpaceId}`,
         formData,
         {
           headers: {
@@ -76,14 +76,14 @@ const WorkSpaceThread = ({ accountId, workSpaceId }) => {
         }
       );
 
-      console.log("Presigned Response ",presignedResponse)
+      console.log("Presigned Response ", presignedResponse);
 
       const postsWithMedia = data.posts.filter(
         (post) => post.media && post.media.length > 0
       );
 
       if (postsWithMedia.length > 0) {
-        console.log("Step 2: Uploading media files for posts ",postsWithMedia);
+        console.log("Step 2: Uploading media files for posts ", postsWithMedia);
 
         for (
           let postIndex = 0;
@@ -93,7 +93,7 @@ const WorkSpaceThread = ({ accountId, workSpaceId }) => {
           const post = postsWithMedia[postIndex];
           const responsePost = presignedResponse.data.data[0].posts[postIndex];
 
-          console.log("Response post ",responsePost)
+          console.log("Response post ", responsePost);
 
           if (post.media && responsePost.media) {
             for (
@@ -103,7 +103,7 @@ const WorkSpaceThread = ({ accountId, workSpaceId }) => {
             ) {
               const mediaItem = post.media[mediaIndex];
               const presignedMediaItem = responsePost.media[mediaIndex];
-              console.log("Media ",presignedMediaItem)
+              console.log("Media ", presignedMediaItem);
 
               if (mediaItem && presignedMediaItem) {
                 console.log(
@@ -126,7 +126,7 @@ const WorkSpaceThread = ({ accountId, workSpaceId }) => {
 
                   console.log(`File upload status:`, uploadResult.status);
                 } catch (uploadError) {
-                  toast.error("Error in uploading File")
+                  toast.error("Error in uploading File");
                   console.error(`Error uploading file:`, uploadError);
                   throw uploadError;
                 }
@@ -139,7 +139,7 @@ const WorkSpaceThread = ({ accountId, workSpaceId }) => {
       console.log("Step 3: Creating final post");
 
       const finalResponse = await axios.post(
-        `https://api.bot.thesquirrel.site/workspace/posts/create/${workSpaceId}`,
+        `https://api.bot.thesquirrel.tech/workspace/posts/create/${workSpaceId}`,
         {
           posts: presignedResponse.data.data,
         },
@@ -150,11 +150,11 @@ const WorkSpaceThread = ({ accountId, workSpaceId }) => {
         }
       );
 
-      console.log("Final Response ",finalResponse)
+      console.log("Final Response ", finalResponse);
 
       console.log("Post created successfully:", finalResponse.data);
     } catch (error) {
-      toast.error("Error in posting data")
+      toast.error("Error in posting data");
 
       console.error("Error posting data", error);
     }

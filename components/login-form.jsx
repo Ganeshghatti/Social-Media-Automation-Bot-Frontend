@@ -56,7 +56,7 @@ export function LoginForm({ className, ...props }) {
     try {
       setLoading(true);
       const response = await axios.post(
-        "https://api.bot.thesquirrel.site/user/login",
+        "https://api.bot.thesquirrel.tech/user/login",
         values
       );
 

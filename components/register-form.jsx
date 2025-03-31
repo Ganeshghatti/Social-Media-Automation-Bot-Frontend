@@ -56,7 +56,7 @@ export function RegisterForm({ className, ...props }) {
       };
 
       const response = await axios.post(
-        "https://api.bot.thesquirrel.site/user/signup",
+        "https://api.bot.thesquirrel.tech/user/signup",
         lowerCaseValues
       );
 

@@ -40,8 +40,6 @@ const WorkspacePage = () => {
     }
   }, [token, fetchUser]);
 
-
-
   useEffect(() => {
     const handleKeyPress = (e) => {
       if (e.ctrlKey && e.shiftKey) {
@@ -74,7 +72,7 @@ const WorkspacePage = () => {
   const SingleWorkspaceData = useCallback(async (workspaceId, token) => {
     try {
       const response = await axios.get(
-        `https://api.bot.thesquirrel.site/workspace/get/${workspaceId}`,
+        `https://api.bot.thesquirrel.tech/workspace/get/${workspaceId}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       console.log("Workspace Data:", response.data.data);
@@ -172,7 +170,7 @@ const WorkspacePage = () => {
 
       console.log("Fetching presigned URL...");
       const presignedResponse = await axios.post(
-        `https://api.bot.thesquirrel.site/workspace/posts/create/presigned-url/${workspaceId}`,
+        `https://api.bot.thesquirrel.tech/workspace/posts/create/presigned-url/${workspaceId}`,
         formData,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -187,7 +185,7 @@ const WorkspacePage = () => {
       console.log("Final Data being sent:", JSON.stringify(finalData, null, 2));
 
       const finalResponse = await axios.post(
-        `https://api.bot.thesquirrel.site/workspace/posts/create/${workspaceId}`,
+        `https://api.bot.thesquirrel.tech/workspace/posts/create/${workspaceId}`,
         finalData,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -269,7 +267,7 @@ const WorkspacePage = () => {
 
       // Step 1: Get presigned URL response
       const presignedResponse = await axios.post(
-        `https://api.bot.thesquirrel.site/workspace/posts/create/presigned-url/${workspaceId}`,
+        `https://api.bot.thesquirrel.tech/workspace/posts/create/presigned-url/${workspaceId}`,
         formData,
         {
           headers: {
@@ -302,7 +300,7 @@ const WorkspacePage = () => {
 
       // Step 3: Send final request to draft API
       const finalResponse = await axios.post(
-        `https://api.bot.thesquirrel.site/workspace/draft/create/${workspaceId}`,
+        `https://api.bot.thesquirrel.tech/workspace/draft/create/${workspaceId}`,
         postData,
         {
           headers: {
@@ -358,7 +356,7 @@ const WorkspacePage = () => {
       const token = localStorage.getItem("token");
 
       const finalResponse = await axios.put(
-        `https://api.bot.thesquirrel.site/workspace/draft/edit/${workspaceId}`,
+        `https://api.bot.thesquirrel.tech/workspace/draft/edit/${workspaceId}`,
         formData,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -386,7 +384,7 @@ const WorkspacePage = () => {
       try {
         setDraftLoading(true);
         const response = await axios.get(
-          `https://api.bot.thesquirrel.site/workspace/draft/get/${workspaceId}`,
+          `https://api.bot.thesquirrel.tech/workspace/draft/get/${workspaceId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -433,7 +431,7 @@ const WorkspacePage = () => {
       />
 
       <Form>
-        <form className="w-full flex-1 flex flex-col p-4 py-10 mb-8 no-scrollbar overflow-y-auto items-center ">
+        <form className="w-full flex-1 flex flex-col p-4 py-10  no-scrollbar overflow-y-auto items-center ">
           {cards.map((card, index) => (
             <CreatePostCard
               key={index}
