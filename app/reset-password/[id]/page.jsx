@@ -95,7 +95,7 @@ const page = ({ className, ...props }) => {
                     <FormControl>
                       <Input
                         placeholder="Enter your password"
-                        type="text"
+                        type="password"
                         className="bg-[#1A1D1F] border-[0.5px] border-[#D8DADC]/50 rounded-[10px] text-white"
                         {...field}
                         value={field.value ?? ""}
@@ -114,7 +114,7 @@ const page = ({ className, ...props }) => {
                     <FormControl>
                       <Input
                         placeholder="Confirm your password"
-                        type="text"
+                        type="password"
                         className="bg-[#1A1D1F] border-[0.5px] border-[#D8DADC]/50 rounded-[10px] text-white"
                         {...field}
                         value={field.value ?? ""}
