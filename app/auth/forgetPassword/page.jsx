@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/form";
 import { toast } from "sonner";
 import { Label } from "@components/ui/label";
+import useAuthToken from "@/hooks/useAuthToken";
 
 // ✅ Move Schema outside component
 const formSchema = z.object({
@@ -26,7 +27,11 @@ const formSchema = z.object({
 });
 
 const ForgetPassword = ({ className, ...props }) => {
+  const token = useAuthToken();
   const router = useRouter();
+  if (token) {
+    router.push("/dashboard");
+  }
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -88,7 +93,10 @@ const ForgetPassword = ({ className, ...props }) => {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full rounded-[10px] text-white">
+              <Button
+                type="submit"
+                className="w-full rounded-[10px] text-white"
+              >
                 Submit
               </Button>
             </div>
