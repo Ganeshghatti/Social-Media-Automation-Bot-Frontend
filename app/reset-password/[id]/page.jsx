@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/form";
 import { Label } from "@components/ui/label";
 
-const page = ({ className, ...props }) => {
+const page = () => {
   const router = useRouter();
   const { id } = useParams();
   console.log("Id ", id);
