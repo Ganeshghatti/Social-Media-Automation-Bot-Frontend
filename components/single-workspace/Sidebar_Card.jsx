@@ -16,7 +16,7 @@ export const Sidebar_Card = ({ text, imageUrl, onClickFunction }) => {
         alt="Dashboard Image"
         height={24}
         width={24}
-        className="object-contain"
+        className="object-contain "
       />
       <span className="font-semibold text-base text-white">{text}</span>
     </div>

@@ -15,6 +15,7 @@ import {
   CardTitle,
 } from "@components/ui/card";
 import { Edit, Trash } from "lucide-react";
+import { toast } from "sonner";
 
 export const DraftPosts = ({
   workspaceId,
@@ -25,35 +26,19 @@ export const DraftPosts = ({
   setPostType,
   isEditingDraft,
   setIsEditingDraft,
+  threadIdForEdit,
+  setThreadIdForEdit,
+  SingleWorkspaceDraftData,
+  draftLoading,
+  setDraftLoading,
+  setDraftPosts,
+  draftPosts,
 }) => {
-  const [draftPosts, setDraftPosts] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
-
-  const SingleWorkspaceData = useCallback(async (workspaceId, token) => {
-    try {
-      setLoading(true);
-      const response = await axios.get(
-        `https://api.bot.thesquirrel.site/workspace/draft/get/${workspaceId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      setDraftPosts(response.data.data);
-      console.log("draft ", response.data.data);
-    } catch (error) {
-      console.log("Error ", error);
-      setDraftPosts(null);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
 
   const DeleteDraftPost = async (draftType, draftPostId) => {
     try {
-      setLoading(true);
+      setDraftLoading(true);
 
       console.log("Deelete Draft Type ", draftType);
 
@@ -72,35 +57,56 @@ export const DraftPosts = ({
         }
       );
 
-      console.log("Draft deleted:", response.data.data);
-      SingleWorkspaceData(workspaceId, token);
+      SingleWorkspaceDraftData(
+        workspaceId,
+        token,
+        setDraftLoading,
+        setDraftPosts
+      );
+      toast("Draft Post Has been deleted");
     } catch (error) {
       console.error("Error deleting draft:", error);
-      SingleWorkspaceData(workspaceId, token);
+      SingleWorkspaceDraftData(
+        workspaceId,
+        token,
+        setDraftLoading,
+        setDraftPosts
+      );
     } finally {
-      setLoading(false);
+      setDraftLoading(false);
     }
   };
 
-  const EditDraftPosts = (draftType, draftPostId, draft) => {
+  const EditDraftPosts = (
+    draftType,
+    draftPostId,
+    draft,
+    setThreadIdForEdit
+  ) => {
     setIsEditingDraft(true);
     if (draft?.type === "thread") {
+      setThreadIdForEdit(draft?.threadId);
       setCards(
-        draft.threadPosts.map((post, index) => ({
-          id: index,
+        draft?.threadPosts.map((post) => ({
+          id: post?._id,
           text: post.content,
         }))
       );
     } else {
-      setCards([{ id: 0, text: draft.content }]); // For non-thread drafts
+      setCards([{ id: draft?._id, text: draft.content }]); // For non-thread drafts
     }
   };
 
   useEffect(() => {
-    SingleWorkspaceData(workspaceId, token);
+    SingleWorkspaceDraftData(
+      workspaceId,
+      token,
+      setDraftLoading,
+      setDraftPosts
+    );
   }, [workspaceId, token]);
 
-  if (!loading) {
+  if (!draftLoading) {
     <main className="flex w-full flex-1 justify-around px-4 py-3">
       <h1 className="text-2xl font-semibold">Loading...</h1>
     </main>;
@@ -117,7 +123,8 @@ export const DraftPosts = ({
           {" "}
           <AccordionTrigger>Draft Posts</AccordionTrigger>
           <AccordionContent
-            className=" grid md:grid-cols-4 items-center grid-cols-2 justify-around w-full rounded-xl bg-headerBg
+            className=" grid md:grid-cols-4 items-center grid-cols-2 justify-around
+             w-full rounded-xl bg-headerBg
              border-[#ffffff30] px-5 py-6   gap-6"
           >
             {draftPosts?.length > 0 &&
@@ -126,7 +133,8 @@ export const DraftPosts = ({
                   key={i}
                   onMouseEnter={() => setIsHovering(true)}
                   onMouseLeave={() => setIsHovering(false)}
-                  className={` bg-navBg text-white py-4  border rounded-[20px] border-[#ffffff30] 
+                  className={` bg-navBg text-white py-4  border rounded-[20px]
+                     border-[#ffffff30] 
                   px-4`}
                 >
                   <CardContent className="px-0">
@@ -160,7 +168,8 @@ export const DraftPosts = ({
                         EditDraftPosts(
                           draft.type,
                           draft?.type === "thread" ? draft.threadId : draft._id,
-                          draft
+                          draft,
+                          setThreadIdForEdit
                         )
                       }
                       className={`px-3 py-2 rounded-sm bg-headerBg cursor-pointer ${

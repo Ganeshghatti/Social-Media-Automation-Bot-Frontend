@@ -47,7 +47,7 @@ const Page = () => {
     description: z.string().min(1, "Description is required"),
     keywords: z.array(z.string()),
     icon: z.any().optional().nullable(),
-    timezone: z.string().optional(),
+    timezone: z.string(),
   });
 
   const form = useForm({
@@ -193,7 +193,7 @@ const Page = () => {
       <CreatePostHeader />
 
       <div className="flex gap-6 flex-col w-[96%] mx-auto py-3 ">
-        <h1 className="text-4xl font-semibold  text-white">Create Workspace</h1>
+        <h1 className="text-4xl font-semibold  text-white md:text-left text-center">Create Workspace</h1>
 
         <Form {...form}>
           <form
@@ -201,12 +201,12 @@ const Page = () => {
             className="w-full rounded-xl bg-headerBg
              border-[#ffffff30] px-5 py-6 flex flex-col gap-6"
           >
-            <div className="w-full flex gap-3 items-center justify-between">
+            <div className="w-full flex gap-3 items-center justify-between flex-wrap md:flex-row flex-col">
               <FormField
                 control={form.control}
                 name="name"
                 render={({ field }) => (
-                  <FormItem className="flex-1 bg-navBg text-white py-4 border rounded-[20px] border-[#ffffff30] px-2">
+                  <FormItem className="flex-1 w-full bg-navBg text-white py-4 border rounded-[20px] border-[#ffffff30] px-2">
                     <FormControl>
                       <Input
                         className="bg-transparent border-transparent focus:border-transparent focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-[24px] placeholder:text-[24px]"
@@ -224,7 +224,7 @@ const Page = () => {
                 control={form.control}
                 name="timezone"
                 render={({ field }) => (
-                  <div className="flex-1 flex gap-3 bg-navBg text-white py-4 border rounded-[20px] justify-center items-center border-[#ffffff30] px-2">
+                  <div className="flex-1 w-full flex gap-3 bg-navBg text-white py-4 border rounded-[20px] justify-center items-center border-[#ffffff30] px-2">
                     <Select
                       onValueChange={(value) => {
                         field.onChange(value);
@@ -258,7 +258,7 @@ const Page = () => {
                 control={form.control}
                 name="icon"
                 render={({ field }) => (
-                  <div className="flex-1 relative">
+                  <div className="flex-1 w-full relative">
                     <input
                       type="file"
                       id="fileInput"
