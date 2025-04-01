@@ -19,16 +19,16 @@ import { toast } from "sonner";
 import { Label } from "@components/ui/label";
 import useAuthToken from "@/hooks/useAuthToken";
 
-// ✅ Move Schema outside component
 const formSchema = z.object({
   email: z.string().email({
     message: "Please enter a valid email address.",
   }),
 });
 
-const ForgetPassword = ({ className, ...props }) => {
+const ForgetPassword = () => {
   const token = useAuthToken();
   const router = useRouter();
+
   if (token) {
     router.push("/dashboard");
   }
@@ -61,7 +61,7 @@ const ForgetPassword = ({ className, ...props }) => {
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className={cn("flex flex-col gap-10", className)}
+            className="flex flex-col gap-10"
           >
             <div className="flex flex-col items-center gap-2 text-center">
               <h1 className="text-2xl font-bold text-white">
