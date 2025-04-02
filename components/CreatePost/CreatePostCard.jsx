@@ -6,19 +6,10 @@ import { CustomTextarea } from "../global/CustomTextarea";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { useUserStore } from "@/store/userStore";
-import {
-  Ellipsis,
-  Images,
-  Plus,
-  Search,
-  Sparkles,
-  Trash,
-  Upload,
-} from "lucide-react";
+import { Search, Sparkles, Trash, Upload } from "lucide-react";
 
 export const CreatePostCard = ({
   value,
@@ -29,10 +20,17 @@ export const CreatePostCard = ({
   cards,
   setPostType,
   cardId,
+  width,
 }) => {
   const { user, setUser } = useUserStore();
   return (
-    <Card className="w-full sm:w-full md:w-[60vw] lg:w-[70vw] xl:w-[55vw] flex flex-row gap-4 bg-transparent h-full max-h-[240px] border-transparent mx-auto min-w-[240px] max-w-[1440px]">
+    <Card
+      className={`w-full sm:w-full 
+        flex flex-row gap-4 bg-transparent h-full max-h-[240px] 
+        border-transparent mx-auto 
+        ${!width?"md:w-[60vw] lg:w-[70vw] xl:w-[55vw] min-w-[240px] max-w-[1440px] ":"w-full"}
+        `}
+    >
       <CardTitle className="p-0 justify-between   flex gap-4 h-full items-center">
         <div className="flex gap-4 items-center justify-center  h-full ">
           <div className="relative h-full  ">

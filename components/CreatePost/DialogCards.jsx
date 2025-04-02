@@ -30,7 +30,7 @@ export const DialogCards = ({
                 setNewCardAdded={setNewCardAdded}
                 isFirst={index === 0}
                 isLast={index === localCards.length - 1}
-                width={"600px"}
+                width={true}
               />
             ))}
         </form>
@@ -38,4 +38,3 @@ export const DialogCards = ({
     </div>
   );
 };
-

@@ -11,6 +11,7 @@ import useAuthToken from "@hooks/useAuthToken";
 import { CustomLoader } from "@/components/global/CustomLoader";
 import { useUserStore } from "@/store/userStore";
 import { useRouter } from "next/navigation";
+import { handleApiError } from "@/lib/ErrorResponse";
 
 const Page = () => {
   const token = useAuthToken();
@@ -31,9 +32,18 @@ const Page = () => {
             },
           }
         );
-        setUserData(response.data.data);
+        if (response.data.success) {
+          setUserData(response.data.data);
+        } else {
+          throw new Error(
+            response.data.error?.message || "Failed to fetch Profile Data"
+          );
+        }
       } catch (error) {
-        console.error("Error fetching profile:", error);
+        const errorMessage = handleApiError(
+          error,
+          "Error Fetching Profile. Please try again."
+        );
       } finally {
         setLoading(false);
       }

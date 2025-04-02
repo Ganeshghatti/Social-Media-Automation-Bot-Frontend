@@ -85,7 +85,8 @@ export const DateTimePicker = ({ date, setDate }) => {
           onClick={handleClose}
         >
           <div
-            className="bg-white rounded-lg shadow-lg flex flex-col p-4 w-[600px] max-h-[80vh] overflow-y-auto justify-between"
+            className="bg-navBg text-white rounded-lg shadow-lg flex flex-col p-4 
+            w-[600px] max-h-[90vh] overflow-y-auto justify-between space-y-6"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex flex-row justify-between max-h-[40vh]">
@@ -164,8 +165,8 @@ export const DateTimePicker = ({ date, setDate }) => {
                 </div>
               </div>
             </div>
-            <div className="flex flex-col items-center gap-2 mt-4">
-              <Button variant="outline" className="w-full" onClick={handleClose}>
+            <div className="flex flex-col items-center gap-2 mt-8">
+              <Button variant="outline" className="w-full text-black" onClick={handleClose}>
                 Cancel
               </Button>
               <Button className="w-full" onClick={handleApply}>
