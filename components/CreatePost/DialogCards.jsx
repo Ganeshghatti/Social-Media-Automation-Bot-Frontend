@@ -43,9 +43,7 @@ export const DialogCards = ({
                 setNewCardAdded={setNewCardAdded}
                 isFirst={index === 0}
                 isLast={index === localCards.length - 1}
-                width={"600px"}
-                selectedImages={card.media} // Pass current media
-                onImageSelect={(images) => handleImageSelect(card.id, images)} // Enable image updates
+                width={true}
               />
             ))}
         </form>

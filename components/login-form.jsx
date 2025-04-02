@@ -29,6 +29,7 @@ import Image from "next/image";
 import { Label } from "./ui/label";
 import { toast } from "sonner";
 import { useUserStore } from "@/store/userStore";
+import { handleApiError } from "@lib/ErrorResponse";
 
 export function LoginForm({ className, ...props }) {
   const router = useRouter();
@@ -60,24 +61,30 @@ export function LoginForm({ className, ...props }) {
         values
       );
 
-      const token = response.data.data.token;
+      if (response.data.success) {
+        const token = response.data.data.token;
 
-      if (typeof window !== "undefined") {
-        localStorage.setItem("token", token);
-      }
-
-      if (token) {
-        await fetchUser(token);
-
-        if (useUserStore.getState().user?.onboarding) {
-          router.replace("/dashboard");
-        } else {
-          router.replace("/onboarding");
+        if (typeof window !== "undefined") {
+          localStorage.setItem("token", token);
         }
+
+        if (token) {
+          await fetchUser(token);
+
+          if (useUserStore.getState().user?.onboarding) {
+            router.replace("/dashboard");
+          } else {
+            router.replace("/onboarding");
+          }
+        }
+      } else {
+        throw new Error(response.data.error?.message || "Signin failed");
       }
     } catch (error) {
-      toast.error("Login Failed");
-      console.error("Login failed:", error);
+      const errorMessage = handleApiError(
+        error,
+        "Verification failed. Please try again."
+      );
     } finally {
       setLoading(false);
     }

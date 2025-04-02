@@ -60,13 +60,17 @@ export function RegisterForm({ className, ...props }) {
         lowerCaseValues
       );
 
-      if (response.data) {
+      if (response.data.success) {
         window.location.href = "/auth/verify";
+      } else {
+        throw new Error(response.data.error?.message || "Signup failed");
       }
     } catch (error) {
-      toast.error("Sigup Failed");
+      const errorMessage =
+        error.response?.data?.error?.message ||
+        "Signup Failed. Please try again.";
+      toast.error(errorMessage);
       console.error("Signup failed:", error);
-      // You might want to show an error message to the user here
     }
   }
 

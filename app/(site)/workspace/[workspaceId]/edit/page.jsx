@@ -44,6 +44,7 @@ import {
   DialogTrigger,
 } from "@components/ui/dialog";
 import { toast } from "sonner";
+import { handleApiError } from "@lib/ErrorResponse";
 const EditWorkspace = () => {
   const [loading, setLoading] = useState(false);
   const [singleWorkspace, setSingleWorkspace] = useState(null);
@@ -188,15 +189,28 @@ const EditWorkspace = () => {
         data.icon &&
         response.data.data.presignedUrl
       ) {
-        await axios.put(response.data.data.presignedUrl, data.icon.file, {
-          headers: { "Content-Type": data.icon.mimetype },
-        });
-      }
+        const finalResponse = await axios.put(
+          response.data.data.presignedUrl,
+          data.icon.file,
+          {
+            headers: { "Content-Type": data.icon.mimetype },
+          }
+        );
 
-      // router.push("/workspaces");
+        if (finalResponse.data.success) {
+          console.log("Edited Workspace Data ", response.data.data);
+          toast("Workspace has been edited");
+        } else {
+          throw new Error(
+            response.data.error?.message || "Failed to edit workspace"
+          );
+        }
+      }
     } catch (error) {
-      toast.error(`Failed to edit workspace`);
-      console.error("Error:", error);
+      const errorMessage = handleApiError(
+        error,
+        "Failed to edit workspace. Please try again."
+      );
     }
   };
 
@@ -214,10 +228,16 @@ const EditWorkspace = () => {
       if (response.data.success) {
         toast(`Workspace deleted`);
         router.push("/workspaces");
+      } else {
+        throw new Error(
+          response.data.error?.message || "Failed to delete workspace"
+        );
       }
     } catch (error) {
-      toast.error(`Failed to delete workspace`);
-      console.error("Error:", error);
+      const errorMessage = handleApiError(
+        error,
+        "Failed to delete workspace. Please try again."
+      );
     }
   };
 
@@ -261,7 +281,6 @@ const EditWorkspace = () => {
              px-4 md:px-6 py-6 flex flex-col gap-6"
           >
             <div className="w-full flex flex-col lg:flex-row flex-wrap gap-4 flex-1">
-              {/* Workspace Name Input */}
               <FormField
                 control={form.control}
                 name="name"
@@ -280,7 +299,6 @@ const EditWorkspace = () => {
                 )}
               />
 
-              {/* Timezone Selector */}
               <FormField
                 control={form.control}
                 name="timezone"
@@ -312,7 +330,6 @@ const EditWorkspace = () => {
                 )}
               />
 
-              {/* Image Upload */}
               <FormField
                 control={form.control}
                 name="icon"

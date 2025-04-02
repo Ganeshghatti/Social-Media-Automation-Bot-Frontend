@@ -1,11 +1,9 @@
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Script from 'next/script';
 import { Toaster } from "@/components/ui/sonner"
-import { SidebarProvider } from "../components/ui/sidebar";
 
 export const metadata = {
-  title: "Social Media Bot",
+  title: "The Squirrel",
   description: "Social Media Bot",
 };
 
@@ -13,7 +11,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={`family-jakarta antialiased`}>
-        {/* <Script
+        <Script
           id="google-analytics"
           strategy="afterInteractive"
           src={`https://www.googletagmanager.com/gtag/js?id=G-TNSWCQXZTN`}
@@ -28,8 +26,8 @@ export default function RootLayout({ children }) {
             gtag('js', new Date());
             gtag('config', 'G-TNSWCQXZTN');
           `}
-        </Script> */}
-        <div className="flex flex-col w-screen">
+        </Script>
+        <div className="flex flex-col w-screen overflow-x-hidden">
           {children}
         </div>
         <Toaster />

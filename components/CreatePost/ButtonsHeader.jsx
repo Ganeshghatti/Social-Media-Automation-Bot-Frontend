@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import CustomButtonHeader from "./CustomButtonHeader";
 import { Button } from "@components/ui/button";
 import {
@@ -17,6 +17,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { DateTimePicker } from "@components/global/DateTimePicker";
 import { SidebarTrigger } from "@components/ui/sidebar";
 import { toast } from "sonner";
+import { connectLinkedin, connectTwitter } from "@functions/social";
+import { useRouter } from "next/navigation";
+import useAuthToken from "@hooks/useAuthToken";
+import { Sidebar_Card } from "@components/single-workspace/Sidebar_Card";
 
 export const ButtonsHeader = ({
   isEditingDraft,
@@ -30,7 +34,12 @@ export const ButtonsHeader = ({
   textAreaRefs,
   setNewCardAdded,
 }) => {
+  const [workspaceData, setWorkspaceData] = useState(singleWorkspace);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const router = useRouter();
+  const token = useAuthToken();
+  const [localCards, setLocalCards] = useState(cards || [{ id: 0, text: "" }]);
+
 
   const formSchema = z.object({
     scheduledDateTime: z.date({ required_error: "Please select a date and time" }),
@@ -40,6 +49,17 @@ export const ButtonsHeader = ({
     resolver: zodResolver(formSchema),
     defaultValues: { scheduledDateTime: null },
   });
+
+  const handleTextareaChange = (id, val) => {
+    setLocalCards((prev) =>
+      prev.map((card) => (card.id === id ? { ...card, text: val } : card))
+    );
+    if (setCards) {
+      setCards((prev) =>
+        prev.map((card) => (card.id === id ? { ...card, text: val } : card))
+      );
+    }
+  };
 
   const onSubmit = (values) => {
     try {
@@ -51,6 +71,17 @@ export const ButtonsHeader = ({
       console.error("Submission error:", error);
     }
   };
+
+  useEffect(() => {
+    setWorkspaceData(singleWorkspace);
+  }, [singleWorkspace]);
+
+  
+  useEffect(() => {
+    if (cards) {
+      setLocalCards(cards);
+    }
+  }, [cards]);
 
   return (
     <div className="w-full px-8 py-3 gap-3 flex justify-center md:justify-end">
@@ -73,45 +104,96 @@ export const ButtonsHeader = ({
             </span>
           </Button>
         </DialogTrigger>
-        <DialogContent className="w-[80vw] max-w-[900px] h-[80vh] max-h-[720px] p-4 bg-navBg flex border-transparent gap-4 rounded-lg shadow-lg">
-          <DialogTitle className="sr-only">Schedule Post</DialogTitle>
-          <div className="flex flex-row gap-4 h-full w-full overflow-hidden">
-            <DialogSidebar
-              workspaceData={singleWorkspace}
-              isSubmitting={form.formState.isSubmitting}
-              onSubmit={form.handleSubmit(onSubmit)}
-            />
-            <div className="flex flex-col gap-6 items-center justify-start h-full w-full px-4 pt-6 pb-4 ">
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="w-full flex flex-col items-center gap-4">
-                  <FormField
-                    control={form.control}
-                    name="scheduledDateTime"
-                    render={({ field }) => (
-                      <FormItem className="w-3/4 max-w-[400px]">
-                        <FormControl>
-                          <DateTimePicker date={field.value} setDate={field.onChange} />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                </form>
-              </Form>
-              <DialogCards
-                localCards={cards}
-                setLocalCards={setCards}
-                setNewCardAdded={setNewCardAdded}
-                textAreaRefs={textAreaRefs}
+        {workspaceData?.connectedAccounts?.length > 0 ? (
+          <DialogContent
+            className="w-[90%] md:w-[60vw] md:max-w-[60vw] h-[720px] 
+        p-0 bg-navBg flex border-transparent gap-2 items-start"
+          >
+            <DialogTitle></DialogTitle>
+
+            <div className="flex flex-col-reverse lg:flex-row relative gap-3 h-full w-full">
+              <div className=" w-full lg:w-auto">
+                <DialogSidebar
+                  workspaceData={workspaceData}
+                  isSubmitting={form.formState.isSubmitting}
+                  onSubmit={form.handleSubmit(onSubmit)}
+                />
+              </div>
+
+              <div className="flex flex-col gap-4 items-start justify-start h-full w-full pt-20 p-2 order-1 md:order-2">
+                <Form {...form}>
+                  <form
+                    onSubmit={form.handleSubmit(onSubmit)}
+                    className="flex flex-col w-full justify-center items-center"
+                  >
+                    <FormField
+                      control={form.control}
+                      name="scheduledDateTime"
+                      render={({ field }) => (
+                        <FormItem className="w-[70%] lg:w-2/3">
+                          <FormControl>
+                            <DateTimePicker
+                              date={field.value}
+                              setDate={(date) => {
+                                console.log("Form Field Updated:", date);
+                                field.onChange(date);
+                              }}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  </form>
+                </Form>
+                <DialogCards
+                  handleTextareaChange={handleTextareaChange}
+                  localCards={localCards}
+                  setLocalCards={setLocalCards}
+                  setNewCardAdded={setNewCardAdded}
+                  textAreaRefs={textAreaRefs}
+                />
+              </div>
+            </div>
+          </DialogContent>
+        ) : (
+          <DialogContent
+            className="w-[90%] md:w-[60vw] md:max-w-[60vw] h-1/2 py-12 
+         bg-headerBg  space-y-6 border-transparent gap-2 flex flex-col items-center justify-center"
+          >
+            <DialogTitle className="text-3xl text-white">
+              No Accounts To Connect
+            </DialogTitle>
+
+            <div className="w-[60%] p-4 grid grid-cols-1 lg:grid-cols-2 items-center gap-5">
+              <Sidebar_Card
+                onClickFunction={() =>
+                  connectTwitter(workspaceData?._id, router, token)
+                }
+                imageUrl={"/twitter.png"}
+                text={"Connect X"}
+              />
+              <Sidebar_Card
+                onClickFunction={() =>
+                  connectLinkedin(workspaceData?._id, router, token)
+                }
+                imageUrl={"/linkedIn.png"}
+                text={"Connect LinkedIn"}
               />
             </div>
-          </div>
-        </DialogContent>
+          </DialogContent>
+        )}
       </Dialog>
       <CustomButtonHeader
         buttonColor={"#1E58E8"}
         buttonText={"Publish"}
         activeButtons={activeButtons}
-        actionButton={() => onPublish()}
+        actionButton={
+          singleWorkspace?.connectedAccounts?.length > 0
+            ? () => onPublish()
+            : () => {
+                setIsDialogOpen(true);
+              }
+        } // Immediate publish
         isDisabled={activeButtons}
       />
     </div>

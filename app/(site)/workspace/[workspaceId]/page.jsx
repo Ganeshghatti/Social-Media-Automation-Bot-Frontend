@@ -15,6 +15,7 @@ import { Form } from "@components/ui/form";
 import axios from "axios";
 import { DateTime } from "luxon";
 import { CustomLoader } from "@/components/global/CustomLoader";
+import { handleApiError } from "@/lib/ErrorResponse";
 
 const WorkspacePage = () => {
   const { workspaceId } = useParams();
@@ -74,16 +75,22 @@ const WorkspacePage = () => {
         `https://api.bot.thesquirrel.tech/workspace/get/${workspaceId}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      setSingleWorkspace(response.data.data);
-      if (response.data.data.connectedAccounts?.length > 0) {
-        setAccountId(response.data.data.connectedAccounts[0].userId);
+      if (response.data.success) {
+        setSingleWorkspace(response.data.data);
+        if (response.data.data.connectedAccounts?.length > 0) {
+          setAccountId(response.data.data.connectedAccounts[0].userId);
+        }
       } else {
-        console.log("No connected accounts found");
+        throw new Error(
+          response.data.error?.message ||
+            "Failed to fetch Single Workspace Data"
+        );
       }
     } catch (error) {
-      toast.error("Failed to get Single Workspace");
-      console.error("Error fetching workspace:", error);
-      setSingleWorkspace(null);
+      const errorMessage = handleApiError(
+        error,
+        "Failed to fetch Single Workspace Data. Please try again."
+      );
     } finally {
       setLoading(false);
     }
@@ -124,6 +131,15 @@ const WorkspacePage = () => {
           .setZone(workspaceTimezone)
           .toFormat("yyyy-MM-dd HH:mm:ss")
       : "";
+
+    // let formattedDateTime = "";
+    // if (scheduledDateTime) {
+    //   formattedDateTime = DateTime.fromJSDate(scheduledDateTime)
+    //     .setZone(workspaceTimezone)
+    //     .toFormat("yyyy-MM-dd HH:mm:ss"); // Format in local timezone
+
+    //   console.log("Formate Time zone ", formattedDateTime);
+    // }
 
     const isThread = cards.length > 1 && postType === "thread";
 
@@ -255,9 +271,40 @@ const WorkspacePage = () => {
       console.log("Final Response:", finalResponse.data);
       toast(scheduledDateTime ? "Post scheduled successfully!" : "Post published successfully!");
       setCards([{ id: 0, text: "", media: [] }]);
+      if (finalResponse.data.success) {
+        console.log("Final Response:", finalResponse.data);
+        toast(
+          scheduledDateTime
+            ? "Post scheduled successfully!"
+            : "Post published successfully!"
+        );
+      } else {
+        throw new Error(
+          response.data.error?.message || "Failed to Published Post"
+        );
+      }
     } catch (error) {
       console.error("Error creating post/thread:", error);
       toast.error(`Failed to schedule/publish post: ${error.response?.data?.message || error.message}`);
+      console.error(
+        "Error posting data:",
+        JSON.stringify(
+          {
+            message: error.message,
+            status: error.response?.status,
+            data: error.response?.data,
+          },
+          null,
+          2
+        )
+      );
+      toast.error(
+        `Failed to schedule/publish post: ${
+          error.response?.data?.message || error.message
+        }`
+      );
+    } finally {
+      setCards([{ id: 0, text: "" }]);
     }
   };
 
@@ -468,10 +515,22 @@ const WorkspacePage = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      console.log("Final Response:", finalResponse.data);
-      toast("post draft has been created");
-      SingleWorkspaceDraftData(workspaceId, token, setDraftLoading, setDraftPosts);
-      setCards([{ id: 0, text: "", media: [] }]);
+      if (finalResponse.data.success) {
+        console.log("Final Response:", finalResponse.data);
+        toast("Draft Post Has been created");
+        SingleWorkspaceDraftData(
+          workspaceId,
+          token,
+          setDraftLoading,
+          setDraftPosts
+        );
+      } else {
+        throw new Error(
+          response.data.error?.message || "Failed to  create draft posts"
+        );
+      }
+
+      setCards([{ id: 0, text: "" }]);
     } catch (error) {
       toast.error("Failed to make draft post");
 
@@ -510,9 +569,22 @@ const WorkspacePage = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      toast("Draft Post Has been Edited");
-      setCards([{ id: 0, text: "", media: [] }]);
-      SingleWorkspaceDraftData(workspaceId, token, setDraftLoading, setDraftPosts);
+      console.log("Final Response:", finalResponse.data);
+      if (finalResponse.data.success) {
+        toast("Draft Post Has been Edited");
+
+        SingleWorkspaceDraftData(
+          workspaceId,
+          token,
+          setDraftLoading,
+          setDraftPosts
+        );
+      } else {
+        throw new Error(
+          response.data.error?.message || "Failed to  edit draft posts"
+        );
+      }
+      setCards([{ id: 0, text: "" }]);
     } catch (error) {
       toast.error("Failed to edit draft post");
 
@@ -528,10 +600,18 @@ const WorkspacePage = () => {
           `https://api.bot.thesquirrel.tech/workspace/draft/get/${workspaceId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
-        setDraftPosts(response.data.data);
+        if (response.data.success) {
+          setDraftPosts(response.data.data);
+          console.log("Single Workspace Draft Data ", response.data.data);
+        } else {
+          throw new Error(
+            response.data.error?.message ||
+              "Failed to fetch Single Workspace Draft Data"
+          );
+        }
       } catch (error) {
-        toast.error("Failed to get single workspace data");
-        console.log("Error ", error);
+        toast.error("Failed to get draft post");
+        console.error("Error getting draft post:", error);
         setDraftPosts(null);
       } finally {
         setDraftLoading(false);

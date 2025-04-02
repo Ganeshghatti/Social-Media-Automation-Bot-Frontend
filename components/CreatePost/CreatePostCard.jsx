@@ -47,6 +47,7 @@ export const CreatePostCard = ({
   cards,
   setPostType,
   cardId,
+  width,
 }) => {
   const [showImageDialog, setShowImageDialog] = useState(false);
   const [imageDialogType, setImageDialogType] = useState("");
@@ -202,11 +203,28 @@ export const CreatePostCard = ({
   };
 
   return (
-    <Card className="w-2/4 flex flex-row gap-4 bg-transparent h-full border-transparent mx-auto">
-      <CardTitle className="p-0 justify-between flex gap-4 h-full items-center">
-        <div className="flex gap-4 items-center justify-center h-full">
-          <div className="relative h-full">
-            <div className="bg-[#FFFFFF33] absolute left-1/2 h-[100%] w-[1px]" />
+    <Card
+      className={`w-full sm:w-full 
+        flex flex-row gap-4 bg-transparent h-full max-h-[240px] 
+        border-transparent mx-auto 
+        ${!width?"md:w-[60vw] lg:w-[70vw] xl:w-[55vw] min-w-[240px] max-w-[1440px] ":"w-full"}
+        `}
+    >
+      <CardTitle className="p-0 justify-between   flex gap-4 h-full items-center">
+        <div className="flex gap-4 items-center justify-center  h-full ">
+          <div className="relative h-full  ">
+            {/* <Image
+              alt="Profile"
+              src={
+                user && user?.profilePicture
+                  ? user?.profilePicture
+                  : "/logo.jpg"
+              }
+              height={40}
+              width={40}
+              className="rounded-full object-cover"
+            /> */}
+            <div className="bg-[#FFFFFF33] absolute left-1/2 h-[90%] w-[1px]" />
           </div>
         </div>
       </CardTitle>

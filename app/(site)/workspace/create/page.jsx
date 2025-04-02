@@ -32,6 +32,7 @@ import { TIMEZONES } from "@constants/create-workspace/index";
 import Image from "next/image";
 import { toast } from "sonner";
 import { CustomLoader } from "@/components/global/CustomLoader";
+import { handleApiError } from "@/lib/ErrorResponse";
 const Page = () => {
   const [loading, setLoading] = useState(true); // Set to true initially
   const [keywordInput, setKeywordInput] = useState("");
@@ -142,27 +143,28 @@ const Page = () => {
       );
 
       console.log("Response received:", response.data);
-
-      // Upload the image if we got a presigned URL back
-      if (
-        response.data.success &&
-        data.icon &&
-        response.data.data.presignedUrl
-      ) {
-        console.log("Uploading file to presigned URL");
-        await axios.put(response.data.data.presignedUrl, data.icon.file, {
-          headers: {
-            "Content-Type": data.icon.mimetype,
-          },
-        });
-        console.log("File upload complete");
+      if (response.data.success) {
+        if (data.icon && response.data.data.presignedUrl) {
+          console.log("Uploading file to presigned URL");
+          await axios.put(response.data.data.presignedUrl, data.icon.file, {
+            headers: {
+              "Content-Type": data.icon.mimetype,
+            },
+          });
+          console.log("File upload complete");
+        }
+        console.log("Redirecting to workspaces page");
+        router.push("/workspaces");
+      } else {
+        throw new Error(
+          response.data.error?.message || "Failed to create workspace"
+        );
       }
-
-      console.log("Redirecting to workspaces page");
-      router.push("/workspaces");
     } catch (error) {
-      console.error("Error details:", error.response?.data || error.message);
-      toast.error(`Error creating workspace`);
+      const errorMessage = handleApiError(
+        error,
+        "Failed to create workspace. Please try again."
+      );
     } finally {
       setLoading(false);
     }
