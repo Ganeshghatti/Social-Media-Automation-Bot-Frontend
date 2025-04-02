@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardFooter, CardTitle } from "../ui/card";
 import Image from "next/image";
 import { CustomTextarea } from "../global/CustomTextarea";
@@ -23,12 +23,17 @@ export const CreatePostCard = ({
   width,
 }) => {
   const { user, setUser } = useUserStore();
+  const [isOpen, setIsOpen] = useState(false);
   return (
     <Card
       className={`w-full sm:w-full 
         flex flex-row gap-4 bg-transparent h-full max-h-[240px] 
         border-transparent mx-auto 
-        ${!width?"md:w-[60vw] lg:w-[70vw] xl:w-[55vw] min-w-[240px] max-w-[1440px] ":"w-full"}
+        ${
+          !width
+            ? "md:w-[60vw] lg:w-[70vw] xl:w-[55vw] min-w-[240px] max-w-[1440px] "
+            : "w-full"
+        }
         `}
     >
       <CardTitle className="p-0 justify-between   flex gap-4 h-full items-center">
@@ -52,8 +57,7 @@ export const CreatePostCard = ({
       <div className="flex h-full w-full  flex-col gap-4   justify-between">
         <div className="flex flex-1 w-full items-center justify-between ">
           <h2 className="font-medium text-lg text-white">{user?.username}</h2>
-
-          <DropdownMenu>
+          <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
             <DropdownMenuTrigger>
               <div className="w-8 h-8 hover:bg-headerBg rounded-sm cursor-pointer flex justify-center items-center">
                 <Image
@@ -65,11 +69,15 @@ export const CreatePostCard = ({
                 />
               </div>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="rounded-lg p-0 min-w-[140px] flex flex-col gap-2 bg-headerBg border-[0.5px] border-transparent">
+            <DropdownMenuContent className="rounded-lg p-0 min-w-[140px] 
+            flex flex-col gap-2 bg-headerBg border-[0.5px] border-transparent">
               <div
                 onClick={() => {
-                  setCards(cards.filter((card) => card.id !== cardId));
+                  if (cards.length > 1) {
+                    setCards(cards.filter((card) => card.id !== cardId));
+                  }
                   if (cards.length <= 1) setPostType("post");
+                  setIsOpen(false);
                 }}
                 className="flex gap-3  bg-[#2C3032] rounded-md hover:bg-[#2C3032] hover:opacity-100 px-4 justify-between py-3 items-center cursor-pointer"
               >

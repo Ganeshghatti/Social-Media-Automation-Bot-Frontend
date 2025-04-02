@@ -16,12 +16,15 @@ import React from "react";
 import { DiamondPlus } from "lucide-react";
 
 export const CreatePostHeader = () => {
-  const { logout, user } = useUserStore();
+  const { user } = useUserStore();
+  console.log("user", user);
   return (
-    <div className="w-full px-8 py-3 gap-3 flex justify-end bg-[#1A1D1F] sticky top-0 z-10">
+    <div className="w-full px-8 py-3 gap-3 flex justify-end
+     bg-[#1A1D1F] sticky top-0 z-10">
       <Dialog>
         <DialogTrigger asChild>
-          <Button className="px-8 bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 border-2 border-yellow-600 rounded-full py-3 flex justify-center items-center shadow-lg transform transition-transform hover:scale-105">
+          <Button className="px-8 bg-gradient-to-r from-yellow-400 via-yellow-500
+           to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 border-2 border-yellow-600 rounded-full py-3 flex justify-center items-center shadow-lg transform transition-transform hover:scale-105">
             <span className="text-base font-semibold text-white">
               Join Premium
             </span>

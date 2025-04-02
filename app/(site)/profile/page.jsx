@@ -81,12 +81,6 @@ const Page = () => {
 
             <div className="w-full space-y-4">
               <div>
-                <Label className="text-white/80">Bio</Label>
-                <p className="text-white">
-                  A passionate developer who loves to code.
-                </p>
-              </div>
-              <div>
                 <Label className="text-white/80">Phone</Label>
                 <p className="text-white">{userData.phone}</p>
               </div>
@@ -100,9 +94,6 @@ const Page = () => {
                 <p className="text-white capitalize">{userData.subscription}</p>
               </div>
 
-              <Button className="w-full capitalize text-white">
-                Edit Profile
-              </Button>
               <Button
                 onClick={() => {
                   logout();

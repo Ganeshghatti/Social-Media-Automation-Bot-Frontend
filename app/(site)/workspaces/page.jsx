@@ -88,7 +88,6 @@ const WorkspacesPage = () => {
     <>
       <div className="md:px-10 py-12 w-full flex-1 flex justify-center items-center">
         {workspaces.length === 0 ? (
-          // No workspaces case: Fully centered
           <div className="flex flex-col items-center justify-center h-full w-full space-y-4">
             <h1 className="text-2xl font-semibold text-white">
               No Workspaces Found
@@ -102,7 +101,6 @@ const WorkspacesPage = () => {
             </Link>
           </div>
         ) : (
-          // Workspaces exist case: Display them in the center
           <div className="flex flex-wrap justify-center gap-6">
             {workspaces.map((workspace, i) => (
               <Link
@@ -122,7 +120,6 @@ const WorkspacesPage = () => {
                 {workspace.name}
               </Link>
             ))}
-            {/* Always show Add Workspace button */}
             <Link
               href={`/workspace/create`}
               className="border-white text-white flex items-center space-x-2 border-2 rounded-sm px-6 py-4"

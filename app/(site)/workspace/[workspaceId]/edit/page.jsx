@@ -268,7 +268,7 @@ const EditWorkspace = () => {
       <div
         className="flex gap-6 flex-col w-full
        mx-auto py-3 max-w-[90%]
-        sm:max-w-[90%] md:max-w-[80%] pb-6 lg:max-w-[80%] xl:max-w-[60%] 2xl:max-w-[60%] min-h-screen"
+        sm:max-w-[90%] md:max-w-[80%] pb-6  lg:max-w-[80%] xl:max-w-[60%] 2xl:max-w-[60%] min-h-screen"
       >
         <h1 className="text-2xl md:text-4xl font-semibold text-white text-center md:text-left">
           Edit Workspace
@@ -451,7 +451,7 @@ const EditWorkspace = () => {
               className="bg-primary hover:bg-primary/90 
                    mx-auto px-6 w-full md:w-auto text-white py-4 text-lg md:text-xl rounded-full"
             >
-              {loading ? "Creating..." : "Create Workspace"}
+              {loading ? "Editing..." : "Edit Workspace"}
             </Button>
           </form>
         </Form>
@@ -508,7 +508,7 @@ const EditWorkspace = () => {
         </div>
 
         <div
-          className="flex gap-6 my-6   flex-col w-[96%]  
+          className="flex gap-6 my-6  mb-6  flex-col w-[96%]  
          mx-auto  "
         >
           <h1 className="text-4xl font-semibold  text-white">

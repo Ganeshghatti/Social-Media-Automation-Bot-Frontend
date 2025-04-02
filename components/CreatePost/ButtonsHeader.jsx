@@ -133,7 +133,8 @@ export const ButtonsHeader = ({
                 />
               </div>
 
-              <div className="flex flex-col gap-4 items-start justify-start h-full w-full pt-20 p-2 order-1 md:order-2">
+              <div className="flex flex-col gap-4 items-start justify-start 
+              h-full w-full pt-20 p-2 order-1 md:order-2">
                 <Form {...form}>
                   <form
                     onSubmit={form.handleSubmit(onSubmit)}
@@ -148,7 +149,6 @@ export const ButtonsHeader = ({
                             <DateTimePicker
                               date={field.value}
                               setDate={(date) => {
-                                console.log("Form Field Updated:", date);
                                 field.onChange(date);
                               }}
                             />

@@ -124,7 +124,11 @@ export const Sidebar = ({ workspaceId, token }) => {
   }
 
   return (
-    <div className="md:flex hidden flex-col  items-start justify-between  bg-darkBg px-4 py-6 shadow-sm text-white w-72 no-scrollbar  min-h-screen overflow-y-auto sticky top-0">
+    <div className="md:flex hidden
+     flex-col items-start justify-between w-56
+      bg-darkBg px-4 py-6 shadow-sm text-white no-scrollbar h-screen 
+      sticky top-0 self-start max-h-screen">
+
       <div className="flex flex-col gap-14 items-center w-full">
         <div className="flex w-full items-center gap-4">
           <Image
