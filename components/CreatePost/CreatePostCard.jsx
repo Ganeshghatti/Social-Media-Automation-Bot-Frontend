@@ -7,6 +7,16 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import { useUserStore } from "@/store/userStore";
+import {
+  Ellipsis,
+  Images,
+  Plus,
+  Search,
+  Sparkles,
+  Trash,
+  Upload,
+} from "lucide-react";
 import { X } from "lucide-react";
 import axios from "axios";
 import {
@@ -34,6 +44,9 @@ export const CreatePostCard = ({
   setNewCardAdded,
   selectedImages = [],
   onImageSelect,
+  cards,
+  setPostType,
+  cardId,
 }) => {
   const [showImageDialog, setShowImageDialog] = useState(false);
   const [imageDialogType, setImageDialogType] = useState("");
@@ -197,11 +210,35 @@ export const CreatePostCard = ({
           </div>
         </div>
       </CardTitle>
-      <div className="flex py-10 h-full w-full flex-col gap-8">
-        <div className="flex w-full items-center justify-between">
-          <div className="w-8 h-8 bg-headerBg rounded-sm cursor-pointer flex justify-center items-center">
-            <Image src="/ThreeDots.png" alt="More" width={20} height={20} className="h-5 w-5 object-contain" />
-          </div>
+      <div className="flex h-full w-full  flex-col gap-4   justify-between">
+        <div className="flex flex-1 w-full items-center justify-between ">
+          {/* <h2 className="font-medium text-lg text-white">{user?.username}</h2> */}
+
+          <DropdownMenu>
+            <DropdownMenuTrigger>
+              <div className="w-8 h-8 hover:bg-headerBg rounded-sm cursor-pointer flex justify-center items-center">
+                <Image
+                  src="/ThreeDots.svg"
+                  alt="More"
+                  width={20}
+                  height={20}
+                  className="h-5 w-5 object-contain"
+                />
+              </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="rounded-lg p-0 min-w-[140px] flex flex-col gap-2 bg-headerBg border-[0.5px] border-transparent">
+              <div
+                onClick={() => {
+                  setCards(cards.filter((card) => card.id !== cardId));
+                  if (cards.length <= 1) setPostType("post");
+                }}
+                className="flex gap-3  bg-[#2C3032] rounded-md hover:bg-[#2C3032] hover:opacity-100 px-4 justify-between py-3 items-center cursor-pointer"
+              >
+                <span className="text-white text-xs">Delete</span>
+                <Trash className="object-contain h-4 w-4 text-red-600" />
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
         <CardContent className="w-full border-2 rounded-md border-neutral-700 p-0 justify-start items-start flex">
           <CustomTextarea value={value} onChange={onChange} ref={textareaRef} />
@@ -231,14 +268,20 @@ export const CreatePostCard = ({
               setCards((prev) => [...prev, { id: prev.length, text: "", media: [] }]);
               setNewCardAdded(true);
             }}
-            className="w-8 h-8 rounded-sm flex bg-headerBg justify-center items-center cursor-pointer"
+            className="w-8 h-8 rounded-sm flex hover:bg-headerBg  justify-center items-center cursor-pointer"
           >
-            <Image src="/AddSquirrel.png" alt="AddSquirrel" height={200} width={200} className="object-contain h-5 w-5" />
+            <Image src="/AddSquirrel.svg" alt="AddSquirrel" height={20} width={20} className="object-contain h-4 w-4" />
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger>
-              <div className="w-8 h-8 flex bg-headerBg rounded-sm justify-center items-center cursor-pointer">
-                <Image src="/SquireelGallery.png" alt="SquireelGallery" height={200} width={200} className="object-contain h-5 w-5" />
+              <div className="w-8 h-8 flex  rounded-sm  hover:bg-headerBg justify-center items-center cursor-pointer">
+                <Image
+                  src={"/SquireelGallery.svg"}
+                  alt="SquireelGallery"
+                  height={200}
+                  width={200}
+                  className="object-contain h-5 w-5"
+                />
               </div>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="rounded-lg px-2 py-2 min-w-[140px] flex flex-col gap-2 bg-headerBg border-[0.5px] border-[#ffffff32]">
@@ -248,6 +291,7 @@ export const CreatePostCard = ({
               >
                 <span className="text-white text-sm">User Upload</span>
                 <div className="flex items-center justify-center bg-headerBg px-1 py-1 rounded-md">
+                  <Upload className="object-contain h-5 w-5 text-white" />
                   <Image alt="Image" src="/Upload.png" height={20} quality={100} width={20} className="object-contain h-5 w-5" />
                 </div>
               </div>
@@ -257,7 +301,7 @@ export const CreatePostCard = ({
               >
                 <span className="text-white text-sm">Ai Generated</span>
                 <div className="flex items-center justify-center bg-headerBg px-1 py-1 rounded-md">
-                  <Image alt="Image" src="/Gemini.png" height={20} quality={100} width={20} className="object-contain h-5 w-5" />
+                  <Sparkles className="object-contain text-purple-900 h-5 w-5" />
                 </div>
               </div>
               <div
@@ -266,6 +310,7 @@ export const CreatePostCard = ({
               >
                 <span className="text-white text-sm">Google Search</span>
                 <div className="flex items-center justify-center bg-headerBg px-1 py-1 rounded-md">
+                  <Search className="object-contain h-5 w-5 text-white" />
                   <Image alt="Image" src="/Search.png" height={20} quality={100} width={20} className="object-contain h-5 w-5" />
                 </div>
               </div>

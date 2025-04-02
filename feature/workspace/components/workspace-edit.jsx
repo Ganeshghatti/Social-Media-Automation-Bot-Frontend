@@ -34,6 +34,7 @@ import {
   FormMessage,
 } from "@components/ui/form";
 import useAuthToken from "@hooks/useAuthToken";
+import { toast } from "sonner";
 
 const WorkspaceEdit = ({ isOpen, setIsOpen, workSpaceData }) => {
   const [file, setFile] = useState(null);
@@ -87,7 +88,7 @@ const WorkspaceEdit = ({ isOpen, setIsOpen, workSpaceData }) => {
       console.log(values);
 
       const response = await axios.post(
-        "https://api.bot.thesquirrel.site/workspace/create",
+        "https://api.bot.thesquirrel.tech/workspace/create",
         values,
         {
           headers: {
@@ -109,6 +110,8 @@ const WorkspaceEdit = ({ isOpen, setIsOpen, workSpaceData }) => {
 
       setIsOpen(false);
     } catch (error) {
+      toast.error("Error in creating workspace");
+
       console.error(
         "Error creating workspace:",
         error.response?.data || error.message

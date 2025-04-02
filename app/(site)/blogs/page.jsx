@@ -40,7 +40,7 @@ export default function Home() {
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
             Explore the latest tips, updates, and insights on{" "}
             <span className="text-[#6C5CE7]">Linkedin</span> content creation
-            with <span className="text-[#6C5CE7]">squirrel.tech</span>. Stay
+            with <span className="text-[#6C5CE7]">thesquirrel.tech</span>. Stay
             inspired and grow your Linkedin with us.
           </p>
         </div>

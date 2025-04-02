@@ -15,6 +15,8 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DateTimePicker } from "@components/global/DateTimePicker";
+import { SidebarTrigger } from "@components/ui/sidebar";
+import { toast } from "sonner";
 
 export const ButtonsHeader = ({
   isEditingDraft,
@@ -45,6 +47,7 @@ export const ButtonsHeader = ({
       onPublish(scheduledDateTime);
       setIsDialogOpen(false);
     } catch (error) {
+      toast.error("Submission Failed");
       console.error("Submission error:", error);
     }
   };
@@ -56,14 +59,18 @@ export const ButtonsHeader = ({
         activeButtons={activeButtons}
         actionButton={isEditingDraft ? EditDraftPosts : createDraftPosts}
         buttonText={isEditingDraft ? "Edit the Draft" : "Save as Draft"}
+        isDisabled={activeButtons}
       />
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogTrigger asChild>
           <Button
+            disabled={!activeButtons}
             style={{ backgroundColor: activeButtons ? "#079500" : "gray" }}
             className="px-6 rounded-full py-3 flex justify-center items-center"
           >
-            <span className="text-sm md:text-base font-medium text-white">Schedule</span>
+            <span className="text-sm md:text-base font-medium text-white">
+              Schedule
+            </span>
           </Button>
         </DialogTrigger>
         <DialogContent className="w-[80vw] max-w-[900px] h-[80vh] max-h-[720px] p-4 bg-navBg flex border-transparent gap-4 rounded-lg shadow-lg">
@@ -105,6 +112,7 @@ export const ButtonsHeader = ({
         buttonText={"Publish"}
         activeButtons={activeButtons}
         actionButton={() => onPublish()}
+        isDisabled={activeButtons}
       />
     </div>
   );

@@ -29,6 +29,7 @@ import ImageFetch from "@feature/post/components/image-fetch";
 
 import axios from "axios";
 import useAuthToken from "@/hooks/useAuthToken";
+import { toast } from "sonner";
 
 const WorkSpacePost = ({ accountId, workSpaceId }) => {
   const token = useAuthToken();
@@ -48,6 +49,7 @@ const WorkSpacePost = ({ accountId, workSpaceId }) => {
 
   const onSubmit = async (data) => {
     try {
+<<<<<<< HEAD
       // Format selected images to match API requirements
       const formattedSelectedImages = selectedImages.map((image) => {
         // Extract filename from URL or use a default name
@@ -89,6 +91,8 @@ const WorkSpacePost = ({ accountId, workSpaceId }) => {
       );
 
       // Create form data with proper media format
+=======
+>>>>>>> d9b8f603c0842998ed6393f617d64ac5b119b664
       const formData = {
         posts: [
           {
@@ -106,7 +110,11 @@ const WorkSpacePost = ({ accountId, workSpaceId }) => {
 
       // Step 1: Get presigned URLs
       const presignedResponse = await axios.post(
+<<<<<<< HEAD
         `${process.env.NEXT_PUBLIC_SERVER_URI}/workspace/posts/create/presigned-url/${workSpaceId}`,
+=======
+        `https://api.bot.thesquirrel.tech/workspace/posts/create/presigned-url/${workSpaceId}`,
+>>>>>>> d9b8f603c0842998ed6393f617d64ac5b119b664
         formData,
         {
           headers: {
@@ -139,6 +147,8 @@ const WorkSpacePost = ({ accountId, workSpaceId }) => {
               },
             });
           } catch (uploadError) {
+            toast.error("Error in uploading file");
+
             console.error(`Error uploading file ${i + 1}:`, uploadError);
             throw uploadError;
           }
@@ -146,7 +156,11 @@ const WorkSpacePost = ({ accountId, workSpaceId }) => {
 
         // Create final post with uploaded media
         const finalResponse = await axios.post(
+<<<<<<< HEAD
           `${process.env.NEXT_PUBLIC_SERVER_URI}/workspace/posts/create/${workSpaceId}`,
+=======
+          `https://api.bot.thesquirrel.tech/workspace/posts/create/${workSpaceId}`,
+>>>>>>> d9b8f603c0842998ed6393f617d64ac5b119b664
           {
             posts: presignedResponse.data.data,
           },
@@ -161,7 +175,11 @@ const WorkSpacePost = ({ accountId, workSpaceId }) => {
       } else {
         // Handle post without media
         const finalResponse = await axios.post(
+<<<<<<< HEAD
           `${process.env.NEXT_PUBLIC_SERVER_URI}/workspace/posts/create/${workSpaceId}`,
+=======
+          `https://api.bot.thesquirrel.tech/workspace/posts/create/${workSpaceId}`,
+>>>>>>> d9b8f603c0842998ed6393f617d64ac5b119b664
           {
             posts: presignedResponse.data.data,
           },
@@ -180,8 +198,19 @@ const WorkSpacePost = ({ accountId, workSpaceId }) => {
       setSelectedImages([]);
       
     } catch (error) {
+<<<<<<< HEAD
       console.error("Error creating post:", error);
       // Handle error appropriately (show toast/notification)
+=======
+      toast.error("Error in creating post");
+
+      console.error("Detailed error:", {
+        message: error.message,
+        response: error.response?.data,
+        request: error.config,
+      });
+      throw error;
+>>>>>>> d9b8f603c0842998ed6393f617d64ac5b119b664
     }
   };
 

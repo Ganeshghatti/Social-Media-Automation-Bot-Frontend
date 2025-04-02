@@ -13,7 +13,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { X } from "lucide-react";
+import { Upload, X } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -32,6 +32,18 @@ import { TIMEZONES } from "@constants/create-workspace/index";
 import Image from "next/image";
 import { Sidebar_Card } from "@components/single-workspace/Sidebar_Card";
 import { disconnectLinkedIn, disconnectTwitter } from "@functions/social";
+import { useUserStore } from "@/store/userStore";
+import { CustomLoader } from "@components/global/CustomLoader";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@components/ui/dialog";
+import { toast } from "sonner";
 const EditWorkspace = () => {
   const [loading, setLoading] = useState(false);
   const [singleWorkspace, setSingleWorkspace] = useState(null);
@@ -39,10 +51,23 @@ const EditWorkspace = () => {
   const [iconPreview, setIconPreview] = useState(null);
   const [selectedTimezone, setSelectedTimezone] = useState("");
   const fileInputRef = useRef(null);
-  const router = useRouter();
   const token = useAuthToken() || "";
   const params = useParams();
   const { workspaceId } = params;
+
+  const { user } = useUserStore();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!user) {
+      return;
+    }
+    if (!user?.onboarding) {
+      router.replace("/onboarding");
+    } else {
+      setLoading(false);
+    }
+  }, [user, router]);
 
   const formSchema = z.object({
     name: z.string().min(1, "Name is required"),
@@ -66,14 +91,11 @@ const EditWorkspace = () => {
   const keywords = form.watch("keywords");
 
   const handleFileChange = (e) => {
-    console.log("File input changed"); // Debugging
     const file = e.target.files[0];
     if (!file) {
       console.log("No file selected");
       return;
     }
-
-    console.log("File selected:", file.name);
 
     if (!file.type.startsWith("image/")) {
       alert("Please upload an image file");
@@ -102,11 +124,12 @@ const EditWorkspace = () => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `https://api.bot.thesquirrel.site/workspace/get/${workspaceId}`,
+        `https://api.bot.thesquirrel.tech/workspace/get/${workspaceId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
+      console.log("Response data ", response.data.data);
       setSingleWorkspace(response.data.data);
       if (response.data.data) {
         setIconPreview(response.data.data.icon);
@@ -118,6 +141,8 @@ const EditWorkspace = () => {
         });
       }
     } catch (error) {
+      toast.error("Failed to get single workspace data");
+
       console.error("Error:", error);
     } finally {
       setLoading(false);
@@ -132,9 +157,6 @@ const EditWorkspace = () => {
   const onSubmit = async (data) => {
     try {
       if (!token) return;
-      setLoading(true);
-
-      console.log("DATA ", data);
 
       const payload = {
         name: data.name,
@@ -154,7 +176,7 @@ const EditWorkspace = () => {
       }
 
       const response = await axios.put(
-        `https://api.bot.thesquirrel.site/workspace/edit/${workspaceId}`,
+        `https://api.bot.thesquirrel.tech/workspace/edit/${workspaceId}`,
         payload,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -173,9 +195,29 @@ const EditWorkspace = () => {
 
       // router.push("/workspaces");
     } catch (error) {
+      toast.error(`Failed to edit workspace`);
       console.error("Error:", error);
-    } finally {
-      setLoading(false);
+    }
+  };
+
+  const deleteWorkspace = async (data) => {
+    try {
+      if (!token) return;
+
+      const response = await axios.delete(
+        `https://api.bot.thesquirrel.tech/workspace/delete/${workspaceId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (response.data.success) {
+        toast(`Workspace deleted`);
+        router.push("/workspaces");
+      }
+    } catch (error) {
+      toast.error(`Failed to delete workspace`);
+      console.error("Error:", error);
     }
   };
 
@@ -197,30 +239,37 @@ const EditWorkspace = () => {
     );
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) {
+    return <CustomLoader />;
+  }
 
   return (
-    <div className="flex items-start gap-4 justify-start min-h-screen w-full flex-col ">
-      <CreatePostHeader />
-
-      <div className="flex gap-6 flex-col w-[96%] mx-auto py-3 ">
-        <h1 className="text-4xl font-semibold  text-white">Edit Workspace</h1>
+    <>
+      <div
+        className="flex gap-6 flex-col w-full
+       mx-auto py-3 max-w-[90%]
+        sm:max-w-[90%] md:max-w-[80%] pb-6 lg:max-w-[80%] xl:max-w-[60%] 2xl:max-w-[60%] min-h-screen"
+      >
+        <h1 className="text-2xl md:text-4xl font-semibold text-white text-center md:text-left">
+          Edit Workspace
+        </h1>
 
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="w-full rounded-xl bg-headerBg
-           border-[#ffffff30] px-5 py-6 flex flex-col gap-6"
+            className="w-full rounded-xl bg-headerBg border-[#ffffff30]
+             px-4 md:px-6 py-6 flex flex-col gap-6"
           >
-            <div className="w-full flex gap-3 items-center justify-between flex-wrap md:flex-row flex-col">
+            <div className="w-full flex flex-col lg:flex-row flex-wrap gap-4 flex-1">
+              {/* Workspace Name Input */}
               <FormField
                 control={form.control}
                 name="name"
                 render={({ field }) => (
-                  <FormItem className="flex-1 w-full bg-navBg text-white py-4 border rounded-[20px] border-[#ffffff30] px-2">
+                  <FormItem className="flex-1 w-full min-h-[48px] bg-navBg text-white border rounded-[20px] border-[#ffffff30] px-3">
                     <FormControl>
                       <Input
-                        className="bg-transparent border-transparent focus:border-transparent focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-[24px] placeholder:text-[24px]"
+                        className="bg-transparent border-transparent focus:border-transparent focus:outline-none focus:ring-0 text-base md:text-base placeholder:text-base h-full py-2"
                         placeholder="Workspace name"
                         {...field}
                         value={field.value ?? ""}
@@ -231,14 +280,12 @@ const EditWorkspace = () => {
                 )}
               />
 
+              {/* Timezone Selector */}
               <FormField
                 control={form.control}
                 name="timezone"
                 render={({ field }) => (
-                  <div
-                    className="flex-1 w-full flex gap-3 bg-navBg text-white py-4
-                   border rounded-[20px] justify-center items-center border-[#ffffff30] px-2"
-                  >
+                  <div className="flex-1 w-full flex items-center justify-center bg-navBg text-white border rounded-[20px] border-[#ffffff30] px-3 min-h-[48px]">
                     <Select
                       onValueChange={(value) => {
                         field.onChange(value);
@@ -246,20 +293,15 @@ const EditWorkspace = () => {
                       }}
                       value={field.value}
                     >
-                      <SelectTrigger className="bg-transparent border-transparent focus:border-transparent focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 flex-1 text-xl text-[#ffffff60]">
-                        <SelectValue
-                          placeholder="Timezone = (08:00)"
-                          className="bg-transparent"
-                        />
+                      <SelectTrigger className="bg-transparent border-transparent focus:outline-none focus:ring-0 flex-1 text-base md:text-xl text-[#ffffff60] min-h-[48px]">
+                        <SelectValue placeholder="Timezone = (08:00)" />
                       </SelectTrigger>
                       <SelectContent className="bg-navBg text-white">
                         {TIMEZONES.map((time_zone, i) => (
                           <SelectItem
                             key={i}
-                            className="cursor-pointer bg-navBg hover:opacity-90
-                             hover:bg-navBg focus:bg-navBg focus:opacity-70 focus:text-white
-                             "
-                            value={time_zone.name} // Just use the timezone name like "IST"
+                            className="cursor-pointer bg-navBg hover:bg-opacity-90 focus:bg-navBg focus:text-white text-base"
+                            value={time_zone.name}
                           >
                             {time_zone.name} ({time_zone.offset})
                           </SelectItem>
@@ -270,25 +312,24 @@ const EditWorkspace = () => {
                 )}
               />
 
+              {/* Image Upload */}
               <FormField
                 control={form.control}
                 name="icon"
                 render={({ field }) => (
-                  <div className="flex-1 w-full relative">
-                    <Input
-                      type="file"
-                      id="fileInput"
-                      ref={fileInputRef}
-                      className="hidden"
-                      accept="image/*"
-                      onChange={(e) => handleFileChange(e)}
-                    />
+                  <div className="flex-1 justify-center">
                     <div
                       onClick={() => fileInputRef.current.click()}
-                      className="flex gap-3 cursor-pointer
-                     bg-navBg text-white py-5 border rounded-[20px] justify-center 
-                     items-center border-[#ffffff30] px-2"
+                      className="flex items-center gap-3 cursor-pointer bg-navBg text-white border rounded-[20px] border-[#ffffff30] px-4 w-full md:w-auto min-h-[48px] py-2"
                     >
+                      <Input
+                        type="file"
+                        id="fileInput"
+                        ref={fileInputRef}
+                        className="hidden"
+                        accept="image/*"
+                        onChange={(e) => handleFileChange(e)}
+                      />
                       {iconPreview ? (
                         <div className="relative h-8 w-8 rounded-full overflow-hidden">
                           <Image
@@ -304,11 +345,10 @@ const EditWorkspace = () => {
                           alt="Upload Image"
                           height={24}
                           width={24}
-                          className="object-contain h-6 w-6"
+                          className="h-6 w-6 object-contain"
                         />
                       )}
-
-                      <span className="text-2xl text-white opacity-50">
+                      <span className="text-base md:text-base text-white opacity-50">
                         {iconPreview ? "Change Image" : "Upload Image"}
                       </span>
                     </div>
@@ -317,19 +357,23 @@ const EditWorkspace = () => {
               />
             </div>
 
+            {/* Icon Upload */}
+
+            {/* Description */}
             <FormField
               control={form.control}
               name="description"
               render={({ field }) => (
                 <FormItem
-                  className="flex-1 bg-navBg
-               text-white py-4 border rounded-[20px] border-[#ffffff30] px-2"
+                  className="flex-1 bg-navBg text-white py-2
+                        border rounded-[20px] border-[#ffffff30] px-3"
                 >
-                  <FormControl className="text-2xl">
+                  <FormControl>
                     <Textarea
-                      className="bg-navBg text-white border-transparent 
-                      focus:border-transparent focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-[24px] placeholder:text-[24px] rounded-xl py-4"
-                      rows={10}
+                      className="bg-navBg text-white border-transparent
+                              focus:border-transparent focus:outline-none focus:ring-0 text-base
+                               md:text-base placeholder:text-base rounded-xl py-2"
+                      rows={6}
                       placeholder="Enter Description"
                       {...field}
                     />
@@ -338,23 +382,19 @@ const EditWorkspace = () => {
               )}
             />
 
+            {/* Keywords Input */}
             <FormField
               control={form.control}
               name="keywords"
               render={({ field }) => (
-                <FormItem
-                  className="flex-1 bg-navBg text-white py-4 border 
-              rounded-[20px] border-[#ffffff30] px-2"
-                >
+                <FormItem className="flex-1 bg-navBg text-white border rounded-[20px] border-[#ffffff30] px-3 min-h-[48px]">
                   <FormControl>
                     <Input
                       placeholder="Add keyword"
                       value={keywordInput}
-                      className="bg-navBg text-white
-                     border-transparent focus:border-transparent focus:outline-none 
-                     focus-visible:bg-transparent focus-within:bg-transparent focus:ring-0
-                      focus-visible:ring-0 focus-visible:ring-offset-0 text-[24px] 
-                      placeholder:text-[24px] rounded-xl py-2 focus:bg-transparent"
+                      className="bg-navBg text-white border-transparent 
+                 focus:border-transparent focus:outline-none text-base 
+                 md:text-base placeholder:text-base rounded-[20px] py-2 min-h-[48px]"
                       onChange={(e) => setKeywordInput(e.target.value)}
                       onKeyDown={(e) => {
                         if (e.key === "Enter") {
@@ -373,8 +413,7 @@ const EditWorkspace = () => {
               {keywords.map((keyword, index) => (
                 <div
                   key={index}
-                  className="flex items-center text-white gap-4
-                 bg-primary px-3 py-2 rounded-full"
+                  className="flex items-center text-white gap-2 bg-primary px-3 py-2 rounded-full"
                 >
                   {keyword}
                   <button
@@ -392,14 +431,14 @@ const EditWorkspace = () => {
             <Button
               type="submit"
               disabled={loading}
-              className="bg-primary 
-            hover:bg-primary/90 text-white py-6 text-xl rounded-[20px]"
+              className="bg-primary hover:bg-primary/90 
+                   mx-auto px-6 w-full md:w-auto text-white py-4 text-lg md:text-xl rounded-full"
             >
-              {loading ? "Updating..." : "Update Workspace"}
+              {loading ? "Creating..." : "Create Workspace"}
             </Button>
           </form>
         </Form>
-        <div className="flex gap-6 flex-col w-[96%] mx-auto py-3 ">
+        <div className="flex gap-6  flex-col w-[96%] mx-auto py-3 ">
           <h1 className="text-4xl font-semibold  text-white">
             Disconnect Accounts
           </h1>
@@ -441,7 +480,7 @@ const EditWorkspace = () => {
                         }}
                         key={i}
                         imageUrl={"/twitter.png"}
-                        text={"Disconnect Twitter"}
+                        text={"Disconnect " + account?.username}
                       />
                     );
                   }
@@ -450,8 +489,46 @@ const EditWorkspace = () => {
             </div>
           )}
         </div>
+
+        <div
+          className="flex gap-6 my-6   flex-col w-[96%]  
+         mx-auto  "
+        >
+          <h1 className="text-4xl font-semibold  text-white">
+            Delete Workspace
+          </h1>
+
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button className="bg-red-600 hover:bg-red-700 w-max rounded-full py-5">
+                <span className="text-lg font-medium">Delete Workspace</span>
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="bg-navBg gap-3 text-white border-transparent">
+              <DialogHeader>
+                <DialogTitle>Are you absolutely sure?</DialogTitle>
+                <DialogDescription className="text-white/60">
+                  This action cannot be undone. This will permanently delete
+                  your workspace and remove your data from our servers.
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter
+                className={"flex justify-center mt-2   items-center "}
+              >
+                <Button
+                  onClick={() => {
+                    deleteWorkspace();
+                  }}
+                  className="bg-red-600 mx-auto hover:bg-red-700  rounded-full py-5"
+                >
+                  <span className="text-base font-medium">Yes Delete</span>
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

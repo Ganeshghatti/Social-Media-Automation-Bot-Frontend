@@ -1,6 +1,7 @@
 "use client";
-
+import Image from "next/image";
 import { ArrowRight } from "lucide-react";
+import Link from "next/link";
 
 export default function BlogCard({ blogs = [] }) {
   return (
@@ -12,8 +13,9 @@ export default function BlogCard({ blogs = [] }) {
             className="rounded-2xl overflow-hidden shadow-lg transform transition duration-300 hover:scale-105"
           >
             <div className="relative bg-[#6C5CE7] h-64">
-              <img
+              <Image
                 src={blog.thumbnailImageUrl}
+                fill
                 alt={blog.thumbnailImageAlt || blog.title}
                 className="w-full h-full object-cover"
               />
@@ -27,13 +29,13 @@ export default function BlogCard({ blogs = [] }) {
                 <span className="text-black/90 text-sm">
                   {new Date(blog.createdAt).toLocaleDateString()}
                 </span>
-                <a
-                  href={`/blogs/${blog._id}`}
+                <Link
+                  href={`/blogs/${blog.slug}`}
                   className="text-black flex items-center hover:underline"
                 >
                   Read more
                   <ArrowRight className="ml-2 h-4 w-4" />
-                </a>
+                </Link>
               </div>
             </div>
           </div>

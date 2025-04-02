@@ -24,8 +24,9 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Label } from "@components/ui/label";
 
-const page = () => {
+const page = ({ className, ...props }) => {
   const router = useRouter();
   const { id } = useParams();
   console.log("Id ", id);
@@ -54,7 +55,7 @@ const page = () => {
   async function onSubmit(values) {
     try {
       const response = await axios.post(
-        "https://api.bot.thesquirrel.site/user/reset-password",
+        "https://api.bot.thesquirrel.tech/user/reset-password",
         {
           newPassword: values.newPassword,
           token: id,
@@ -73,58 +74,61 @@ const page = () => {
   return (
     <div className="h-screen w-screen overflow-x-hidden bg-navBg flex items-center justify-center p-2">
       <div className="flex flex-col gap-6">
-        <Card className="w-[60vh]">
-          <CardHeader className="flex items-center justify-center">
-            <CardTitle className="text-2xl">Reset Password</CardTitle>
-            <CardDescription>Enter new password</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-8"
-              >
-                <FormField
-                  control={form.control}
-                  name="newPassword"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>New Password</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Enter your password"
-                          type="text"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="confirmPassword"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Confirm Password</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Confirm your password"
-                          type="text"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button type="submit" className="w-full">
-                  Submit
-                </Button>
-              </form>
-            </Form>
-          </CardContent>
-        </Card>
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className={cn("flex flex-col gap-10", className)}
+          >
+            <div className="flex flex-col items-center gap-2 text-center">
+              <h1 className="text-2xl font-bold text-white">
+                Reset Your Password
+              </h1>
+            </div>
+            <div className="grid gap-6">
+              <FormField
+                control={form.control}
+                name="newPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <Label className="text-white">New Password</Label>
+                    <FormControl>
+                      <Input
+                        placeholder="Enter your password"
+                        type="text"
+                        className="bg-[#1A1D1F] border-[0.5px] border-[#D8DADC]/50 rounded-[10px] text-white"
+                        {...field}
+                        value={field.value ?? ""}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <Label className="text-white">Confirm Password</Label>
+                    <FormControl>
+                      <Input
+                        placeholder="Confirm your password"
+                        type="text"
+                        className="bg-[#1A1D1F] border-[0.5px] border-[#D8DADC]/50 rounded-[10px] text-white"
+                        {...field}
+                        value={field.value ?? ""}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button type="submit" className="w-full text-white">
+                Submit
+              </Button>
+            </div>
+          </form>
+        </Form>
       </div>
     </div>
   );

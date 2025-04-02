@@ -14,6 +14,7 @@ import { notFound, useParams, useRouter } from "next/navigation";
 import { Form } from "@components/ui/form";
 import axios from "axios";
 import { DateTime } from "luxon";
+import { CustomLoader } from "@/components/global/CustomLoader";
 
 const WorkspacePage = () => {
   const { workspaceId } = useParams();
@@ -70,14 +71,17 @@ const WorkspacePage = () => {
   const SingleWorkspaceData = useCallback(async (workspaceId, token) => {
     try {
       const response = await axios.get(
-        `https://api.bot.thesquirrel.site/workspace/get/${workspaceId}`,
+        `https://api.bot.thesquirrel.tech/workspace/get/${workspaceId}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setSingleWorkspace(response.data.data);
       if (response.data.data.connectedAccounts?.length > 0) {
         setAccountId(response.data.data.connectedAccounts[0].userId);
+      } else {
+        console.log("No connected accounts found");
       }
     } catch (error) {
+      toast.error("Failed to get Single Workspace");
       console.error("Error fetching workspace:", error);
       setSingleWorkspace(null);
     } finally {
@@ -469,6 +473,8 @@ const WorkspacePage = () => {
       SingleWorkspaceDraftData(workspaceId, token, setDraftLoading, setDraftPosts);
       setCards([{ id: 0, text: "", media: [] }]);
     } catch (error) {
+      toast.error("Failed to make draft post");
+
       console.error("Error making draft post:", error);
     }
   };
@@ -508,6 +514,8 @@ const WorkspacePage = () => {
       setCards([{ id: 0, text: "", media: [] }]);
       SingleWorkspaceDraftData(workspaceId, token, setDraftLoading, setDraftPosts);
     } catch (error) {
+      toast.error("Failed to edit draft post");
+
       console.error("Error editing draft post:", error);
     }
   };
@@ -517,11 +525,12 @@ const WorkspacePage = () => {
       try {
         setDraftLoading(true);
         const response = await axios.get(
-          `https://api.bot.thesquirrel.site/workspace/draft/get/${workspaceId}`,
+          `https://api.bot.thesquirrel.tech/workspace/draft/get/${workspaceId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setDraftPosts(response.data.data);
       } catch (error) {
+        toast.error("Failed to get single workspace data");
         console.log("Error ", error);
         setDraftPosts(null);
       } finally {
@@ -531,16 +540,12 @@ const WorkspacePage = () => {
     []
   );
 
-  if (loading)
-    return (
-      <main className="flex-1 flex flex-col h-screen overflow-y-auto">
-        <h1 className="text-2xl">Loading...</h1>
-      </main>
-    );
+  if (loading) {
+    return <CustomLoader />;
+  }
 
   return (
-    <main className="flex-1 flex flex-col h-screen overflow-y-auto">
-      <CreatePostHeader />
+    <>
       <ButtonsHeader
         isEditingDraft={isEditingDraft}
         onPublish={onPublish}
@@ -555,7 +560,10 @@ const WorkspacePage = () => {
         SingleWorkspaceDraftData={SingleWorkspaceDraftData}
       />
       <Form>
-        <form className="w-full flex-1 p-4 py-10 mb-8 no-scrollbar overflow-y-auto justify-center items-center">
+        <form
+          className="w-full  flex-1 p-4 py-10 mb-8 no-scrollbar overflow-y-auto
+         justify-center items-center"
+        >
           {cards.map((card, index) => (
             <CreatePostCard
               key={index}
@@ -587,7 +595,7 @@ const WorkspacePage = () => {
         draftLoading={draftLoading}
         setDraftLoading={setDraftLoading}
       />
-    </main>
+    </>
   );
 };
 

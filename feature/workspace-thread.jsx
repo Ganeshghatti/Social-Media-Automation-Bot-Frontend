@@ -21,7 +21,11 @@ import {
 } from "@components/ui/form";
 
 import useAuthToken from "@hooks/useAuthToken";
+<<<<<<< HEAD
 import { workSpaceThreadSchema } from "@/schema/index";
+=======
+import { toast } from "sonner";
+>>>>>>> d9b8f603c0842998ed6393f617d64ac5b119b664
 
 const WorkSpaceThread = ({ accountId, workSpaceId }) => {
   const token = useAuthToken();
@@ -82,7 +86,11 @@ const WorkSpaceThread = ({ accountId, workSpaceId }) => {
       console.log("Step 1: Sending initial data:", formData);
 
       const presignedResponse = await axios.post(
+<<<<<<< HEAD
         `${process.env.NEXT_PUBLIC_SERVER_URI}/workspace/posts/create/presigned-url/${workSpaceId}`,
+=======
+        `https://api.bot.thesquirrel.tech/workspace/posts/create/presigned-url/${workSpaceId}`,
+>>>>>>> d9b8f603c0842998ed6393f617d64ac5b119b664
         formData,
         {
           headers: {
@@ -91,7 +99,11 @@ const WorkSpaceThread = ({ accountId, workSpaceId }) => {
         }
       );
 
+<<<<<<< HEAD
       console.log("Presigned Response:", presignedResponse);
+=======
+      console.log("Presigned Response ", presignedResponse);
+>>>>>>> d9b8f603c0842998ed6393f617d64ac5b119b664
 
       // Get the thread data from the response
       const threadData = presignedResponse.data.data[0];
@@ -99,17 +111,36 @@ const WorkSpaceThread = ({ accountId, workSpaceId }) => {
       if (threadData && threadData.posts && threadData.posts.length > 0) {
         console.log("Step 2: Uploading media files for posts", threadData.posts);
 
+<<<<<<< HEAD
         // Iterate through each post in the thread
         for (const responsePost of threadData.posts) {
+=======
+      if (postsWithMedia.length > 0) {
+        console.log("Step 2: Uploading media files for posts ", postsWithMedia);
+>>>>>>> d9b8f603c0842998ed6393f617d64ac5b119b664
 
           console.log("Response Post:", responsePost);
           if (responsePost.media && responsePost.media.length > 0) {
             console.log(`Processing media for post ID: ${responsePost._id}`);
 
+<<<<<<< HEAD
             // Find matching original post by comparing content
             const originalPost = data.posts.find(p => p.content === responsePost.content);
 
             console.log("Original Post:", originalPost);
+=======
+          console.log("Response post ", responsePost);
+
+          if (post.media && responsePost.media) {
+            for (
+              let mediaIndex = 0;
+              mediaIndex < post.media.length;
+              mediaIndex++
+            ) {
+              const mediaItem = post.media[mediaIndex];
+              const presignedMediaItem = responsePost.media[mediaIndex];
+              console.log("Media ", presignedMediaItem);
+>>>>>>> d9b8f603c0842998ed6393f617d64ac5b119b664
 
             if (originalPost && originalPost.media) {
 
@@ -150,11 +181,19 @@ const WorkSpaceThread = ({ accountId, workSpaceId }) => {
                       }
                     );
 
+<<<<<<< HEAD
                     console.log(`Media ${i + 1} upload status:`, uploadResult);
                   } catch (error) {
                     console.error(`Error uploading media ${i + 1} for post ${responsePost._id}:`, error);
                     throw new Error(`Failed to upload media: ${error.message}`);
                   }
+=======
+                  console.log(`File upload status:`, uploadResult.status);
+                } catch (uploadError) {
+                  toast.error("Error in uploading File");
+                  console.error(`Error uploading file:`, uploadError);
+                  throw uploadError;
+>>>>>>> d9b8f603c0842998ed6393f617d64ac5b119b664
                 }
               }
             }
@@ -165,7 +204,11 @@ const WorkSpaceThread = ({ accountId, workSpaceId }) => {
       console.log("Step 3: Creating final post");
 
       const finalResponse = await axios.post(
+<<<<<<< HEAD
         `${process.env.NEXT_PUBLIC_SERVER_URI}/workspace/posts/create/${workSpaceId}`,
+=======
+        `https://api.bot.thesquirrel.tech/workspace/posts/create/${workSpaceId}`,
+>>>>>>> d9b8f603c0842998ed6393f617d64ac5b119b664
         {
           posts: presignedResponse.data.data,
         },
@@ -176,10 +219,20 @@ const WorkSpaceThread = ({ accountId, workSpaceId }) => {
         }
       );
 
+<<<<<<< HEAD
       console.log("Final Response:", finalResponse);
       console.log("Thread created successfully:", finalResponse.data);
     } catch (error) {
       console.error("Error creating thread:", error);
+=======
+      console.log("Final Response ", finalResponse);
+
+      console.log("Post created successfully:", finalResponse.data);
+    } catch (error) {
+      toast.error("Error in posting data");
+
+      console.error("Error posting data", error);
+>>>>>>> d9b8f603c0842998ed6393f617d64ac5b119b664
     }
   };
 
