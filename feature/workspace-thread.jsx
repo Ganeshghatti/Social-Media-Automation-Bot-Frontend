@@ -1,10 +1,16 @@
-import React from "react";
-import { useForm, useFieldArray, Controller } from "react-hook-form";
+'use client';
+import React, { useState } from "react";
+import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import axios from "axios";
 import * as z from "zod";
+
 import { Button } from "@components/ui/button";
 import { Input } from "@components/ui/input";
 import { Textarea } from "@components/ui/textarea";
+import { Switch } from "@components/ui/switch";
+import ThreadImageSelector from "./post/components/thread-image-selector"; // Import ThreadImageSelector component
+
 import {
   Form,
   FormControl,
@@ -14,16 +20,15 @@ import {
   FormMessage,
 } from "@components/ui/form";
 
-import axios from "axios";
-
-import { Switch } from "@components/ui/switch"; // Assuming you have a Switch component
-import { workSpaceThreadSchema } from "@/schema/index";
 import useAuthToken from "@hooks/useAuthToken";
+<<<<<<< HEAD
+import { workSpaceThreadSchema } from "@/schema/index";
+=======
 import { toast } from "sonner";
+>>>>>>> d9b8f603c0842998ed6393f617d64ac5b119b664
 
 const WorkSpaceThread = ({ accountId, workSpaceId }) => {
   const token = useAuthToken();
-
   const form = useForm({
     resolver: zodResolver(workSpaceThreadSchema),
     defaultValues: {
@@ -31,13 +36,7 @@ const WorkSpaceThread = ({ accountId, workSpaceId }) => {
       posttype: "thread",
       publishnow: false,
       tobePublishedAt: "",
-      posts: [
-        {
-          type: "post",
-          content: "",
-          media: [],
-        },
-      ],
+      posts: [{ type: "post", content: "", media: [] }],
     },
   });
 
@@ -46,28 +45,52 @@ const WorkSpaceThread = ({ accountId, workSpaceId }) => {
     name: "posts",
   });
 
-  const onSubmit = async (data) => {
-    const formData = {
-      posts: [
-        {
-          accountId: accountId,
-          type: "twitter",
-          posttype: "thread",
-          publishnow: data.publishnow,
-          tobePublishedAt: data.tobePublishedAt,
-          posts: data.posts.map((post) => ({
-            ...post,
-            media: post.media.map(({ blobUrl, ...rest }) => rest),
-          })),
-        },
-      ],
-    };
+  // Ensure media is always an array
+  const getMedia = (index) => {
+    const media = form.watch(`posts.${index}.media`);
+    return Array.isArray(media) ? media : [];
+  };
 
+  const handleImageSelect = (index, selectedImages) => {
+    form.setValue(`posts.${index}.media`, selectedImages);
+  };
+
+  const handleRemoveImage = (index, imgIndex) => {
+    const currentFiles = getMedia(index);
+    const updatedFiles = currentFiles.filter((_, i) => i !== imgIndex);
+    form.setValue(`posts.${index}.media`, updatedFiles);
+  };
+
+  const handleSubmit = async () => {
     try {
+      const data = form.getValues();
+
+      const formData = {
+        posts: [
+          {
+            type: "twitter",
+            posttype: "thread",
+            mode: "create",
+            publishnow: data.publishnow,
+            tobePublishedAt: data.tobePublishedAt,
+            accountId: accountId,
+            posts: data.posts.map(post => ({
+              mode: "create",
+              content: post.content,
+              media: post.media || [],
+            }))
+          }
+        ]
+      };
+
       console.log("Step 1: Sending initial data:", formData);
 
       const presignedResponse = await axios.post(
+<<<<<<< HEAD
+        `${process.env.NEXT_PUBLIC_SERVER_URI}/workspace/posts/create/presigned-url/${workSpaceId}`,
+=======
         `https://api.bot.thesquirrel.tech/workspace/posts/create/presigned-url/${workSpaceId}`,
+>>>>>>> d9b8f603c0842998ed6393f617d64ac5b119b664
         formData,
         {
           headers: {
@@ -76,23 +99,36 @@ const WorkSpaceThread = ({ accountId, workSpaceId }) => {
         }
       );
 
+<<<<<<< HEAD
+      console.log("Presigned Response:", presignedResponse);
+=======
       console.log("Presigned Response ", presignedResponse);
+>>>>>>> d9b8f603c0842998ed6393f617d64ac5b119b664
 
-      const postsWithMedia = data.posts.filter(
-        (post) => post.media && post.media.length > 0
-      );
+      // Get the thread data from the response
+      const threadData = presignedResponse.data.data[0];
+      
+      if (threadData && threadData.posts && threadData.posts.length > 0) {
+        console.log("Step 2: Uploading media files for posts", threadData.posts);
 
+<<<<<<< HEAD
+        // Iterate through each post in the thread
+        for (const responsePost of threadData.posts) {
+=======
       if (postsWithMedia.length > 0) {
         console.log("Step 2: Uploading media files for posts ", postsWithMedia);
+>>>>>>> d9b8f603c0842998ed6393f617d64ac5b119b664
 
-        for (
-          let postIndex = 0;
-          postIndex < postsWithMedia.length;
-          postIndex++
-        ) {
-          const post = postsWithMedia[postIndex];
-          const responsePost = presignedResponse.data.data[0].posts[postIndex];
+          console.log("Response Post:", responsePost);
+          if (responsePost.media && responsePost.media.length > 0) {
+            console.log(`Processing media for post ID: ${responsePost._id}`);
 
+<<<<<<< HEAD
+            // Find matching original post by comparing content
+            const originalPost = data.posts.find(p => p.content === responsePost.content);
+
+            console.log("Original Post:", originalPost);
+=======
           console.log("Response post ", responsePost);
 
           if (post.media && responsePost.media) {
@@ -104,31 +140,60 @@ const WorkSpaceThread = ({ accountId, workSpaceId }) => {
               const mediaItem = post.media[mediaIndex];
               const presignedMediaItem = responsePost.media[mediaIndex];
               console.log("Media ", presignedMediaItem);
+>>>>>>> d9b8f603c0842998ed6393f617d64ac5b119b664
 
-              if (mediaItem && presignedMediaItem) {
-                console.log(
-                  `Uploading file ${mediaIndex + 1} for post ${postIndex + 1}`
-                );
+            if (originalPost && originalPost.media) {
 
-                try {
-                  const imageBlob = await fetch(mediaItem.blobUrl).then((r) =>
-                    r.blob()
-                  );
-                  const uploadResult = await axios.put(
-                    presignedMediaItem.presignedUrl,
-                    imageBlob,
-                    {
-                      headers: {
-                        "Content-Type": mediaItem.mimetype,
-                      },
+              console.log("Original post media:", originalPost.media);
+
+              // Process each media item
+              for (let i = 0; i < responsePost.media.length; i++) {
+                const presignedMedia = responsePost.media[i];
+                const originalMedia = originalPost.media[i];
+
+                console.log("Presigned media:", presignedMedia);
+                console.log("Original media:", originalMedia);
+
+                // Check for either blobUrl (for uploaded files) or imageUrl (for selected images)
+                const mediaUrl = originalMedia.type === 'blob' ? originalMedia.blobUrl : originalMedia.imageUrl;
+
+                if (presignedMedia.presignedUrl && mediaUrl) {
+                  try {
+                    console.log(`Uploading media ${i + 1} for post ${responsePost._id}`);
+                    
+                    let imageBlob;
+                    if (originalMedia.type === 'blob') {
+                      // For uploaded files, use the blob URL
+                      imageBlob = await fetch(originalMedia.blobUrl).then(r => r.blob());
+                    } else {
+                      // For selected images (from search), use the image URL
+                      imageBlob = await fetch(originalMedia.imageUrl).then(r => r.blob());
                     }
-                  );
+                    
+                    // Upload to presigned URL
+                    const uploadResult = await axios.put(
+                      presignedMedia.presignedUrl,
+                      imageBlob,
+                      {
+                        headers: {
+                          'Content-Type': presignedMedia.mimetype,
+                        },
+                      }
+                    );
 
+<<<<<<< HEAD
+                    console.log(`Media ${i + 1} upload status:`, uploadResult);
+                  } catch (error) {
+                    console.error(`Error uploading media ${i + 1} for post ${responsePost._id}:`, error);
+                    throw new Error(`Failed to upload media: ${error.message}`);
+                  }
+=======
                   console.log(`File upload status:`, uploadResult.status);
                 } catch (uploadError) {
                   toast.error("Error in uploading File");
                   console.error(`Error uploading file:`, uploadError);
                   throw uploadError;
+>>>>>>> d9b8f603c0842998ed6393f617d64ac5b119b664
                 }
               }
             }
@@ -139,7 +204,11 @@ const WorkSpaceThread = ({ accountId, workSpaceId }) => {
       console.log("Step 3: Creating final post");
 
       const finalResponse = await axios.post(
+<<<<<<< HEAD
+        `${process.env.NEXT_PUBLIC_SERVER_URI}/workspace/posts/create/${workSpaceId}`,
+=======
         `https://api.bot.thesquirrel.tech/workspace/posts/create/${workSpaceId}`,
+>>>>>>> d9b8f603c0842998ed6393f617d64ac5b119b664
         {
           posts: presignedResponse.data.data,
         },
@@ -150,6 +219,12 @@ const WorkSpaceThread = ({ accountId, workSpaceId }) => {
         }
       );
 
+<<<<<<< HEAD
+      console.log("Final Response:", finalResponse);
+      console.log("Thread created successfully:", finalResponse.data);
+    } catch (error) {
+      console.error("Error creating thread:", error);
+=======
       console.log("Final Response ", finalResponse);
 
       console.log("Post created successfully:", finalResponse.data);
@@ -157,130 +232,84 @@ const WorkSpaceThread = ({ accountId, workSpaceId }) => {
       toast.error("Error in posting data");
 
       console.error("Error posting data", error);
+>>>>>>> d9b8f603c0842998ed6393f617d64ac5b119b664
     }
-  };
-
-  const handleFileChange = (e, onChange, index) => {
-    const files = Array.from(e.target.files);
-    const currentFiles = form.getValues(`posts.${index}.media`) || [];
-    if (currentFiles.length + files.length > 4) {
-      alert("You can only upload a maximum of 4 images.");
-      return;
-    }
-    const fileData = files.map((file) => ({
-      originalname: file.name,
-      size: file.size,
-      mimetype: file.type,
-      blobUrl: URL.createObjectURL(file),
-    }));
-    onChange([...currentFiles, ...fileData]);
-  };
-
-  const handleRemoveImage = (index, imgIndex, onChange) => {
-    const currentFiles = form.getValues(`posts.${index}.media`) || [];
-    const updatedFiles = currentFiles.filter((_, i) => i !== imgIndex);
-    onChange(updatedFiles);
   };
 
   return (
     <div className="px-16 py-10">
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          {fields.map((field, index) => (
-            <div key={field.id} className="space-y-4">
-              <FormField
-                control={form.control}
-                name={`posts.${index}.content`}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Content</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        value={field.value}
-                        onChange={field.onChange}
-                        className="focus:outline-none"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name={`posts.${index}.media`}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Upload Image</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="file"
-                        accept="image/*"
-                        multiple
-                        onChange={(e) =>
-                          handleFileChange(e, field.onChange, index)
-                        }
-                        className="focus:outline-none"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                    <div className="mt-4 flex">
-                      {field.value &&
-                        field.value.map((file, imgIndex) => (
-                          <div key={imgIndex} className="mb-2 relative">
-                            <img
-                              src={file.blobUrl}
-                              alt={file.originalname}
-                              className="w-64 h-64 object-cover"
-                            />
-                            <button
-                              type="button"
-                              onClick={() =>
-                                handleRemoveImage(
-                                  index,
-                                  imgIndex,
-                                  field.onChange
-                                )
-                              }
-                              className="absolute top-0
-                               right-0 bg-red-500 text-white rounded-full p-1 
-                               focus:outline-none"
-                            >
-                              X
-                            </button>
-                          </div>
-                        ))}
-                    </div>
-                  </FormItem>
-                )}
-              />
-              <Button type="button" onClick={() => remove(index)}>
-                Delete Post
-              </Button>
-            </div>
-          ))}
-          <Button
-            type="button"
-            onClick={() => append({ type: "post", content: "", media: [] })}
-          >
-            Add Post
-          </Button>
+        <div className="space-y-8">
+          <div className="flex flex-col gap-4">
+            {fields.map((field, index) => (
+              <div key={field.id} className="p-4 border rounded-lg">
+                <FormField
+                  control={form.control}
+                  name={`posts.${index}.content`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Post Content {index + 1}</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder={`Write your post content ${index + 1}`}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Thread Image Selector */}
+                <div className="mt-4">
+                  <ThreadImageSelector
+                    token={token}
+                    postIndex={index}
+                    selectedImages={getMedia(index)}
+                    onImageSelect={handleImageSelect}
+                  />
+                </div>
+
+                {/* Post Actions */}
+                <div className="flex justify-between mt-4">
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    onClick={() => remove(index)}
+                    disabled={fields.length === 1}
+                  >
+                    Remove Post
+                  </Button>
+                  {index === fields.length - 1 && (
+                    <Button
+                      type="button"
+                      onClick={() => append({ type: "post", content: "", media: [] })}
+                    >
+                      Add Another Post
+                    </Button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+
           <FormField
             control={form.control}
             name="publishnow"
             render={({ field }) => (
               <FormItem className="flex items-center space-x-4">
-                <FormLabel className="pt-2">Publish Now</FormLabel>
+                <FormLabel>Publish Now</FormLabel>
                 <FormControl>
                   <Switch
                     checked={field.value}
                     onCheckedChange={field.onChange}
-                    className="focus:outline-none"
                   />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
+
           {!form.watch("publishnow") && (
             <FormField
               control={form.control}
@@ -291,8 +320,7 @@ const WorkSpaceThread = ({ accountId, workSpaceId }) => {
                   <FormControl>
                     <Input
                       type="datetime-local"
-                      value={field.value}
-                      onChange={field.onChange}
+                      {...field}
                       className="focus:outline-none"
                     />
                   </FormControl>
@@ -301,10 +329,17 @@ const WorkSpaceThread = ({ accountId, workSpaceId }) => {
               )}
             />
           )}
-          <Button type="submit" className="focus:outline-none">
-            Submit
-          </Button>
-        </form>
+
+          <div className="flex justify-end mt-6">
+            <Button 
+              type="button"
+              className="px-8"
+              onClick={handleSubmit}
+            >
+              Create Thread
+            </Button>
+          </div>
+        </div>
       </Form>
     </div>
   );

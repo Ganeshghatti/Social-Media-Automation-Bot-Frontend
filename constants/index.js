@@ -16,11 +16,16 @@ export const navItems = [
   },
   {
     id: 4,
+    title: "Blogs",
+    path: "/blogs",
+  },
+  {
+    id: 5,
     title: "Portfolio",
     path: "/portfolio",
   },
   {
-    id: 5,
+    id: 6,
     title: "Contact",
     path: "/contact",
   },

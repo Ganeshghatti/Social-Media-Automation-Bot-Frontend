@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import CustomButtonHeader from "./CustomButtonHeader";
 import { Button } from "@components/ui/button";
 import {
@@ -35,29 +35,20 @@ export const ButtonsHeader = ({
   setNewCardAdded,
 }) => {
   const [workspaceData, setWorkspaceData] = useState(singleWorkspace);
-  const [localCards, setLocalCards] = useState(cards || [{ id: 0, text: "" }]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const router = useRouter();
   const token = useAuthToken();
+  const [localCards, setLocalCards] = useState(cards || [{ id: 0, text: "" }]);
+
 
   const formSchema = z.object({
-    scheduledDateTime: z.date({
-      required_error: "Please select a date and time",
-    }),
+    scheduledDateTime: z.date({ required_error: "Please select a date and time" }),
   });
 
   const form = useForm({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      scheduledDateTime: null,
-    },
+    defaultValues: { scheduledDateTime: null },
   });
-
-  useEffect(() => {
-    if (cards) {
-      setLocalCards(cards);
-    }
-  }, [cards]);
 
   const handleTextareaChange = (id, val) => {
     setLocalCards((prev) =>
@@ -70,30 +61,27 @@ export const ButtonsHeader = ({
     }
   };
 
-  useEffect(() => {
-    setWorkspaceData(singleWorkspace);
-  }, [singleWorkspace]);
-
   const onSubmit = (values) => {
     try {
       const scheduledDateTime = values.scheduledDateTime;
-      console.log("Scheduled DateTime:", scheduledDateTime);
-      console.log("Cards:", localCards);
-
-      // Sync localCards back to parent state before publishing
-      if (setCards) {
-        setCards(localCards);
-      }
-
-      // Call onPublish with the scheduled date
       onPublish(scheduledDateTime);
-
       setIsDialogOpen(false);
     } catch (error) {
       toast.error("Submission Failed");
       console.error("Submission error:", error);
     }
   };
+
+  useEffect(() => {
+    setWorkspaceData(singleWorkspace);
+  }, [singleWorkspace]);
+
+  
+  useEffect(() => {
+    if (cards) {
+      setLocalCards(cards);
+    }
+  }, [cards]);
 
   return (
     <div className="w-full px-8 py-3 gap-3 flex justify-center md:justify-end">
@@ -104,7 +92,6 @@ export const ButtonsHeader = ({
         buttonText={isEditingDraft ? "Edit the Draft" : "Save as Draft"}
         isDisabled={activeButtons}
       />
-
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogTrigger asChild>
           <Button
@@ -196,7 +183,6 @@ export const ButtonsHeader = ({
           </DialogContent>
         )}
       </Dialog>
-
       <CustomButtonHeader
         buttonColor={"#1E58E8"}
         buttonText={"Publish"}

@@ -31,7 +31,7 @@ const Footer = () => {
               />
             ))}
           </div>
-          <p className="text-white underline">info@thesquirrel.site</p>
+          <p className="text-white underline">info@thesquirrel.tech</p>
           <p className="text-white font-normal">+91 94496 10077</p>
         </div>
       </div>
