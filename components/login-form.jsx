@@ -56,6 +56,10 @@ export function LoginForm({ className, ...props }) {
   async function onSubmit(values) {
     try {
       setLoading(true);
+      // const lowerCaseValues = {
+      //   email: values.email.toLowerCase(),
+      //   password: values.password.toLowerCase(),
+      // };
       const response = await axios.post(
         "https://api.bot.thesquirrel.tech/user/login",
         values
@@ -94,7 +98,19 @@ export function LoginForm({ className, ...props }) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-6">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className={cn("flex flex-col gap-10", className)}
+      >
+        <div className="flex flex-col items-center gap-2 text-center">
+          <h1 className="text-2xl font-bold text-white">Welcome Back</h1>
+          <p className="text-balance text-sm text-muted-foreground">
+            Enter your details to login to your account
+          </p>
+        </div>
+
+        <div className="grid gap-6">
+      
         <FormField
           control={form.control}
           name="email"
@@ -163,6 +179,8 @@ export function LoginForm({ className, ...props }) {
             Submit
           </Button>
         </div>
+        </div>
+
         <div className="text-center text-sm text-white/50">
           Don't have an Account?{"  "}
           <Link

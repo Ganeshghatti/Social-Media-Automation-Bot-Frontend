@@ -44,7 +44,7 @@ export const CreatePostCard = ({
               src={
                 user && user?.profilePicture
                   ? user?.profilePicture
-                  : "/logo.jpg"
+                  : "/Default_pic.jpg"
               }
               height={40}
               width={40}
@@ -69,8 +69,10 @@ export const CreatePostCard = ({
                 />
               </div>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="rounded-lg p-0 min-w-[140px] 
-            flex flex-col gap-2 bg-headerBg border-[0.5px] border-transparent">
+            <DropdownMenuContent
+              className="rounded-lg p-0 min-w-[140px] 
+            flex flex-col gap-2 bg-headerBg border-[0.5px] border-transparent"
+            >
               <div
                 onClick={() => {
                   if (cards.length > 1) {

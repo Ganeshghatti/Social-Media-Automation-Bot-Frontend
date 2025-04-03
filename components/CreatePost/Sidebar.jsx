@@ -125,7 +125,7 @@ export const Sidebar = ({ workspaceId, token }) => {
 
   return (
     <div className="md:flex hidden
-     flex-col items-start justify-between w-56
+     flex-col items-start justify-between w-72
       bg-darkBg px-4 py-6 shadow-sm text-white no-scrollbar h-screen 
       sticky top-0 self-start max-h-screen">
 
@@ -241,7 +241,8 @@ export const Sidebar = ({ workspaceId, token }) => {
       ) : (
         <DropdownMenu className="w-full mt-6">
           <DropdownMenuTrigger asChild>
-            <Button className="bg-primary rounded-2xl w-full py-8  flex items-center gap-2 mt-auto">
+            <Button className="bg-primary rounded-2xl w-full py-8 
+             flex items-center gap-2 mt-auto">
               {singleWorkspace?.icon && (
                 <Image
                   alt="Paw image"
@@ -258,13 +259,15 @@ export const Sidebar = ({ workspaceId, token }) => {
               <ChevronsUpDown className="h-6 w-6 object-contain" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="bg-white/5 flex justify-center rounded-2xl my-2 w-[16rem] text-center border-orange-600  items-center gap-2 mt-auto">
+          <DropdownMenuContent className="bg-navBg flex justify-center 
+          rounded-md border-transparent my-2 w-[16rem] text-center  items-center
+           gap-2 mt-auto">
             {workspaces?.length !== 0 &&
               workspaces?.map((workspace, i) => (
                 <Link
                   href={`/workspace/${workspace._id}`}
                   key={i}
-                  className="text-white  text-center border-0  rounded-sm   "
+                  className="text-white  text-center border-b border-b-white/70 rounded-sm   "
                 >
                   {workspace.name}
                 </Link>
@@ -274,7 +277,7 @@ export const Sidebar = ({ workspaceId, token }) => {
               href={`/workspaces`}
               className="text-white border-none rounded-sm px-6 py-4 "
             >
-              More Workspaces
+              Manage Workspaces
             </Link>
           </DropdownMenuContent>
         </DropdownMenu>

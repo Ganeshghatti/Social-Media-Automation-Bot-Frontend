@@ -67,6 +67,7 @@ const Page = () => {
         <CardContent>
           <div className="flex flex-col items-center space-y-6">
             <Avatar className="h-24 w-24">
+              <AvatarImage src={"/Default_pic.jpg"} alt="DeafultImage" />
               <AvatarFallback className="text-2xl font-bold">
                 {userData.username[0]}
               </AvatarFallback>
