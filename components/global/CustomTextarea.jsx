@@ -19,6 +19,7 @@ export const CustomTextarea = forwardRef(({ value, onChange }, ref) => {
     <Textarea
       ref={ref || textareaRef} // Use external ref if provided
       value={value}
+      placeholder="Write your post here..."
       onChange={(e) => {
         onChange(e.target.value);
         adjustHeight(); // Adjust height on every change
