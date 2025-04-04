@@ -4,7 +4,7 @@ import { useUserStore } from "@/store/userStore";
 import { CustomLoader } from "@components/global/CustomLoader";
 import useAuthToken from "@hooks/useAuthToken";
 import axios from "axios";
-import { PlusIcon } from "lucide-react";
+import { Layers, PlusIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -108,7 +108,7 @@ const WorkspacesPage = () => {
                 key={i}
                 className="border-white text-white flex items-center space-x-2 border-2 rounded-sm px-12 py-4 gap-3"
               >
-                {workspace?.icon && (
+                {workspace?.icon ? (
                   <Image
                     src={workspace.icon}
                     alt="Workspace Icon"
@@ -116,6 +116,8 @@ const WorkspacesPage = () => {
                     width={60}
                     className="h-10 w-10 object-contain"
                   />
+                ) : (
+                  <Layers className="h-8 w-8 object-contain"/>
                 )}
                 {workspace.name}
               </Link>

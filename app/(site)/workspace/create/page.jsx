@@ -222,7 +222,8 @@ const Page = () => {
   }
 
   return (
-    <div className="flex items-start gap-4 justify-start bg-navBg min-h-screen w-full flex-col px-4 md:px-8">
+    <div className="flex items-start gap-4 justify-start bg-navBg min-h-screen
+     w-full flex-col px-4 md:px-8 overflow-x-hidden">
       <CreatePostHeader />
 
       <div

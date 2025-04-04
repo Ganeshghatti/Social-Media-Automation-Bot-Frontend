@@ -8,7 +8,7 @@ const AnalyticsLayout = ({ children }) => {
         <SidebarDashboard />
         <main
           className="h-screen flex bg-navBg text-white items-center
-       flex-col justify-start gap-7 flex-1 "
+       flex-col justify-between gap-7 flex-1 "
         >
           <CreatePostHeader />
   
