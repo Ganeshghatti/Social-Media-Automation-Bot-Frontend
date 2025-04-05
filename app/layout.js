@@ -10,7 +10,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`family-jakarta antialiased`}>
+      <body className={`family-jakarta antialiased overflow-x-hidden`}>
         <Script
           id="google-analytics"
           strategy="afterInteractive"
