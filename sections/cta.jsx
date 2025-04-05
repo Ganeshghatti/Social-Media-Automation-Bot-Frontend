@@ -11,10 +11,10 @@ const CTA = () => {
         Effortlessly enhance your app with powerful AI-driven capabilities.
       </p>
       <div className="flex gap-5">
-        <Button className="border-2 border-white px-10 bg-white text-[#0C1E5B]  py-5 rounded-md hover:bg-[#0C1E5B] hover:text-white">
+        <Button className="border-2 border-white px-10 bg-white text-[#e05a00]  py-5 rounded-md hover:bg-[#e05a00] hover:text-white">
           Talk to Us
         </Button>
-        <Button className="border-2 border-white px-10 bg-[#0C1E5B]  text-white  py-5 rounded-md hover:bg-white hover:text-[#0C1E5B]">
+        <Button className="border-2 border-white px-10 bg-[#e05a00]  text-white  py-5 rounded-md hover:bg-white hover:text-[#e05a00]">
           Get Started
         </Button>
       </div>
