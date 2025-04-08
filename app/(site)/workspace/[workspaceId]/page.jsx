@@ -654,6 +654,7 @@ const WorkspacePage = () => {
               setNewCardAdded={setNewCardAdded}
               selectedImages={card.media}
               onImageSelect={(images) => handleImageSelect(card.id, images)}
+              cards={cards}
             />
           ))}
         </form>

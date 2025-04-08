@@ -35,7 +35,10 @@ const WorkspacesPage = () => {
   }, [user, router, fetchUser, token]);
 
   useEffect(() => {
-    if (user === null) return;
+
+    if (user === null) {
+      router.replace("/auth/login")
+    };
     if (!user?.onboarding) {
       router.replace("/onboarding");
     }
@@ -114,10 +117,10 @@ const WorkspacesPage = () => {
                     alt="Workspace Icon"
                     height={60}
                     width={60}
-                    className="h-10 w-10 object-contain"
+                    className="h-10 w-10 object-contain rounded-full"
                   />
                 ) : (
-                  <Layers className="h-8 w-8 object-contain"/>
+                  <Layers className="h-8 w-8 object-contain" />
                 )}
                 {workspace.name}
               </Link>

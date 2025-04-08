@@ -36,6 +36,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Avatar, AvatarFallback } from "@components/ui/avatar";
 
 export const CreatePostCard = ({
   value,
@@ -224,28 +225,22 @@ export const CreatePostCard = ({
       className={`w-full sm:w-full 
         flex flex-row gap-4 bg-transparent h-full max-h-[240px] 
         border-transparent mx-auto 
-        ${
-          !width
-            ? "md:w-[60vw] lg:w-[70vw] xl:w-[55vw] min-w-[240px] max-w-[1440px] "
-            : "w-full"
+        ${!width
+          ? "md:w-[60vw] lg:w-[70vw] xl:w-[55vw] min-w-[240px] max-w-[1440px] "
+          : "w-full"
         }
         `}
     >
       <CardTitle className="p-0 justify-between   flex gap-4 h-full items-center">
         <div className="flex gap-4 items-center justify-center  h-full ">
           <div className="relative h-full  ">
-            {/* <Image
-              alt="Profile"
-              src={
-                user && user?.profilePicture
-                  ? user?.profilePicture
-                  : "/Default_pic.jpg"
-              }
-              height={40}
-              width={40}
-              className="rounded-full object-cover"
-            /> */}
-            <div className="bg-[#FFFFFF33] absolute left-1/2 h-[90%] w-[1px]" />
+            <Avatar className="h-10 w-10">
+              {/* <AvatarImage src={"/Default_pic.jpg"} alt="DefaultImage" /> */}
+              <AvatarFallback className="flex items-center justify-center h-full w-full text-xl text-black">
+                {user && user?.username[0]}
+              </AvatarFallback>
+            </Avatar>
+            {cards?.length > 1 && <div className="bg-[#FFFFFF33] absolute left-1/2 h-[90%] w-[1px]" />}
           </div>
         </div>
       </CardTitle>
@@ -458,8 +453,8 @@ export const CreatePostCard = ({
               {isLoading
                 ? "Processing..."
                 : imageDialogType === "ai"
-                ? "Generate Image"
-                : "Search Images"}
+                  ? "Generate Image"
+                  : "Search Images"}
             </Button>
             {imageDialogType === "search" && searchResults.length > 0 && (
               <div className="mt-4">

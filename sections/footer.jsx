@@ -4,7 +4,7 @@ import { socialData } from "@constants/index.js";
 
 const Footer = () => {
   return (
-    <div className="bg-[#222] py-10">
+    <div className="bg-[#222]  py-10">
       <div className="py-16 px-10 flex flex-col md:flex-row items-center justify-center md:justify-between">
         <div className="py-10">
           <Image

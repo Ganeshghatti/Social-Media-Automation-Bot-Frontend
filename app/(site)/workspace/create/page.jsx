@@ -222,15 +222,10 @@ const Page = () => {
   }
 
   return (
-    <div className="flex items-start gap-4 justify-start bg-navBg min-h-screen
-     w-full flex-col px-4 md:px-8 overflow-x-hidden">
+    <div className="flex items-start gap-4 justify-start bg-navBg min-h-screen w-full px-4 md:px-8 flex-col overflow-x-hidden border-2 " style={{ boxSizing: 'border-box' }}>
       <CreatePostHeader />
 
-      <div
-        className="flex gap-6 flex-col w-full mx-auto py-3 
-      max-w-[90%] sm:max-w-[90%] md:max-w-[80%] lg:max-w-[80%] xl:max-w-[60%] 
-      2xl:max-w-[60%] min-h-screen"
-      >
+      <div className="flex gap-6 flex-col w-full mx-auto py-3 max-w-[90%] md:max-w-[80%] xl:max-w-[60%] h-screen overflow-x-hidden  border-2">
         <h1
           className="text-3xl md:text-4xl font-semibold text-white 
         text-center md:text-left"

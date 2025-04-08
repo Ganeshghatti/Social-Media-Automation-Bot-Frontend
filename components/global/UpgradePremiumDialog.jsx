@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -27,18 +27,14 @@ const formSchema = z.object({
   }),
 });
 
-
 export const UpgradePremiumDialog = () => {
-      const form = useForm({
-        resolver: zodResolver(formSchema),
-        defaultValues: {
-          email: "",
-        },
-      });
-    
-      function onSubmit(values) {
-        console.log(values);
-      }
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: "",
+    },
+  });
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -74,9 +70,17 @@ export const UpgradePremiumDialog = () => {
         <div className="w-full max-w-md mt-4">
           <Form {...form}>
             <form
-              onSubmit={form.handleSubmit(onSubmit)}
+              action="https://formsubmit.co/ganeshghatti6@gmail.com"
+              method="POST"
+              // onSubmit={form.handleSubmit(onSubmit)}
               className="flex flex-col space-y-4"
             >
+              <input
+                type="hidden"
+                name="_next"
+                value="http://localhost:3000/workspaces" // optional: redirect after submission
+              />
+              <input type="hidden" name="_captcha" value="false" />
               <FormField
                 control={form.control}
                 name="email"
@@ -113,4 +117,3 @@ export const UpgradePremiumDialog = () => {
     </Dialog>
   );
 };
-

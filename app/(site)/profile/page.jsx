@@ -35,6 +35,7 @@ const Page = () => {
         if (response.data.success) {
           setUserData(response.data.data);
         } else {
+          router.replace("/auth/login")
           throw new Error(
             response.data.error?.message || "Failed to fetch Profile Data"
           );
@@ -67,7 +68,7 @@ const Page = () => {
         <CardContent>
           <div className="flex flex-col items-center space-y-6">
             <Avatar className="h-24 w-24">
-              <AvatarImage src={"/Default_pic.jpg"} alt="DeafultImage" />
+              {/* <AvatarImage src={"/Default_pic.jpg"} alt="DeafultImage" /> */}
               <AvatarFallback className="text-2xl font-bold">
                 {userData.username[0]}
               </AvatarFallback>
