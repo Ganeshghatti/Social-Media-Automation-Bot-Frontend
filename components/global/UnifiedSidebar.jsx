@@ -31,7 +31,7 @@ export const UnifiedSidebar = ({ workspaceId, token }) => {
     const [workspaces, setWorkspaces] = useState([]);
     const [loading, setLoading] = useState(false);
 
-    const isDashboardPage = pathname?.includes("/dashboard") || pathname?.includes("/analytics");
+    const isDashboardPage = pathname?.includes("/dashboard") || pathname?.includes("/analytics") || pathname?.includes("/workspaces") || pathname?.includes("/scheduledPosts") ;
 
     const getSingleWorkspace = useCallback(async () => {
         if (!workspaceId || !token) return;
@@ -76,7 +76,7 @@ export const UnifiedSidebar = ({ workspaceId, token }) => {
     }, [getSingleWorkspace, getAllWorkspaces]);
 
     return (
-        <div className="md:flex hidden flex-col items-start justify-between w-64 bg-darkBg px-4 py-6 shadow-sm text-white no-scrollbar h-screen sticky top-0 self-start max-h-screen">
+        <div className="md:flex hidden flex-col items-start justify-between w-64 bg-darkBg px-4 py-6 shadow-sm text-white no-scrollbar h-screen fixed top-0 left-0 overflow-y-auto z-20">
             {/* Header */}
             <div className="flex flex-col gap-14 items-center w-full">
                 <div className="flex w-full items-center gap-4">
@@ -130,12 +130,12 @@ export const UnifiedSidebar = ({ workspaceId, token }) => {
                             <Sidebar_Card
                                 imageUrl={"/Create-Post.png"}
                                 text={"Create post"}
-                                onClickFunction={() => router.push(`/workspace/${workspaceId}`)}
+                                onClickFunction={() => router.push(`/workspace/${singleWorkspace?._id}`)}
                             />
                             <Sidebar_Card
                                 imageUrl={"/edit.png"}
                                 text={"Edit Workspace"}
-                                onClickFunction={() => router.push(`/workspace/${workspaceId}/edit`)}
+                                onClickFunction={() => router.push(`/workspace/${singleWorkspace?._id}/edit`)}
                             />
 
                             <Dialog>
@@ -150,14 +150,14 @@ export const UnifiedSidebar = ({ workspaceId, token }) => {
                                     <div className="w-full p-4 grid grid-cols-1 lg:grid-cols-2 gap-5">
                                         <Sidebar_Card
                                             onClickFunction={() =>
-                                                connectTwitter(workspaceId, router, token)
+                                                connectTwitter(singleWorkspace?._id, router, token)
                                             }
                                             imageUrl={"/twitter.png"}
                                             text={"Connect X"}
                                         />
                                         <Sidebar_Card
                                             onClickFunction={() =>
-                                                connectLinkedin(workspaceId, router, token)
+                                                connectLinkedin(singleWorkspace?._id, router, token)
                                             }
                                             imageUrl={"/linkedIn.png"}
                                             text={"Connect LinkedIn"}
@@ -174,7 +174,7 @@ export const UnifiedSidebar = ({ workspaceId, token }) => {
             {!loading && (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button className="bg-primary rounded-2xl w-full py-8 mt-auto flex items-center justify-center gap-2">
+                        <Button className="bg-primary rounded-2xl w-full py-8  flex items-center justify-center gap-2 mt-4">
                             <div className="flex flex-1 space-x-2 items-center justify-center ">
 
                                 {singleWorkspace ? (
@@ -203,6 +203,7 @@ export const UnifiedSidebar = ({ workspaceId, token }) => {
 
                     <DropdownMenuContent className="bg-navBg rounded-md mt-2 w-[16rem] text-center">
                         {workspaces.map((ws, i) => (
+
                             <Link
                                 key={i}
                                 href={`/workspace/${ws._id}`}

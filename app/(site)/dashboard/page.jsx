@@ -17,7 +17,7 @@ const Page = () => {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center flex-1 gap-6">
+    <div className="flex flex-col items-center justify-center gap-6">
       <Image
         src="/UnderConstructionImage.png"
         alt="Under Construction"

@@ -222,14 +222,14 @@ export const CreatePostCard = ({
 
   return (
     <Card
-      className={`w-full sm:w-full 
-        flex flex-row gap-4 bg-transparent h-full max-h-[240px] 
-        border-transparent mx-auto 
-        ${!width
-          ? "md:w-[60vw] lg:w-[70vw] xl:w-[55vw] min-w-[240px] max-w-[1440px] "
+      className={`w-[90%] sm:w-[90%] md:w-[80%]
+      flex flex-row gap-4 bg-transparent h-full max-h-[240px]
+      border-transparent mx-auto
+      ${!width
+          ? "md:w-[60vw] lg:w-[70vw] xl:w-[55vw] min-w-[240px] max-w-[1440px]"
           : "w-full"
         }
-        `}
+    `}
     >
       <CardTitle className="p-0 justify-between   flex gap-4 h-full items-center">
         <div className="flex gap-4 items-center justify-center  h-full ">

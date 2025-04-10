@@ -34,16 +34,7 @@ const WorkspacesPage = () => {
     }
   }, [user, router, fetchUser, token]);
 
-  useEffect(() => {
 
-    if (user === null) {
-      router.replace("/auth/login")
-    };
-    if (!user?.onboarding) {
-      router.replace("/onboarding");
-    }
-    setLoading(false);
-  }, [user, router]);
 
   // Fetch workspaces
   const GetAllWorkspaces = async (token) => {

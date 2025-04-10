@@ -76,7 +76,7 @@ export const ButtonsHeader = ({
     setWorkspaceData(singleWorkspace);
   }, [singleWorkspace]);
 
-  
+
   useEffect(() => {
     if (cards) {
       setLocalCards(cards);
@@ -84,7 +84,7 @@ export const ButtonsHeader = ({
   }, [cards]);
 
   return (
-    <div className="w-full px-8 py-3 gap-3 flex justify-center md:justify-end">
+    <div className="w-full px-2 md:px-8  gap-3 pt-3 flex-wrap flex justify-center md:justify-end">
       <CustomButtonHeader
         buttonColor={"#FF9900"}
         activeButtons={activeButtons}
@@ -106,7 +106,7 @@ export const ButtonsHeader = ({
         </DialogTrigger>
         {workspaceData?.connectedAccounts?.length > 0 ? (
           <DialogContent
-            className="w-[90%] md:w-[60vw] md:max-w-[60vw] h-[720px] 
+            className="w-[90%] md:w-[60vw] md:max-w-[60vw] h-2/3 max-h-[800px]
         p-0 bg-navBg flex border-transparent gap-2 items-start"
           >
             <DialogTitle></DialogTitle>
@@ -120,8 +120,8 @@ export const ButtonsHeader = ({
                 />
               </div>
 
-              <div className="flex flex-col gap-4 items-start justify-start 
-              h-full w-full pt-20 p-2 order-1 md:order-2">
+              <div className="flex flex-col gap-2 items-start justify-start 
+              h-full w-full pt-8 p-2 order-1 md:order-2 overflow-y-auto ">
                 <Form {...form}>
                   <form
                     onSubmit={form.handleSubmit(onSubmit)}
@@ -131,7 +131,7 @@ export const ButtonsHeader = ({
                       control={form.control}
                       name="scheduledDateTime"
                       render={({ field }) => (
-                        <FormItem className="w-[70%] lg:w-2/3">
+                        <FormItem className="w-[70%] max-w-[600px] ">
                           <FormControl>
                             <DateTimePicker
                               date={field.value}
@@ -191,8 +191,8 @@ export const ButtonsHeader = ({
           singleWorkspace?.connectedAccounts?.length > 0
             ? () => onPublish()
             : () => {
-                setIsDialogOpen(true);
-              }
+              setIsDialogOpen(true);
+            }
         } // Immediate publish
         isDisabled={activeButtons}
       />

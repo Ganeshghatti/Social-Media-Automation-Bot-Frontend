@@ -6,10 +6,10 @@ const ScheduledPostsLayout = ({ children }) => {
   return (
     <div className="flex min-h-screen bg-navBg w-full">
       <UnifiedSidebar key={"scheduledPosts"} />
-      <main
-        className="h-screen flex bg-navBg text-white items-center
-     flex-col justify-start gap-7  flex-1 "
-      >
+      <main 
+        className="min-h-screen flex bg-navBg text-white items-center 
+   flex-col justify-start gap-7 flex-1 md:ml-64" 
+      > 
         <CreatePostHeader />
 
         {children}
