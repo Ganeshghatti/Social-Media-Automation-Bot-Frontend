@@ -114,7 +114,7 @@ export const DraftPosts = ({
   }
 
   return (
-    <section className="flex justify-start w-[96%] lg:w-[60%]  mb-4  mx-auto items-center px-4  py-3">
+    <section className="flex justify-start w-[96%] lg:w-[60%]  mb-4  mx-auto items-center px-4  md:py-3">
       <Accordion
         type="single"
         collapsible

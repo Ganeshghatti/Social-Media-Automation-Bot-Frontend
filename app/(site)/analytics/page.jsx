@@ -17,16 +17,25 @@ const Page = () => {
     return <CustomLoader />;
   }
   return (
-    <>
+    <div className="flex flex-col items-center justify-center flex-1 gap-6">
       <Image
-        src={"/coming-soon.avif"}
-        alt="no image"
-        className="object-fill h-64 w-64"
-        height={400}
-        width={400}
+        src="/UnderConstructionImage.png"
+        alt="Under Construction"
+        className="object-contain"
+        height={600}
+        width={600}
       />
-      <h2 className="text-2xl text-white ">Coming Soon...</h2>
-    </>
+      <div className="flex flex-col space-y-3 items-center justify-center ">
+        <h2 className="text-xl text-center md:text-3xl font-semibold text-white">
+          Analytics Coming Soon
+        </h2>
+        <p className="text-[10px] md:text-sm text-gray-300 text-center max-w-md">
+          We’re building something awesome! This analytics is currently under
+          construction and will be available soon with powerful insights and
+          features tailored just for you.
+        </p>
+      </div>
+    </div>
   );
 };
 

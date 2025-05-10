@@ -3,7 +3,7 @@ import React from "react";
 
 const Productivity = () => {
   return (
-    <div className="background-image flex items-center justify-center flex-col">
+    <div className="background-image  flex items-center justify-center flex-col">
       <h2 className="text-white font-bold text-3xl md:text-5xl text-center py-16 md:py-36">
         Boost your Productivity
       </h2>

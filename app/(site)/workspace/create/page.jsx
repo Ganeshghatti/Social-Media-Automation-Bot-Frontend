@@ -33,6 +33,7 @@ import Image from "next/image";
 import { toast } from "sonner";
 import { CustomLoader } from "@/components/global/CustomLoader";
 import { handleApiError } from "@/lib/ErrorResponse";
+import { GLOBAL_KEYWORDS } from "@constants/keywords/index";
 const Page = () => {
   const [loading, setLoading] = useState(true); // Set to true initially
   const [keywordInput, setKeywordInput] = useState("");
@@ -41,12 +42,24 @@ const Page = () => {
   const router = useRouter();
   const token = useAuthToken() || "";
   const fileInputRef = useRef(null);
-
+  const MAX_KEYWORDS = 200;
+  const [suggestions, setSuggestions] = useState([]);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null); // Ref for dropdown to handle outside clicks
   useEffect(() => {
-    // Simulate API or initial setup delay
     setTimeout(() => {
       setLoading(false);
-    }, 1000); // Adjust time as needed
+    }, 1000);
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const formSchema = z.object({
@@ -64,21 +77,18 @@ const Page = () => {
       description: "",
       keywords: [],
       icon: null,
-      timezone: "",
+      timezone: "IST",
     },
   });
 
   const keywords = form.watch("keywords");
 
   const handleFileChange = (e) => {
-    console.log("File input changed"); // Debugging
     const file = e.target.files[0];
     if (!file) {
       console.log("No file selected");
       return;
     }
-
-    console.log("File selected:", file.name);
 
     if (!file.type.startsWith("image/")) {
       alert("Please upload an image file");
@@ -105,6 +115,7 @@ const Page = () => {
 
   const onSubmit = async (data) => {
     try {
+      console.log("Form data:", data);
       if (!token) {
         console.log("No token available");
         return;
@@ -120,7 +131,6 @@ const Page = () => {
         },
       };
 
-      // Add icon if available
       if (data.icon) {
         payload.icon = {
           originalname: data.icon.originalname,
@@ -170,14 +180,33 @@ const Page = () => {
     }
   };
 
+  const handleKeywordInputChange = (value) => {
+    setKeywordInput(value);
+    if (value.trim() === "") {
+      setSuggestions([]);
+      setIsDropdownOpen(false);
+      return;
+    }
+    const filteredSuggestions = GLOBAL_KEYWORDS.filter((item) =>
+      item.keyword.toLowerCase().startsWith(value.toLowerCase())
+    );
+    setSuggestions(filteredSuggestions);
+    setIsDropdownOpen(true);
+  };
+
   const addKeyword = (value) => {
     const trimmedValue = value.trim();
     if (trimmedValue && !keywords.includes(trimmedValue)) {
+      if (keywords.length >= MAX_KEYWORDS) {
+        toast.error("Keywords can't exceed 200 words");
+        return;
+      }
       form.setValue("keywords", [...keywords, trimmedValue], {
         shouldValidate: true,
       });
     }
     setKeywordInput("");
+    setIsDropdownOpen(false);
   };
 
   const removeKeyword = (keywordToRemove) => {
@@ -193,11 +222,14 @@ const Page = () => {
   }
 
   return (
-    <div className="flex items-start gap-4 justify-start bg-navBg min-h-screen w-full flex-col px-4 md:px-8">
+    <div className="flex items-start gap-4 justify-start bg-navBg min-h-screen w-full px-4 md:px-8 flex-col overflow-x-hidden border-2 " style={{ boxSizing: 'border-box' }}>
       <CreatePostHeader />
 
-      <div className="flex gap-6 flex-col w-full mx-auto py-3 max-w-[90%] sm:max-w-[90%] md:max-w-[80%] lg:max-w-[80%] xl:max-w-[60%] 2xl:max-w-[60%] min-h-screen">
-        <h1 className="text-3xl md:text-4xl font-semibold text-white text-center md:text-left">
+      <div className="flex gap-6 flex-col w-full mx-auto py-3 max-w-[90%] md:max-w-[80%] xl:max-w-[60%] h-screen overflow-x-hidden  border-2">
+        <h1
+          className="text-3xl md:text-4xl font-semibold text-white 
+        text-center md:text-left"
+        >
           Create Workspace
         </h1>
 
@@ -207,7 +239,6 @@ const Page = () => {
             className="w-full rounded-xl bg-headerBg border-[#ffffff30] px-4 md:px-6 py-6 flex flex-col gap-6"
           >
             <div className="w-full flex flex-col lg:flex-row flex-wrap gap-4 flex-1">
-              {/* Workspace Name Input */}
               <FormField
                 control={form.control}
                 name="name"
@@ -226,7 +257,6 @@ const Page = () => {
                 )}
               />
 
-              {/* Timezone Selector */}
               <FormField
                 control={form.control}
                 name="timezone"
@@ -258,7 +288,6 @@ const Page = () => {
                 )}
               />
 
-              {/* Image Upload */}
               <FormField
                 control={form.control}
                 name="icon"
@@ -266,7 +295,9 @@ const Page = () => {
                   <div className="flex-1 justify-center">
                     <div
                       onClick={() => fileInputRef.current.click()}
-                      className="flex items-center gap-3 cursor-pointer bg-navBg text-white border rounded-[20px] border-[#ffffff30] px-4 w-full md:w-auto min-h-[48px] py-2"
+                      className="flex items-center gap-3 cursor-pointer
+                       bg-navBg text-white border rounded-[20px] border-[#ffffff30]
+                        px-4 w-full md:w-auto min-h-[48px] py-2"
                     >
                       <Input
                         type="file"
@@ -303,45 +334,44 @@ const Page = () => {
               />
             </div>
 
-            {/* Icon Upload */}
-
-            {/* Description */}
             <FormField
               control={form.control}
               name="description"
               render={({ field }) => (
-                <FormItem
-                  className="flex-1 bg-navBg text-white py-2
+                <div className="flex-1 flex-col space-y-1 ">
+                  <FormLabel className="text-white text-base">
+                    Describe your workspace
+                  </FormLabel>
+
+                  <FormItem
+                    className="flex-1 bg-navBg text-white py-2
                  border rounded-[20px] border-[#ffffff30] px-3"
-                >
-                  <FormControl>
-                    <Textarea
-                      className="bg-navBg text-white border-transparent
+                  >
+                    <FormControl>
+                      <Textarea
+                        className="bg-navBg text-white border-transparent
                        focus:border-transparent focus:outline-none focus:ring-0 text-base
                         md:text-base placeholder:text-base rounded-xl py-2"
-                      rows={6}
-                      placeholder="Enter Description"
-                      {...field}
-                    />
-                  </FormControl>
-                </FormItem>
+                        rows={6}
+                        placeholder="Describe your workspace. You can connect social accounts and publish posts directly from here."
+                        {...field}
+                      />
+                    </FormControl>
+                  </FormItem>
+                </div>
               )}
             />
-
-            {/* Keywords Input */}
             <FormField
               control={form.control}
               name="keywords"
               render={({ field }) => (
-                <FormItem className="flex-1 bg-navBg text-white border rounded-[20px] border-[#ffffff30] px-3 min-h-[48px]">
+                <FormItem className="relative flex-1 bg-navBg text-white border rounded-[20px] border-[#ffffff30] px-3 min-h-[48px]">
                   <FormControl>
                     <Input
                       placeholder="Add keyword"
                       value={keywordInput}
-                      className="bg-navBg text-white border-transparent 
-          focus:border-transparent focus:outline-none text-base 
-          md:text-base placeholder:text-base rounded-[20px] py-2 min-h-[48px]"
-                      onChange={(e) => setKeywordInput(e.target.value)}
+                      className="bg-navBg text-white border-transparent focus:border-transparent focus:outline-none text-base md:text-base placeholder:text-base rounded-[20px] py-2 min-h-[48px]"
+                      onChange={(e) => handleKeywordInputChange(e.target.value)}
                       onKeyDown={(e) => {
                         if (e.key === "Enter") {
                           e.preventDefault();
@@ -350,11 +380,33 @@ const Page = () => {
                       }}
                     />
                   </FormControl>
+
+                  {/* Dropdown for suggestions */}
+                  {isDropdownOpen && suggestions.length > 0 && (
+                    <div
+                      ref={dropdownRef}
+                      className="absolute z-10 top-full left-0 mt-2 w-full bg-navBg border border-[#ffffff30] rounded-lg max-h-60 overflow-y-auto shadow-lg"
+                    >
+                      {suggestions.map((suggestion, index) => (
+                        <div
+                          key={index}
+                          className="px-4 py-2 text-white hover:bg-primary/90 cursor-pointer"
+                          onClick={() => addKeyword(suggestion.keyword)}
+                        >
+                          <div className="font-semibold">
+                            {suggestion.keyword}
+                          </div>
+                          <div className="text-sm text-gray-400">
+                            {suggestion.supportingKeywords.join(", ")}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </FormItem>
               )}
             />
 
-            {/* Keywords Display */}
             <div className="flex flex-wrap gap-2 px-3">
               {keywords.map((keyword, index) => (
                 <div
@@ -373,12 +425,10 @@ const Page = () => {
               ))}
             </div>
 
-            {/* Submit Button */}
             <Button
               type="submit"
               disabled={loading}
-              className="bg-primary hover:bg-primary/90 
-            mx-auto px-6 w-full md:w-auto text-white py-4 text-lg md:text-xl rounded-full"
+              className="bg-primary hover:bg-primary/90 mx-auto px-6 w-full md:w-auto text-white py-4 text-lg md:text-xl rounded-full"
             >
               {loading ? "Creating..." : "Create Workspace"}
             </Button>

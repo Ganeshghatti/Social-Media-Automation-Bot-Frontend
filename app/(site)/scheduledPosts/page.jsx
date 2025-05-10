@@ -25,7 +25,9 @@ const Page = () => {
         }
       );
 
+
       if (response.status === 200 && response.data.success) {
+        console.log("response ", response.data)
         setScheduledPosts(response.data.data.groupedPosts || {});
       } else {
         throw new Error(
@@ -54,7 +56,7 @@ const Page = () => {
     <>
       <h1 className="text-3xl font-medium">All Scheduled Posts</h1>
 
-      <div className="w-full max-w-5xl">
+      <div className="w-full max-w-5xl px-4">
         {error ? (
           <p className="text-red-500">{error}</p>
         ) : Object.keys(scheduledPosts).length > 0 ? (

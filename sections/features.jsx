@@ -4,7 +4,7 @@ import React from "react";
 
 const Features = () => {
   return (
-    <div className="py-24 bg-[#F4F8FE] px-6 md:px-14 flex flex-col gap-6">
+    <div className="py-24  bg-[#F4F8FE] px-6 md:px-14 flex flex-col gap-6">
       <h3 className="text-4xl text-[#383838] font-bold">
         Explore advanced Features
       </h3>

@@ -86,10 +86,10 @@ export const DateTimePicker = ({ date, setDate }) => {
         >
           <div
             className="bg-navBg text-white rounded-lg shadow-lg flex flex-col p-4 
-            w-[600px] max-h-[90vh] overflow-y-auto justify-between space-y-6"
+        max-h-[90vh] overflow-y-auto justify-between space-y-6"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex flex-row justify-between max-h-[40vh]">
+            <div className="flex flex-row justify-between max-h-[80vh]">
               <Calendar
                 mode="single"
                 selected={tempDate}
@@ -100,7 +100,7 @@ export const DateTimePicker = ({ date, setDate }) => {
                 initialFocus
                 className="mb-4 flex-1"
               />
-              <div className="flex flex-1 gap-4 h-[32vh] no-scrollbar justify-around">
+              <div className="flex flex-1 gap-4 h-[28vh] maxh-[28vh] no-scrollbar justify-around">
                 <ScrollArea className="no-scrollbar h-full">
                   <div className="flex flex-col no-scrollbar">
                     {Array.from({ length: 12 }, (_, i) => i + 1).map((hour) => (
@@ -165,11 +165,11 @@ export const DateTimePicker = ({ date, setDate }) => {
                 </div>
               </div>
             </div>
-            <div className="flex flex-col items-center gap-2 mt-8">
-              <Button variant="outline" className="w-full text-black" onClick={handleClose}>
+            <div className="flex flex-row space-x-3 items-center gap-2 mt-8">
+              <Button variant="outline" className=" text-black flex-1" onClick={handleClose}>
                 Cancel
               </Button>
-              <Button className="w-full" onClick={handleApply}>
+              <Button className="flex-1" onClick={handleApply}>
                 Apply
               </Button>
             </div>

@@ -23,9 +23,9 @@ export const DialogCards = ({
   };
 
   return (
-    <div className="flex flex-col py-14 w-full items-start flex-1">
+    <div className="flex flex-col py-8 w-full items-start flex-1 h-full max-h-full = ">
       <Form>
-        <form  className="!w-full h-[600px] flex flex-col overflow-y-auto no-scrollbar">
+        <form  className="!w-full h-[600px] space-y-6 flex flex-col   ">
           {localCards &&
             localCards.map((card, index) => (
               <CreatePostCard
