@@ -3,7 +3,7 @@ import { Button } from "@components/ui/button";
 
 const CTA = () => {
   return (
-    <div className="background-image flex items-center justify-center flex-col py-32 px-5 gap-8">
+    <div className="background-image  flex items-center justify-center flex-col py-32 px-5 gap-8">
       <h3 className="text-white font-bold text-3xl md:text-5xl text-center">
         Join our mission. Copilot the future.
       </h3>

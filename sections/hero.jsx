@@ -5,7 +5,7 @@ import Link from "next/link";
 
 const Hero = () => {
   return (
-    <div className="flex items-center justify-center flex-col py-36 gap-10">
+    <div className="flex  items-center justify-center flex-col py-36 gap-10">
       <h1 className="text-4xl md:text-7xl text-center text-black font-bold">
         Experience Digital automation <br /> like never before
       </h1>

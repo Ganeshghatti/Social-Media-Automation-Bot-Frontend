@@ -98,7 +98,7 @@ const WorkspaceEdit = ({ isOpen, setIsOpen, workSpaceData }) => {
         }
       );
 
-      console.log("Workspace created:", response.data.data.presignedUrl);
+      console.log("Workspace Edited:", response.data.data.presignedUrl);
 
       if (blobFile && response.data.data.presignedUrl) {
         await axios.put(response.data.data.presignedUrl, blobFile, {
@@ -110,10 +110,10 @@ const WorkspaceEdit = ({ isOpen, setIsOpen, workSpaceData }) => {
 
       setIsOpen(false);
     } catch (error) {
-      toast.error("Error in creating workspace");
+      toast.error("Error in editing workspace");
 
       console.error(
-        "Error creating workspace:",
+        "Error editing workspace:",
         error.response?.data || error.message
       );
     }

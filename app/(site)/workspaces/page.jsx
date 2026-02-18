@@ -4,7 +4,7 @@ import { useUserStore } from "@/store/userStore";
 import { CustomLoader } from "@components/global/CustomLoader";
 import useAuthToken from "@hooks/useAuthToken";
 import axios from "axios";
-import { PlusIcon } from "lucide-react";
+import { Layers, PlusIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -34,13 +34,7 @@ const WorkspacesPage = () => {
     }
   }, [user, router, fetchUser, token]);
 
-  useEffect(() => {
-    if (user === null) return;
-    if (!user?.onboarding) {
-      router.replace("/onboarding");
-    }
-    setLoading(false);
-  }, [user, router]);
+
 
   // Fetch workspaces
   const GetAllWorkspaces = async (token) => {
@@ -88,7 +82,6 @@ const WorkspacesPage = () => {
     <>
       <div className="md:px-10 py-12 w-full flex-1 flex justify-center items-center">
         {workspaces.length === 0 ? (
-          // No workspaces case: Fully centered
           <div className="flex flex-col items-center justify-center h-full w-full space-y-4">
             <h1 className="text-2xl font-semibold text-white">
               No Workspaces Found
@@ -102,7 +95,6 @@ const WorkspacesPage = () => {
             </Link>
           </div>
         ) : (
-          // Workspaces exist case: Display them in the center
           <div className="flex flex-wrap justify-center gap-6">
             {workspaces.map((workspace, i) => (
               <Link
@@ -110,19 +102,20 @@ const WorkspacesPage = () => {
                 key={i}
                 className="border-white text-white flex items-center space-x-2 border-2 rounded-sm px-12 py-4 gap-3"
               >
-                {workspace?.icon && (
+                {workspace?.icon ? (
                   <Image
                     src={workspace.icon}
                     alt="Workspace Icon"
                     height={60}
                     width={60}
-                    className="h-10 w-10 object-contain"
+                    className="h-10 w-10 object-contain rounded-full"
                   />
+                ) : (
+                  <Layers className="h-8 w-8 object-contain" />
                 )}
                 {workspace.name}
               </Link>
             ))}
-            {/* Always show Add Workspace button */}
             <Link
               href={`/workspace/create`}
               className="border-white text-white flex items-center space-x-2 border-2 rounded-sm px-6 py-4"

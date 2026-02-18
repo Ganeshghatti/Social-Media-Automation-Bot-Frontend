@@ -83,7 +83,7 @@ const WorkspacePage = () => {
       } else {
         throw new Error(
           response.data.error?.message ||
-            "Failed to fetch Single Workspace Data"
+          "Failed to fetch Single Workspace Data"
         );
       }
     } catch (error) {
@@ -121,171 +121,95 @@ const WorkspacePage = () => {
 
   const onPublish = async (scheduledDateTime = null) => {
     if (!accountId) {
+      console.error("No accountId set for publishing");
       toast.error("Please connect an account to publish.");
       return;
     }
 
+    // Ensure singleWorkspace and timezone exist
     const workspaceTimezone = singleWorkspace?.timezone || "UTC";
-    let formattedDateTime = scheduledDateTime
-      ? DateTime.fromJSDate(scheduledDateTime)
-          .setZone(workspaceTimezone)
-          .toFormat("yyyy-MM-dd HH:mm:ss")
-      : "";
 
-    // let formattedDateTime = "";
-    // if (scheduledDateTime) {
-    //   formattedDateTime = DateTime.fromJSDate(scheduledDateTime)
-    //     .setZone(workspaceTimezone)
-    //     .toFormat("yyyy-MM-dd HH:mm:ss"); // Format in local timezone
+    // Convert scheduledDateTime to workspace's timezone
+    let formattedDateTime = "";
+    if (scheduledDateTime) {
+      console.log("Workspace Time zone ", workspaceTimezone);
+      formattedDateTime = DateTime.fromJSDate(scheduledDateTime)
+        .setZone(workspaceTimezone)
+        .toFormat("yyyy-MM-dd HH:mm:ss"); // Format in local timezone
 
-    //   console.log("Formate Time zone ", formattedDateTime);
-    // }
+      console.log("Formate Time zone ", formattedDateTime);
+    }
 
     const isThread = cards.length > 1 && postType === "thread";
 
-    // Step 1: Prepare form data (matching previous structure)
     const formData = {
+
       posts: [
-        {
-          accountId: accountId,
-          type: "twitter",
-          mode: "create",
-          posttype: isThread ? "thread" : "post",
-          publishnow: !scheduledDateTime,
-          tobePublishedAt: formattedDateTime,
-          ...(isThread
-            ? {
-                posts: cards.map((card) => ({
-                  mode: "create",
-                  content: card.text,
-                  media: card.media.map((img) => ({
-                    originalname: img.name,
-                    size: img.size || 0,
-                    mimetype: img.mimetype || "image/jpeg",
-                  })),
-                })),
-              }
-            : {
-                content: cards[0]?.text || "",
-                media: cards[0]?.media.map((img) => ({
-                  originalname: img.name,
-                  size: img.size || 0,
-                  mimetype: img.mimetype || "image/jpeg",
-                })) || [],
-              }),
-        },
-      ],
+        isThread
+          ? {
+            type: "twitter",
+            posttype: "thread",
+            mode: "create",
+            publishnow: scheduledDateTime ? false : true,
+            tobePublishedAt: formattedDateTime,
+            accountId: accountId,
+            posts: cards.map((card) => ({
+              content: card.text,
+              media: [],
+            })),
+          }
+          : {
+            type: "twitter",
+            posttype: "post",
+            content: cards[0]?.text || "",
+            publishnow: scheduledDateTime ? false : true,
+            tobePublishedAt: formattedDateTime,
+            accountId: accountId,
+            media: [],
+            mode: "create"
+          },
+      ]
+
     };
 
-    console.log("Step 1: Sending initial data:", JSON.stringify(formData, null, 2));
+    console.log("FormData being sent:", JSON.stringify(formData, null, 2));
 
     try {
-      // Step 2: Get presigned URLs
+      const token = localStorage.getItem("token");
+
+      console.log("Fetching presigned URL...");
       const presignedResponse = await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_URI}/workspace/posts/create/presigned-url/${workspaceId}`,
+        `https://api.bot.thesquirrel.tech/workspace/posts/create/presigned-url/${workspaceId}`,
         formData,
-        { headers: { Authorization: `Bearer ${token}` } }
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
       );
 
       console.log("Presigned Response:", presignedResponse.data);
 
-      const threadData = presignedResponse.data.data[0];
-      if (threadData && threadData.posts?.length > 0) {
-        console.log("Step 2: Uploading media files for posts", threadData.posts);
+      const finalData = {
+        posts: [...presignedResponse.data.data],
+      };
+      console.log("Final Data being sent:", JSON.stringify(finalData, null, 2));
 
-        // Step 3: Upload media files (for threads)
-        for (const responsePost of threadData.posts) {
-          console.log("Response Post:", responsePost);
-          if (responsePost.media && responsePost.media.length > 0) {
-            console.log(`Processing media for post ID: ${responsePost._id}`);
-            const originalPost = cards.find((p) => p.text === responsePost.content);
-            console.log("Original Post:", originalPost);
-
-            if (originalPost && originalPost.media) {
-              console.log("Original post media:", originalPost.media);
-
-              for (let i = 0; i < responsePost.media.length; i++) {
-                const presignedMedia = responsePost.media[i];
-                const originalMedia = originalPost.media[i];
-                console.log("Presigned media:", presignedMedia);
-                console.log("Original media:", originalMedia);
-
-                const mediaUrl = originalMedia.type === "blob" ? originalMedia.imageUrl : originalMedia.imageUrl;
-
-                if (presignedMedia.presignedUrl && mediaUrl) {
-                  try {
-                    console.log(`Uploading media ${i + 1} for post ${responsePost._id}`);
-                    const imageBlob = await fetch(mediaUrl).then((r) => r.blob());
-                    const uploadResult = await axios.put(
-                      presignedMedia.presignedUrl,
-                      imageBlob,
-                      { headers: { "Content-Type": presignedMedia.mimetype } }
-                    );
-                    console.log(`Media ${i + 1} upload status:`, uploadResult);
-                  } catch (error) {
-                    console.error(`Error uploading media ${i + 1}:`, error);
-                    throw new Error(`Failed to upload media: ${error.message}`);
-                  }
-                }
-              }
-            }
-          }
-        }
-      } else if (threadData && threadData.media?.length > 0) {
-        // Step 3: Upload media files (for single post)
-        console.log("Step 2: Uploading media files for single post", threadData.media);
-        for (let i = 0; i < threadData.media.length; i++) {
-          const presignedMedia = threadData.media[i];
-          const originalMedia = cards[0].media[i];
-          console.log("Presigned media:", presignedMedia);
-          console.log("Original media:", originalMedia);
-
-          const mediaUrl = originalMedia.type === "blob" ? originalMedia.imageUrl : originalMedia.imageUrl;
-
-          if (presignedMedia.presignedUrl && mediaUrl) {
-            try {
-              console.log(`Uploading media ${i + 1} for post ${threadData._id}`);
-              const imageBlob = await fetch(mediaUrl).then((r) => r.blob());
-              const uploadResult = await axios.put(
-                presignedMedia.presignedUrl,
-                imageBlob,
-                { headers: { "Content-Type": presignedMedia.mimetype } }
-              );
-              console.log(`Media ${i + 1} upload status:`, uploadResult);
-            } catch (error) {
-              console.error(`Error uploading media ${i + 1}:`, error);
-              throw new Error(`Failed to upload media: ${error.message}`);
-            }
-          }
-        }
-      }
-
-      // Step 4: Create final post
-      console.log("Step 3: Creating final post");
       const finalResponse = await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_URI}/workspace/posts/create/${workspaceId}`,
-        { posts: presignedResponse.data.data },
-        { headers: { Authorization: `Bearer ${token}` } }
+        `https://api.bot.thesquirrel.tech/workspace/posts/create/${workspaceId}`,
+        finalData,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
       );
 
       console.log("Final Response:", finalResponse.data);
-      toast(scheduledDateTime ? "Post scheduled successfully!" : "Post published successfully!");
-      setCards([{ id: 0, text: "", media: [] }]);
-      if (finalResponse.data.success) {
-        console.log("Final Response:", finalResponse.data);
-        toast(
-          scheduledDateTime
-            ? "Post scheduled successfully!"
-            : "Post published successfully!"
-        );
-      } else {
-        throw new Error(
-          response.data.error?.message || "Failed to Published Post"
-        );
-      }
+      toast(
+        scheduledDateTime
+          ? "Post scheduled successfully!"
+          : "Post published successfully!"
+      );
+      setCards([{ id: 0, text: "" }]);
     } catch (error) {
-      console.error("Error creating post/thread:", error);
-      toast.error(`Failed to schedule/publish post: ${error.response?.data?.message || error.message}`);
+      console.error("Error ", error)
       console.error(
         "Error posting data:",
         JSON.stringify(
@@ -299,12 +223,9 @@ const WorkspacePage = () => {
         )
       );
       toast.error(
-        `Failed to schedule/publish post: ${
-          error.response?.data?.message || error.message
+        `Failed to schedule/publish post: ${error.response?.data?.message || error.message
         }`
       );
-    } finally {
-      setCards([{ id: 0, text: "" }]);
     }
   };
 
@@ -402,24 +323,24 @@ const WorkspacePage = () => {
           tobePublishedAt: "",
           ...(isThread
             ? {
-                posts: cards.map((card) => ({
-                  mode: "create",
-                  content: card.text,
-                  media: card.media.map((img) => ({
-                    originalname: img.name,
-                    size: img.size || 0,
-                    mimetype: img.mimetype || "image/jpeg",
-                  })),
-                })),
-              }
-            : {
-                content: cards[0]?.text || "",
-                media: cards[0]?.media.map((img) => ({
+              posts: cards.map((card) => ({
+                mode: "create",
+                content: card.text,
+                media: card.media.map((img) => ({
                   originalname: img.name,
                   size: img.size || 0,
                   mimetype: img.mimetype || "image/jpeg",
-                })) || [],
-              }),
+                })),
+              })),
+            }
+            : {
+              content: cards[0]?.text || "",
+              media: cards[0]?.media.map((img) => ({
+                originalname: img.name,
+                size: img.size || 0,
+                mimetype: img.mimetype || "image/jpeg",
+              })) || [],
+            }),
         },
       ],
     };
@@ -544,23 +465,23 @@ const WorkspacePage = () => {
     const formData =
       postType === "thread"
         ? {
-            type: "thread",
-            threadId: threadIdForEdit,
-            threadPosts: cards.map((card, index) => ({
-              _id: card.id,
-              content: card.text || "",
-              media: card.media || [],
-              threadPosition: index + 1,
-              previousPost: index > 0 ? cards[index - 1]._id : null,
-              nextPost: index < cards.length - 1 ? cards[index + 1]._id : null,
-            })),
-          }
+          type: "thread",
+          threadId: threadIdForEdit,
+          threadPosts: cards.map((card, index) => ({
+            _id: card.id,
+            content: card.text || "",
+            media: card.media || [],
+            threadPosition: index + 1,
+            previousPost: index > 0 ? cards[index - 1]._id : null,
+            nextPost: index < cards.length - 1 ? cards[index + 1]._id : null,
+          })),
+        }
         : {
-            type: "post",
-            content: cards[0].text || "",
-            _id: cards[0]?.id,
-            media: cards[0]?.media || [],
-          };
+          type: "post",
+          content: cards[0].text || "",
+          _id: cards[0]?.id,
+          media: cards[0]?.media || [],
+        };
 
     try {
       const finalResponse = await axios.put(
@@ -606,7 +527,7 @@ const WorkspacePage = () => {
         } else {
           throw new Error(
             response.data.error?.message ||
-              "Failed to fetch Single Workspace Draft Data"
+            "Failed to fetch Single Workspace Draft Data"
           );
         }
       } catch (error) {
@@ -642,7 +563,7 @@ const WorkspacePage = () => {
       <Form>
         <form
           className="w-full  flex-1 p-4 py-10 mb-8 no-scrollbar overflow-y-auto
-         justify-center items-center"
+         justify-center items-center "
         >
           {cards.map((card, index) => (
             <CreatePostCard
@@ -654,6 +575,7 @@ const WorkspacePage = () => {
               setNewCardAdded={setNewCardAdded}
               selectedImages={card.media}
               onImageSelect={(images) => handleImageSelect(card.id, images)}
+              cards={cards}
             />
           ))}
         </form>
