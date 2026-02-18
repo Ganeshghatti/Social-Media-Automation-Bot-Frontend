@@ -145,7 +145,7 @@ const ContactForm = () => {
         />
         <Button
           type="submit"
-          className="w-full py-7 text-lg font-bold bg-[#0C1E5B] hover:bg-white hover:text-[#0C1E5B] border-2 border-[#0C1E5B] text-white"
+          className="w-full py-7 text-lg font-bold bg-[#e05a00] hover:bg-white hover:text-[#e05a00] border-2 border-[#e05a00] text-white"
         >
           Submit
         </Button>

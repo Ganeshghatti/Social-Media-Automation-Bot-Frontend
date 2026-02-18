@@ -14,11 +14,11 @@ const Hero = () => {
         technology.
       </p>
       <div className="flex gap-5">
-        <Button className="border-2 border-[#0C1E5B]  px-10 bg-white text-[#0C1E5B]  py-5 rounded-md hover:bg-[#0C1E5B] hover:text-white">
+        <Button className="border-2 border-[#e05a00]  px-10 bg-white text-[#e05a00]  py-5 rounded-md hover:bg-[#e05a00] hover:text-white">
           Talk to Us
         </Button>
         <Link href={"/auth/login"}>
-          <Button className="border-2 border-[#0C1E5B] px-10 bg-[#0C1E5B]  text-white  py-5 rounded-md hover:bg-white hover:text-[#0C1E5B]">
+          <Button className="border-2 border-[#e05a00] px-10 bg-[#e05a00]  text-white  py-5 rounded-md hover:bg-white hover:text-[#e05a00]">
             Get Started
           </Button>
         </Link>
